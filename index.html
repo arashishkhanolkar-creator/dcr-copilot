@@ -3,120 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="dark">
-<title>DCR Copilot — Ask the regulation. Get the clause.</title>
-<meta name="description" content="A Claude Skill covering UDCPR and DCPR-2034 — ask Maharashtra's development regulations directly inside Claude and get cited, table-backed answers. Built by Designhaus Collective.">
+<meta name="color-scheme" content="light">
+<title>DCR Copilot — Stop searching. Start asking.</title>
+<meta name="description" content="DCR Copilot brings UDCPR and DCPR-2034 into Claude — ask your question, get the clause, table, and page reference. Built by Designhaus Collective.">
 <link rel="canonical" href="https://designhauscollective.in">
 <meta property="og:type" content="website">
-<meta property="og:title" content="DCR Copilot — Ask the regulation. Get the clause.">
-<meta property="og:description" content="UDCPR and DCPR-2034, inside Claude. Cited, table-backed answers for architects, designers, and liaisoners in Maharashtra.">
+<meta property="og:title" content="DCR Copilot — Stop searching. Start asking.">
+<meta property="og:description" content="UDCPR and DCPR-2034, inside Claude. Ask your question, get the clause, table, and reference.">
 <meta property="og:url" content="https://designhauscollective.in">
-<meta property="og:site_name" content="Designhaus Collective">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="DCR Copilot — Ask the regulation. Get the clause.">
-<meta name="twitter:description" content="UDCPR and DCPR-2034, inside Claude. Cited, table-backed answers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --blue-900:#122238;
-    --blue-700:#1D4573;
-    --blue-600:#28588f;
-    --line:#EAF2FA;
-    --line-dim:#B7CBDe;
-    --paper:#F5F1E8;
-    --paper-dim:#EAE4D5;
-    --ink:#16232E;
-    --ink-dim:#4B5A68;
-    --ochre:#C98A32;
-    --ochre-dark:#A66F22;
-    --red:#B23A2E;
-    --radius:2px;
+    --paper:#FCFBF8;
+    --ink:#0A0A08;
+    --ink-soft:#57544C;
+    --ink-faint:#8B877C;
+    --line:#E7E2D6;
+    --amber:#E8A33D;
+    --amber-deep:#C4801F;
+    --hero-text:#FFFFFF;
+    --hero-text-dim:rgba(255,255,255,0.82);
+    --hero-text-faint:rgba(255,255,255,0.58);
+    --radius:3px;
   }
   *{box-sizing:border-box;}
-  html{
-    scroll-behavior:smooth;
-    background:var(--blue-900);
-    min-height:100%;
-  }
+  html{scroll-behavior:smooth;}
   body{
     margin:0;
-    min-height:100vh;
-    background-color:var(--blue-900);
-    color:var(--line);
-    font-family:'IBM Plex Sans',sans-serif;
-    line-height:1.5;
-    background-image:
-      linear-gradient(rgba(40,88,143,0.35) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(40,88,143,0.35) 1px, transparent 1px);
-    background-size:40px 40px;
-    background-repeat:repeat;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
   }
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
-  h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:700;margin:0;letter-spacing:-0.01em;}
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  a{color:inherit;}
-
-  /* ---------- sheet header / title block ---------- */
-  .sheet-tag{
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+  h1,h2,h3{font-family:'Archivo',sans-serif;font-weight:900;margin:0;letter-spacing:-0.02em;line-height:1.02;}
+  .eyebrow{
     font-family:'IBM Plex Mono',monospace;
     font-size:12px;
-    letter-spacing:0.08em;
-    color:var(--line-dim);
+    letter-spacing:0.14em;
     text-transform:uppercase;
-    display:flex;
-    gap:18px;
-    flex-wrap:wrap;
   }
-  .sheet-tag span{white-space:nowrap;}
-  .sheet-tag b{color:var(--line);font-weight:500;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--amber-deep);outline-offset:3px;}
 
-  header.top{
-    padding:22px 0;
-    border-bottom:1px solid var(--blue-600);
-  }
-  header.top .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
-  .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;}
-  .brand .dot{color:var(--ochre);}
-
-  /* ---------- hero ---------- */
-  .hero{padding:72px 0 64px;}
-  .hero .kicker{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:13px;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    color:var(--ochre);
-    margin-bottom:18px;
-  }
-  .hero h1{font-size:clamp(34px,5.5vw,60px);line-height:1.05;color:var(--line);max-width:780px;}
-  .hero h1 em{font-style:normal;color:var(--ochre);}
-  .hero p.sub{
-    max-width:560px;
-    margin-top:22px;
-    font-size:17px;
-    color:var(--line-dim);
-  }
-  .hero-grid{
-    display:grid;
-    grid-template-columns:1.1fr 0.9fr;
-    gap:48px;
-    align-items:start;
-    margin-top:48px;
-  }
-  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr;} }
-
-  .cta-row{display:flex;gap:16px;align-items:center;margin-top:32px;flex-wrap:wrap;}
   .btn{
-    display:inline-block;
-    background:var(--ochre);
-    color:var(--blue-900);
-    font-family:'Space Grotesk',sans-serif;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--amber);
+    color:#1A1200;
+    font-family:'Archivo',sans-serif;
     font-weight:700;
-    font-size:16px;
+    font-size:15px;
     padding:15px 26px;
     border-radius:var(--radius);
     text-decoration:none;
@@ -124,529 +68,427 @@
     cursor:pointer;
     transition:background 0.15s ease, transform 0.15s ease;
   }
-  .btn:hover{background:var(--ochre-dark);transform:translateY(-1px);}
-  .btn-outline{
+  .btn:hover{background:var(--amber-deep);transform:translateY(-1px);}
+  .btn-ghost{
     background:transparent;
-    color:var(--line);
-    border:1px solid var(--line-dim);
-    font-family:'IBM Plex Mono',monospace;
-    font-weight:400;
-    font-size:14px;
-    padding:14px 20px;
-  }
-  .btn-outline:hover{border-color:var(--line);}
-  .fine{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--line-dim);margin-top:14px;}
-
-  /* ---------- annotation / demo card (signature element) ---------- */
-  .demo-card{
-    background:var(--paper);
-    color:var(--ink);
-    border-radius:var(--radius);
-    padding:26px 24px 30px;
-    position:relative;
-    box-shadow:0 24px 60px -20px rgba(0,0,0,0.5);
-  }
-  .demo-card .corner-label{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--ink-dim);
-    display:flex;
-    justify-content:space-between;
-    border-bottom:1px dashed #C9BFA4;
-    padding-bottom:10px;
-    margin-bottom:18px;
-  }
-  .q-line{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:14px;
-    color:var(--ink-dim);
-    margin-bottom:6px;
-  }
-  .q-text-wrap{min-height:26px;}
-  .q-text{
-    font-family:'Space Grotesk',sans-serif;
+    border:1px solid rgba(255,255,255,0.35);
+    color:var(--hero-text);
     font-weight:500;
-    font-size:18px;
-    color:var(--ink);
-    border-right:2px solid var(--ink);
-    padding-right:3px;
-    animation:blink 0.8s step-end infinite;
   }
-  @keyframes blink{ 50%{border-color:transparent;} }
+  .btn-ghost:hover{border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.06);}
 
-  .answer-block{
-    margin-top:20px;
-    padding-top:18px;
-    border-top:1px dashed #C9BFA4;
-    opacity:0;
-    min-height:70px;
-    transition:opacity 0.5s ease;
+  /* ---------- nav ---------- */
+  header.nav{
+    position:absolute;
+    top:0;left:0;right:0;
+    z-index:10;
+    padding:26px 0;
   }
-  .answer-block.visible{opacity:1;}
-  .answer-block .a-text{font-size:15.5px;color:var(--ink);}
-  .citation-row{
-    margin-top:14px;
+  header.nav .wrap{
     display:flex;
     align-items:center;
-    gap:10px;
+    justify-content:space-between;
   }
-  .leader-line{
-    flex:0 0 28px;
-    height:1px;
-    background:var(--red);
-    position:relative;
+  .logo{
+    font-family:'Archivo',sans-serif;
+    font-weight:900;
+    font-size:29px;
+    color:var(--hero-text);
+    letter-spacing:-0.01em;
+    line-height:1;
+    white-space:nowrap;
   }
-  .leader-line::after{
-    content:'';
-    position:absolute;
-    right:0;top:-3px;
-    width:6px;height:6px;
-    border-radius:50%;
-    background:var(--red);
+  .logo .logo-copilot{
+    color:var(--amber);
   }
-  .citation-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:13px;
-    color:var(--red);
-    border:1px solid var(--red);
-    padding:3px 9px;
-    border-radius:var(--radius);
+  nav.links{display:flex;gap:34px;align-items:center;}
+  nav.links a{
+    font-size:13.5px;
+    color:var(--hero-text-dim);
+    text-decoration:none;
+    font-weight:500;
   }
+  nav.links a:hover{color:var(--hero-text);}
+  @media (max-width:600px){ nav.links{display:none;} }
 
-  /* ---------- why not just ask claude (comparison) ---------- */
-  .comparison{padding:60px 0 20px;}
-  .comparison h2{font-size:clamp(24px,3vw,32px);color:var(--line);max-width:640px;}
-  .comparison-sub{max-width:620px;color:var(--line-dim);font-size:15px;margin-top:14px;}
-  .compare-grid{
-    display:grid;
-    grid-template-columns:1fr auto 1fr;
-    gap:0;
-    margin-top:36px;
-    align-items:center;
+  /* ---------- hero ---------- */
+  .hero{
     position:relative;
+    min-height:92vh;
+    display:flex;
+    align-items:center;
+    background-image:url('data:image/jpeg;base64,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LLLLLLLO5ZZzLLOZZZZZZZZzLLP5CI+azueGWWeGWdyyzwyzudyyyyyz+YiOHyhEdzuWWdzmWczwyzmWczuczmczmfykRERw+ZzxyzufwZZ5Z/ORER8eeB4kR3OZ+OfyZ/IRERwj5Ijh+meGerIiIiPlj17+REREREfHEdPE9a/mRERER8mcPYP5ERER4HxR+BHuiIiIjh8iR4nq39iIiIj44jhHviIiIj4o8COEeueP6kRERw+NOkR06e4OERHyp4HqX9ThwiI4fEHieR5Hp3r+hERERHxxHsX+A4cIj4HP1PA4epf4zxPjjp09g/wHD5Mj1Lx8H9zhw4fFnmepeP8AMffPHj/AcOHT409cz1/iPAj7h4z1n+Ajh04fdPHjP7nDhw+6eMzMz/EcPvXjxn8d8iOERH3bxmZn9iIiIiPu3rMzxnx3w2IiIjhH3T1mZmfx3pERERH3jMzMzM/jtsMMMREREfFngeqeMzMzMz47bb0YiIiIj4E8D2b1mZmZmZny223hDDERDEfAn5Hq3wZmZmZmfDebbbwYYiGGGIj4g6etZ4zMzMzMzbzbbbbYiIYYYYYYbeb9o8ZmZmZmZnjbbbzbYYYYYiIhthtt+2ZmZmZmZmeb3bbYYYYYYYYYbbbbffn5HrGZmZmZmZmZ5ttttsMMMMMMMMMNttv2Lx4zMzMzMzMy22822222GGGGGGGGGG237J6zMzMzMzMzNttttttsMMMMMMMMMNtvwJ7NmZmZmZmWWZZbbbbbbbbYYYYYYYYbYbfbH7nsGZmZmZmWWWWWW222222GGGGGGGGGGG37RmZmZmZmWWWWW2222222GGGGGGGGG2234o9SzMzMzMspZZZZZZbbbbbbYYYYYYYYbYYbfsmZmZmWWZSyyyyyy22222222wwwwwwwwww2+2P4D1jMzMzLLLLwspZZZbbbbbbbbbYYYYYYYYYbfZHv3iyzLLLLMzLLLKWWWWW22222G2GGGGGGG2G32R093tsszMssssspSllllllllttttttthhhhhhhtth+s222222WWWWWWWUpSylllllllttttttttthhhhhhtht+X3+jbZZZZlllllKXhSlLLLLLbbbbbbbbbDbDbDDbDb9Httvdt5tttvNllllllllllllllLLLLLLbbbbbbbbDbDDbbDbDb608z1u2+W+O222yyyyyyyyyyllKWWZZZl7tttttttsNttsNtsPtD0G2+W+G+G222222222222yyyyyyyyyyyllLLLLMsy228222222G22GG222H5bbfz3x22222222WWWWWWWWWWWWWWZllmZmbbbbbbbbbbbbYbbbbflNt8N8tttt8tt5tttsssssssssssspZZZeGZnj3fDbbbbbbYbbbfjN/Leb3bbfLbbbbbbbbbbbZZZZZZZZZZZZZZZZZZlmZmfw2222222235TfLbfHbbbfHbbbbbZbZZZZZZZZZZZZZmWWZmZmfHe7bbbbbbbb4bb8ftttvjtttvjvNttttttltlllllllllllllmZZmZmZ895ttttttttvhvltvpD0O22+W222+W222222222222yyyyyyyyyyyyyzLLMzMzPX8N5tttttvlvN+L3u+W22222222+e2yyyyyyyzLLLLLLLMszMszM/jvd5tttvzO/jttttttttttstsssssssssssssyyzMzMz+e282222347fPbfHbbbbbfDfHbbbbbZZZZZZZZZZZZZZmWZmZn8Nt8dtttt9Wej3z3m/httttttttttttttsssssssssssszLLMyzMzM/pvNttt+Z3u+e2293m822WWWWWWWWWWZZZlmZmZmf03m28235vfDebbzebbbbbbLbMtssssssssssssyyyzMzP5bbbzfYHtd7tttttttsvFllllllllllmWZZZmZmZn9Nt8N+m222222ZbZZZZZZZZZZZllmZmZmZ/g31Z7rbbbbbbbbZZllmWWZZZlmWWZlmZmZ/g32B7ffHbbZlllmWWWWWWZZZmWZmWZn+Pfptt5ttsssssssssssyyzLLMzLM8Z+FPZb3ebbLLMssssssyzMszMyzMz192e83xXrLLMssyyzMszMzMz78+AWeMyzLLMsszMzMzMz4PvD3y8essyyzLMzLMzMzMzx98e+fF4zMzMzMzMzPGeP8v//aAAwDAQACAAMAAAAQ/wD/ALKIJ7p7oZ6b0MXlzpr+eTh2XsKaLNth0+blaEH4KueShDzykMJLXXgIIMMMc/NpQNHHPIRsjH2kMFT+3ygF2n3EXlzbv+azlm7ZpumyRQeaH4X6lvQPRdaRnDDDOA004493vHCABWMvErJTn9ZcDEEc3nU/EV+V+Ebo6LtmSCXpoqm3RJ9pBlYSFDw0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cOFvNjmxDDEQwxEREREREREREREcEfrgj9xERHCI4cOER4PnszMzMzM8KeFwuFKUpSmLPAhCKUvgAAEGODh5OZ8N8b8BtiLbbY4QwwxEMMQwwxEREREREREREREQxEcIhiHgxHDpHg9bNvXm8ZmZ4eFKXRTnKUpZT0bEPIAUpS4HAQ4OHg4edt9b4ObbbHBju2xDDbDDDEMRDEMMQwwxERDERDEMMQxERERERERERw6ed+O+WZmZnwXLhTnOUpSzFt4IfIAAAKIQ8jp434bbw6c3m222222222w2wxDDDDDDDEQxDERDERKGGIYhiIlEQxEQ8IeEQ9OEcOnnbbePGZn+5mZ4UpTlOc5zlKUpZ8AfMBQAEIQ8Hjfe2222923m22282GG3uw2w8GIYYYYYiGGGGIYYYYYYiIhhhiIYYiIiIYYYiODDw4McPB8d4zM8PD4Cn1c5zlLgxm9CEPmAAACHgeN8bbbbbbbbb3eDbbbbDbbDbbbbDDDbDDDDDDDDDDDDDDDDDEMMQwwwxERDDDDDEMMQwwww8IYYt4Nsd3h42fDMzM8M9FPhznOc5zlKYx4EIfMAAAEOCPe2222222222823m2222w22222222ww2ww2wwwwwwxEMMMMMRDDDDEoYYYYYYYYYYYYYhiGIYeEMNsPNhttt5vd8PGW2ZlmZSlKc5znOfaXQfAEIQ+JARTlLvCPO22222222222222222822222GG2222GG2GGGGGGGGGGGHgYYYYYiIYYhhhlDDDDEMMMMMRDDwYYeDDwbbeFsW+9tmZZZllmZSlKc5znP3UA+AIfQIqopzvje7bbbbbbbbbbbbbbbbbbbbbbbDbDbbbbDbDDDDDDDDDDDDDEMMMMMMMMMMMMMMMMQwxDEMMMMMPNhhhthtth7tttvNt5tvNmWWWWZllOUpznOc5+qgY+AIfIiqKQpyeN7ttttttttttttttttsNttttttsNttttsMNsMMMMMMMMMMMMMMMMMMMQwwwwwwwwwxKGIYYYbYYYYeDDDwbYbYebwbbbbbbbbZZZZZZZZSlKU5zn8oqoGPQQ+JVRTtTnfG28222222222222222222222223g2222www8GGGGGGGGGGGIYYYhhhhiIYYhhhhhhhhhiGG2GGGGGHhDDDzYbYYbYbbbbbbbbZbZZZZZSlKc59p/EqqGPgCFPnVVVTsbe7bbzbbebbbbbbbbbbbbbbbbbbDbbbbbDDDDDDDDDDEMMMMoYYYYYYYYYYYYYYZQwwwwwwwwwwxDbDDDDwbYbbebDbbbzbbbbbbbZZfxLLKUpTnPtf7cl7iAYx6CFKfIqqqc7bDbbbbbbbbbbbbbb3bbbbbbbYbbbbbYhtttthhhhhhhhhlDDDDDDDDEMMMMMMMMMMMMMQwwwwwwwwwww2www2wwwww22222w22222y2yyyyyl6C81TnP5VFAPoCfCqqnKXbbbbbbYbbbbbbbbbbbbbbbbbbbbbbbbbYYeDDDDEMMQwwwwyhiUMMMMMQwwwwwwwwwwwwwwwwwwwwwwwwwww2www22wwww22222222y2yyyyzHgUpfwaqAqoBjwKQh8KqqU5dttttt/wBttttttttttttttttttttttttttttht4NsMMMMMMMMQxDDEQxDDDEMMMQwwwwwwwwwwwwwwww2wwww2ww22ww2w222222222222zwYxj/EAFQEVQDGPQQhD3VVOUu222222222222/7bbbbbbbbbbbbbbzbbbbbbYYYYYYhhhhhhhhhhhiGGGIYYYYhhiGGGGGGGGGGGGGG2GGG2G2IMNsNsMMNtsNttttttstssssx8AF8KoJfECgGMeohCHCcp2pyl222222222222222222222222222222222222GGGGGGIYhhhiGGGIiGGGGGGGGGIYYYYYYYYYYYYYYYbbYYbbbYYbbYbYbbbfA23psxjGLP8UAVVVFQDGMeghwHSlOU5S7bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbDweDDDDEoYYhhhlDDDDEMQwwwwwwwxDDDDDDDDDDDbDDDbDDbDDbDDbbbbHDbbbbeNttlmMY/wAAVRBT7C4LLMfAEIcBSnKU5dttt/222222222222222222222223/AG222G2IbYYYYYYYYYYiGGGGHgYhhhhhhhhiGGGGGGGGGGGGGGGGG2GHoMMMMMTbbYmltvsBjGMYx/hAQqoiqfJcGMWfIDgIdAQpy7bbbbbbbbbbbbbbbbbbLbbbbbbbbbbDbbbDDDEMMREMQwwxDDEMRDDDEMMMMMMMMMMMMMMMMMMMMMMMMMMQg22ww2ww228bbbbf9cMYxjH7gAiqqc+05ylKY8HgQhCEIcBCFJtttttttttttttttttttttttttttttttsMNsMRDDDEREMQwwxDDDEMQwwxDDEMMMMNtsMMMMNsMNsNsMQg2w8DbbbbEOjbbbbeGLMYx8AP9PcFX5vRVKc5yllLLM222IQhCEOAhC7bbbbbbbbbbbbbbbbbbbbbbbzYbbbbbbYYYchiGGGIYhhhhiIYhiGGGGGGGGGGGGGGGG22GGGINsMMNsNsMQYm28EJttttvoDwYxjH+EAByqqp/nk5SlKX8yy222wxCEIQhCE2222222222222222222222222222GG2222GGIiGIYhiIYYiIhhhhhhhhiGGGIYYYYYbYYYYYYYbbYbYm2wwwxCbbDb5DbbbeGMYx4H6gAKqnPtKcpSlKWW23jYYhCEIQhCbbb0222222222222222222222222GHm2wwwxEMREQwxDDEQxEQwwwwwwwwwwwwwwww22ww22www228EOA22w+ATbbbeNngxjGPA/YAEVVOfJylKUpSyyy228bEIQhCEITbbeNtttt6bbbbbbbbbbbbbbbbbbwYbYhiHhDHBiGGUQxEQwwxEQwwwwwwww2www22www22wxDgNttsPkBtttt9gMYxjGP2AAFVT7TnKUpSlllLbbbbbbEGIQhCE22223jeNttt7ttttttttttvC3g8GGIYhiIYhhiGIiIiIYhhiGGGGGGGGGGG222222G22G22GHgYYm2w228HsAzbbZZZZj8AAEvhRVLk5S5KUpSyyyy2228DDEGIQhNttttttttttttttttttttttttt4MW2xEQxEPCIYiIYiIiIhhhhhhhhhhhthhhttthttttthththhththt422222223wP+uGMYxjwP1AAFAPsOX5lKUpSyyyy222228EGIQhCbbbbbbbbbbbbbbbbbbbbb3bebw4PBiIiGIiIiIYhiIiIYhhhhhhhhhhhthhttttttttibDbDDb02G232BttpxstssxjGMfsCAKAlLk5SlKUssssstvTbYYYhCEJtttttttttttttttttttttttsPR8DwYiGIiI4IiGIYiI4MMMMWw2www2w2www2222228bDbDbbEHgbbbbbbfgAYxjGMY/QAAASl2lPkpSlKUstsstttttsMQYhCE2222222222222222223u228GGI4REQxERERERERDDEREMMMMMMMPNhhthttttthttttttththtthtibbxtttttvgbLMWYsx+IAgP9OC6C4KcpSlKUssssttttttsTYhBjhtttttttttttttttttttvBiI8EREcI4REREREREREQxDEMQ22w22ww22w2222w222w2w222w222228bbbxvTeFmMYxjwMXB+gICiF4AUpSlLLLLLLbbbwcNiDbbbbbbbbbbbbbbbbbbbbzbeDwiIjyREREQxEcERERERDEMQxbDbbDbbbbbbbbbbbbbDbbbDDDbbbbbbbbbbbbxtvgMYxjwL9ACAAXB9JzlKUpSlllltttttttiE2G3jbbbbbbbbbbbbbbbeDbweEQ+CIiI4RwiIiIiIiIiIjgxbwbYbbbbbbbbYbbbbbbYbbbYbbbbbbbbbbbbbbbbbZZjGMYxcH5gACB9BSlKUpSlLLLLbbbbbbbbDbbxttttttttttttttsPN4WxweEfuIiIiIjhERHBERERERERDDwh4NtttttsNttttttsNtsNsNtsNtsNttttttttttsxjGMYxjwLoLpLoLguwpcFKUpSllllllttttttttt4G223/AG22222222G3m2w29IiIiIiPBwiOkRERwRERERHCItju8222222222GGGG22GG222222G222222W222WYssssxjF4AXsABdBS4KUuClKWWWWWWW2222222G222PTbe7DD0YY6REcI9f3wiIv64RERERERERERHre7bzYbbe7bbbDzbbYhtttttttttttlllltmMWYx+YAAAXQXQUpcFKWUpZZZZZbbbbbbbbbbbbfW293gxbwiIiIjhHwIiI4RERERERweCIfO29223mww822GHg228Hu222222222yyyyzFlmLMegXsABcFLgpSlwUpSlllLLLLLbLbbbbbbbDbb523o+COHkiOEfAiIiI6IiIiIiIiIiI7vnbe7bbDbwhiI7vdtttttttttlllllmLLLLwWWXQXQXQUuClKUpSlLLLLLLLLLbbbbbbbbbbbbzbfJ4IiIiIv64Rwjh4I4REREcER+4iIiIiI8HvfG283h0YiI7vNttttttttllllllllll4KWUuC6C6ClKUpSlKUpZZZSyyy822222222222235kRERERH64RwiP3EREREcIiOiL+4iIjhw8HjbfW+xiP3w6eN9bLLLLLLLLLLwWUssuC6C4KUuClKUpSlKWUsssssttvdttttttttt+ZERERHCIiIiIiIjhHDhEcEX9xERHDydPW+zhHDhEfF6zLL+ZZl/EssspZZZZSylKUpS/EpSlKUpSylMpZZZZeNttttttttttsO8/9k=');
+    background-size:cover;
+    background-position:center 40%;
+    overflow:hidden;
   }
-  @media (max-width:860px){
-    .compare-grid{grid-template-columns:1fr;gap:20px;}
-    .vs-badge{margin:4px auto;}
+  .hero::before{
+    content:'';
+    position:absolute;inset:0;
+    background:linear-gradient(100deg, rgba(10,8,4,0.72) 0%, rgba(10,8,4,0.42) 42%, rgba(10,8,4,0.15) 68%, rgba(10,8,4,0.35) 100%);
   }
-  .vs-badge{
-    width:44px;height:44px;
-    border-radius:50%;
-    background:var(--blue-900);
-    border:1px solid var(--blue-600);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    color:var(--line-dim);
-    margin:0 -1px;
+  .hero-inner{
     position:relative;
     z-index:2;
-  }
-  .compare-card{border-radius:var(--radius);padding:24px;position:relative;}
-  .compare-off{
-    background:transparent;
-    border:1px dashed var(--line-dim);
-    opacity:0.68;
-  }
-  .compare-off::before{
-    content:'✕';
-    position:absolute;
-    top:16px;right:18px;
-    font-size:22px;
-    color:var(--red);
-    opacity:0.6;
-  }
-  .compare-on{
-    background:var(--paper);
-    color:var(--ink);
-    border:2px solid var(--ochre);
-    box-shadow:0 26px 60px -18px rgba(201,138,50,0.35), 0 26px 60px -20px rgba(0,0,0,0.55);
-    transform:scale(1.035);
-    z-index:1;
-    margin-top:6px;
-  }
-  @media (max-width:860px){ .compare-on{transform:none;} }
-  .compare-badge{
-    position:absolute;
-    top:-13px;left:20px;
-    background:var(--ochre);
-    color:var(--blue-900);
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    font-weight:500;
-    letter-spacing:0.04em;
-    padding:4px 10px;
-    border-radius:var(--radius);
-  }
-  .compare-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--line-dim);
-    margin-bottom:14px;
-  }
-  .compare-tag-on{color:var(--ochre-dark);}
-  .compare-q{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:500;
-    font-size:15px;
-    margin-bottom:14px;
-  }
-  .compare-off .compare-q{color:var(--line);}
-  .compare-on .compare-q{color:var(--ink);}
-  .compare-a{
-    font-size:14px;
-    color:var(--line-dim);
-    line-height:1.6;
-    font-style:italic;
-  }
-  .compare-flag{
-    margin-top:16px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    color:var(--red);
-  }
-
-  .mini-table{
+    padding:150px 0 90px;
     width:100%;
-    border-collapse:collapse;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12.5px;
-    margin-top:4px;
   }
-  .mini-table th{
-    text-align:left;
-    font-weight:500;
-    color:var(--ink-dim);
-    padding:6px 8px;
-    border-bottom:1px solid #C9BFA4;
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:0.04em;
+  .hero .eyebrow{color:var(--hero-text);margin-bottom:22px;}
+  .hero h1{
+    font-size:clamp(40px,6.4vw,74px);
+    color:var(--hero-text);
+    max-width:820px;
   }
-  .mini-table td{
-    padding:7px 8px;
-    border-bottom:1px solid #E3DBC6;
-    color:var(--ink);
+  .hero h1 .accent{color:var(--amber);}
+  .hero p.sub{
+    max-width:520px;
+    margin-top:26px;
+    font-size:17.5px;
+    color:var(--hero-text-dim);
   }
-  .mini-table tr.row-hit td{
-    background:rgba(201,138,50,0.14);
-    font-weight:500;
-    position:relative;
-  }
-  .mini-table tr.row-hit td:first-child::before{
-    content:'→';
-    color:var(--ochre-dark);
-    margin-right:5px;
-  }
+  .cta-row{display:flex;gap:14px;align-items:center;margin-top:34px;flex-wrap:wrap;}
+  .badges{display:flex;gap:28px;margin-top:38px;flex-wrap:wrap;}
+  .badge{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--hero-text-dim);}
+  .badge svg{flex:0 0 auto;opacity:0.85;}
 
-  /* ---------- dashed cut divider ---------- */
-  .cut{
-    border:none;
-    border-top:1px dashed var(--blue-600);
-    margin:0;
-  }
-  .cut-label{
-    text-align:center;
-    margin-top:-11px;
-  }
-  .cut-label span{
-    background:var(--blue-900);
-    padding:0 14px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--line-dim);
-  }
-
-  /* ---------- problem strip ---------- */
-  .problems{padding:60px 0 50px;}
-  .problems h2{font-size:clamp(24px,3vw,32px);color:var(--line);max-width:600px;margin-bottom:34px;}
-  .problem-list{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
-  @media (max-width:780px){ .problem-list{grid-template-columns:1fr;} }
-  .problem-item{
-    border-left:2px solid var(--red);
-    padding-left:16px;
-  }
-  .problem-item .mark{
-    font-family:'IBM Plex Mono',monospace;
-    color:var(--red);
-    font-size:13px;
-    display:block;
-    margin-bottom:6px;
-  }
-  .problem-item p{margin:0;color:var(--line-dim);font-size:15px;}
-
-  /* ---------- features ---------- */
-  .features{padding:64px 0;}
-  .features h2{font-size:clamp(24px,3vw,32px);color:var(--line);margin-bottom:36px;max-width:600px;}
-  .feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--blue-600);border:1px solid var(--blue-600);}
-  @media (max-width:780px){ .feature-grid{grid-template-columns:1fr;} }
-  .feature-card{
-    background:var(--blue-900);
-    padding:28px;
-  }
-  .feature-card .f-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    color:var(--ochre);
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    display:block;
-    margin-bottom:10px;
-  }
-  .feature-card h3{font-size:18px;color:var(--line);margin-bottom:8px;}
-  .feature-card p{font-size:14.5px;color:var(--line-dim);margin:0;}
-
-  /* ---------- how it works ---------- */
-  .steps{padding:64px 0;}
-  .steps h2{font-size:clamp(24px,3vw,32px);color:var(--line);margin-bottom:40px;max-width:600px;}
-  .step-row{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
-  @media (max-width:780px){ .step-row{grid-template-columns:1fr;} }
-  .step{position:relative;padding-top:8px;}
-  .step .num{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:38px;
-    color:var(--blue-600);
-    display:block;
-    margin-bottom:10px;
-  }
-  .step h3{font-size:17px;color:var(--line);margin-bottom:8px;}
-  .step p{font-size:14.5px;color:var(--line-dim);margin:0;}
-
-  /* ---------- credibility ---------- */
-  .credibility{padding:50px 0;}
-  .cred-card{
-    background:var(--paper);
-    color:var(--ink);
+  /* signature element: floating rotating demo card */
+  .citation-float{
+    position:absolute;
+    right:6%;
+    bottom:8%;
+    z-index:3;
+    background:rgba(10,8,4,0.62);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.16);
     border-radius:var(--radius);
-    padding:32px;
-    display:flex;
-    gap:24px;
-    align-items:center;
-    flex-wrap:wrap;
+    padding:26px 28px;
+    width:380px;
+    max-width:88vw;
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--hero-text-dim);
   }
-  .cred-mark{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:22px;
-    flex:0 0 auto;
+  .citation-float .cf-top{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;
+    color:rgba(255,255,255,0.45);
+    border-bottom:1px dashed rgba(255,255,255,0.18);
+    padding-bottom:12px;margin-bottom:16px;
+  }
+  .citation-float .cf-top span:last-child{color:var(--amber);}
+  .cf-q-wrap{min-height:24px;margin-bottom:6px;}
+  .cf-q{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:16.5px;color:#fff;
+    border-right:2px solid var(--amber);padding-right:3px;
+    animation:cf-blink 0.8s step-end infinite;
+  }
+  @keyframes cf-blink{ 50%{border-color:transparent;} }
+  .cf-answer{margin-top:16px;padding-top:14px;border-top:1px dashed rgba(255,255,255,0.18);opacity:0;transition:opacity 0.5s ease;min-height:56px;}
+  .cf-answer.visible{opacity:1;}
+  .cf-a-text{font-family:'Inter',sans-serif;font-size:13.5px;color:rgba(255,255,255,0.75);line-height:1.6;}
+  .cf-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px;}
+  .cf-table th{text-align:left;font-weight:500;color:rgba(255,255,255,0.4);padding:5px 6px;border-bottom:1px solid rgba(255,255,255,0.15);font-size:9.5px;text-transform:uppercase;}
+  .cf-table td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,0.08);color:#fff;}
+  .cf-table tr.hit td{background:rgba(232,163,61,0.16);font-weight:500;}
+  .cf-table tr.hit td:first-child::before{content:'→ ';color:var(--amber);}
+  .cf-cite{font-size:11.5px;color:var(--amber);margin-top:12px;display:block;}
+  @media (max-width:780px){ .citation-float{position:static;width:auto;max-width:none;margin:36px 0 0;} }
+
+  /* ---------- section shells ---------- */
+  section{padding:96px 0;}
+  section.tight{padding:70px 0;}
+  .section-head{max-width:640px;margin-bottom:52px;}
+  .section-head .eyebrow{color:var(--amber-deep);margin-bottom:14px;}
+  .section-head h2{font-size:clamp(28px,3.6vw,40px);color:var(--ink);}
+  .section-head p{color:var(--ink-soft);font-size:16px;margin-top:16px;}
+
+  /* ---------- old way / better way ---------- */
+  .compare-cols{display:grid;grid-template-columns:1fr 1fr;gap:56px;}
+  @media (max-width:860px){ .compare-cols{grid-template-columns:1fr;gap:48px;} }
+  .compare-col .eyebrow{color:var(--ink-faint);margin-bottom:10px;}
+  .compare-col h3{font-size:23px;color:var(--ink);margin-bottom:26px;}
+  .flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;}
+  .flow-step{
+    display:flex;flex-direction:column;align-items:center;
+    text-align:center;width:88px;
+  }
+  .flow-step .icon{
+    width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid var(--line);
+    margin-bottom:10px;
     color:var(--ink);
   }
-  .cred-card p{margin:0;font-size:15px;color:var(--ink-dim);max-width:560px;}
+  .compare-col.better .flow-step .icon{border-color:var(--amber);color:var(--amber-deep);}
+  .flow-step span{font-size:11.5px;color:var(--ink-soft);line-height:1.3;}
+  .flow-arrow{color:var(--ink-faint);margin:0 6px;font-size:16px;flex:0 0 auto;}
+  .compare-note{margin-top:26px;font-size:14px;color:var(--ink-soft);max-width:360px;}
+
+  /* ---------- 5-feature grid ---------- */
+  .feature-grid{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+    margin-top:64px;
+  }
+  @media (max-width:900px){ .feature-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .feature-grid{grid-template-columns:1fr;} }
+  .feature-cell{background:var(--paper);padding:30px 24px;}
+  .feature-cell .icon{color:var(--amber-deep);margin-bottom:16px;}
+  .feature-cell h4{font-family:'Archivo',sans-serif;font-weight:700;font-size:15.5px;color:var(--ink);margin-bottom:8px;}
+  .feature-cell p{font-size:13.5px;color:var(--ink-soft);margin:0;line-height:1.5;}
+
+  /* ---------- claude comparison ---------- */
+  .claude-compare{background:#F5F2EA;}
+  .compare-grid2{
+    display:grid;grid-template-columns:1fr auto 1fr;
+    gap:0;align-items:center;margin-top:44px;
+  }
+  @media (max-width:860px){ .compare-grid2{grid-template-columns:1fr;gap:20px;} }
+  .vs-badge{
+    width:42px;height:42px;border-radius:50%;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
+    margin:0 -1px;position:relative;z-index:2;
+  }
+  .cc-card{border-radius:var(--radius);padding:28px;}
+  .cc-off{background:var(--paper);border:1px dashed #C9C2AE;opacity:0.85;}
+  .cc-on{background:var(--ink);color:#fff;box-shadow:0 26px 60px -20px rgba(0,0,0,0.35);position:relative;margin-top:6px;}
+  .cc-badge{
+    position:absolute;top:-12px;left:22px;
+    background:var(--amber);color:#1A1200;
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;
+    padding:4px 10px;border-radius:var(--radius);
+  }
+  .cc-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px;}
+  .cc-off .cc-tag{color:var(--ink-faint);}
+  .cc-on .cc-tag{color:var(--amber);}
+  .cc-q{font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;}
+  .cc-a{font-size:13.5px;color:var(--ink-soft);font-style:italic;line-height:1.6;}
+  .cc-on .cc-a{color:rgba(255,255,255,0.6);}
+  .cc-flag{margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#B23A2E;}
+  .mini-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:2px;}
+  .mini-table th{text-align:left;font-weight:500;color:rgba(255,255,255,0.5);padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;}
+  .mini-table td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,0.08);color:#fff;}
+  .mini-table tr.row-hit td{background:rgba(232,163,61,0.14);font-weight:500;}
+  .mini-table tr.row-hit td:first-child::before{content:'→ ';color:var(--amber);}
+  .cite-row{margin-top:14px;display:flex;align-items:center;gap:10px;}
+  .cite-tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);border:1px solid rgba(232,163,61,0.4);padding:3px 9px;border-radius:var(--radius);}
+
+  /* ---------- how it works (full black, full viewport, never split) ---------- */
+  .how{
+    background:var(--ink);
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    padding:80px 0;
+  }
+  .how .eyebrow{color:var(--amber);margin-bottom:16px;}
+  .how h2{font-size:clamp(30px,4.4vw,46px);color:#fff;max-width:720px;}
+  .how-lede{font-size:16px;color:rgba(255,255,255,0.55);max-width:480px;margin:20px 0 56px;}
+  .step-row{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;}
+  @media (max-width:780px){ .step-row{grid-template-columns:1fr;gap:36px;} }
+  .step .num{font-family:'Archivo',sans-serif;font-weight:900;font-size:30px;color:var(--amber);display:block;margin-bottom:16px;}
+  .step h3{font-family:'Archivo',sans-serif;font-weight:700;font-size:19px;color:#fff;margin-bottom:10px;}
+  .step p{font-size:14.5px;color:rgba(255,255,255,0.55);margin:0;line-height:1.6;}
 
   /* ---------- pricing ---------- */
-  .pricing{padding:70px 0 80px;}
+  .pricing{background:#F5F2EA;}
   .price-block{
-    background:var(--paper);
-    color:var(--ink);
-    border-radius:var(--radius);
-    padding:0;
-    overflow:hidden;
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:32px;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:44px 44px;
   }
-  @media (max-width:780px){ .price-block{grid-template-columns:1fr;} }
-  .price-left{padding:40px;}
-  .price-right{
-    padding:40px;
-    background:var(--paper-dim);
-    border-left:1px dashed #C9BFA4;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  }
-  @media (max-width:780px){ .price-right{border-left:none;border-top:1px dashed #C9BFA4;} }
-  .price-left h2{font-size:26px;color:var(--ink);margin-bottom:14px;}
-  .price-left ul{list-style:none;padding:0;margin:20px 0 0;}
-  .price-left li{
-    font-size:14.5px;
-    color:var(--ink-dim);
-    padding:8px 0 8px 22px;
-    position:relative;
-    border-top:1px solid #E3DBC6;
-  }
-  .price-left li:first-child{border-top:none;}
-  .price-left li::before{
-    content:'—';
-    position:absolute;
-    left:0;
-    color:var(--ochre-dark);
-  }
-  .price-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    color:var(--ink-dim);
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-  }
-  .price-amount-row{display:flex;align-items:baseline;gap:12px;margin:6px 0 4px;}
-  .price-original{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:20px;
-    color:var(--ink-dim);
-    text-decoration:line-through;
-    text-decoration-color:var(--red);
-  }
-  .price-amount{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:48px;
-    color:var(--ink);
-    margin:0;
-  }
-  .price-note{font-size:13.5px;color:var(--ink-dim);margin-bottom:24px;}
-  .price-right .btn{width:100%;text-align:center;}
+  .price-left h2{font-size:26px;color:var(--ink);margin-bottom:10px;}
+  .price-left p{color:var(--ink-soft);font-size:14.5px;margin:0;max-width:360px;}
+  .price-right{text-align:right;}
+  .price-amount-row{display:flex;align-items:baseline;gap:10px;justify-content:flex-end;}
+  .price-original{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--ink-faint);text-decoration:line-through;}
+  .price-amount{font-family:'Archivo',sans-serif;font-weight:900;font-size:44px;color:var(--ink);}
+  .price-note{font-size:12.5px;color:var(--ink-faint);margin:6px 0 18px;}
 
   /* ---------- faq ---------- */
-  .faq{padding:20px 0 80px;}
-  .faq h2{font-size:clamp(24px,3vw,32px);color:var(--line);margin-bottom:30px;max-width:600px;}
-  details{
-    border-top:1px solid var(--blue-600);
-    padding:18px 0;
-  }
-  details:last-child{border-bottom:1px solid var(--blue-600);}
+  details{border-top:1px solid var(--line);padding:20px 0;}
+  details:last-child{border-bottom:1px solid var(--line);}
   summary{
-    cursor:pointer;
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:500;
-    font-size:16px;
-    color:var(--line);
-    list-style:none;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+    cursor:pointer;font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;
+    color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center;
   }
   summary::-webkit-details-marker{display:none;}
-  summary::after{
-    content:'+';
-    font-family:'IBM Plex Mono',monospace;
-    font-size:20px;
-    color:var(--ochre);
-    flex:0 0 auto;
-    margin-left:16px;
-  }
+  summary::after{content:'+';font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--amber-deep);margin-left:16px;}
   details[open] summary::after{content:'–';}
-  details p{
-    margin:14px 0 0;
-    color:var(--line-dim);
-    font-size:14.5px;
-    max-width:640px;
-  }
+  details p{margin:14px 0 0;color:var(--ink-soft);font-size:14.5px;max-width:640px;}
 
   /* ---------- footer ---------- */
-  footer{
-    border-top:1px solid var(--blue-600);
-    padding:34px 0 50px;
+  footer{background:var(--ink);color:rgba(255,255,255,0.6);padding:64px 0 36px;}
+  .footer-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:48px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,0.12);}
+  .footer-logo{font-family:'Archivo',sans-serif;font-weight:900;font-size:19px;color:#fff;}
+  .footer-logo .logo-copilot{color:var(--amber);}
+  .footer-credibility{font-size:13.5px;color:rgba(255,255,255,0.55);max-width:340px;margin-top:14px;line-height:1.6;}
+  .footer-cols{display:flex;gap:64px;flex-wrap:wrap;}
+  .footer-col h5{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:0 0 14px;}
+  .footer-col a{display:block;font-size:13.5px;color:rgba(255,255,255,0.65);text-decoration:none;margin-bottom:10px;}
+  .footer-col a:hover{color:#fff;}
+  .footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding-top:28px;font-size:12px;color:rgba(255,255,255,0.4);}
+  .footer-bottom p{max-width:560px;margin:0;line-height:1.6;}
+
+  /* ---------- policy modals ---------- */
+  .modal{
+    position:fixed;inset:0;z-index:100;
+    display:none;align-items:center;justify-content:center;
+    padding:24px;
   }
-  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;}
-  footer .disclaimer{
-    font-size:12.5px;
-    color:var(--line-dim);
-    max-width:520px;
-    line-height:1.6;
+  .modal.open{display:flex;}
+  .modal-backdrop{
+    position:absolute;inset:0;
+    background:rgba(10,8,4,0.65);
+    backdrop-filter:blur(2px);
   }
-  footer .fmark{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--line-dim);}
+  .modal-panel{
+    position:relative;z-index:1;
+    background:var(--paper);color:var(--ink);
+    max-width:560px;width:100%;max-height:82vh;overflow-y:auto;
+    border-radius:var(--radius);
+    padding:40px 36px;
+  }
+  .modal-panel h3{font-family:'Archivo',sans-serif;font-weight:900;font-size:24px;color:var(--ink);margin-bottom:20px;}
+  .modal-body p{font-size:14.5px;color:var(--ink-soft);line-height:1.7;margin:0 0 14px;}
+  .modal-body strong{color:var(--ink);}
+  .modal-body a{color:var(--amber-deep);}
+  .modal-close{
+    position:absolute;top:18px;right:18px;
+    background:none;border:none;cursor:pointer;
+    font-size:16px;color:var(--ink-faint);
+    width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal-close:hover{background:var(--line);color:var(--ink);}
 </style>
 </head>
 <body>
 
-<header class="top">
+<header class="nav">
   <div class="wrap">
-    <div class="brand">DCR<span class="dot">·</span>Copilot</div>
-    <div class="sheet-tag">
-      <span>SHEET <b>01/01</b></span>
-      <span>REV <b>UDCPR 2023 · DCPR 2034</b></span>
-      <span>BY <b>Designhaus Collective</b></span>
-    </div>
+    <div class="logo">DCR<span class="logo-copilot">COPILOT</span></div>
+    <nav class="links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
   </div>
 </header>
 
 <section class="hero">
-  <div class="wrap">
-    <div class="hero-grid">
-      <div>
-        <div class="kicker">Maharashtra development regulations, inside Claude</div>
-        <h1>Ask the regulation.<br>Get the <em>clause</em>.</h1>
-        <p class="sub">A Claude Skill covering UDCPR and DCPR‑2034 — built by a practicing Mumbai architect for architects, designers, and liaisoners who need a straight answer with a citation, not a 500‑page PDF.</p>
-        <div class="cta-row">
-          <a class="btn" href="#" id="pay-link-hero">Get DCR Copilot — ₹79</a>
-          <a class="btn-outline" href="#how">See how it works ↓</a>
-        </div>
-        <div class="fine">One‑time purchase · UPI / cards / netbanking · Works on free or paid Claude</div>
-      </div>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">For architects · planners · designers</div>
+    <h1>Stop searching.<br><span class="accent">Start asking.</span></h1>
+    <p class="sub">DCR Copilot brings UDCPR and DCPR-2034 into Claude — ask your question, get the clause, table, and page reference and much more. No more digging through 500-page PDFs.</p>
+    <div class="cta-row">
+      <a class="btn" href="#" id="pay-link-hero">Get DCR Copilot — ₹79 →</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+    <div class="badges">
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>One-time purchase</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Instant download</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>No subscription</div>
+    </div>
+  </div>
+  <div class="citation-float">
+    <div class="cf-top"><span>Query log</span><span id="cf-reg">UDCPR §6</span></div>
+    <div class="cf-q-wrap"><span id="cf-q" class="cf-q"></span></div>
+    <div id="cf-answer" class="cf-answer">
+      <div class="cf-a-text" id="cf-a"></div>
+      <div id="cf-table-wrap"></div>
+      <span class="cf-cite" id="cf-cite"></span>
+    </div>
+  </div>
+</section>
 
-      <div class="demo-card">
-        <div class="corner-label">
-          <span>QUERY LOG</span>
-          <span id="demo-reg">UDCPR §6</span>
+<section class="tight" id="features">
+  <div class="wrap">
+    <div class="compare-cols">
+      <div class="compare-col">
+        <div class="eyebrow">The old way</div>
+        <h3>Still searching PDFs?</h3>
+        <div class="flow">
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><span>Open PDF</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><span>Ctrl + F</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v2M9 21h10a2 2 0 002-2v-8a2 2 0 00-2-2H9a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div><span>Too many results</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><span>Open another PDF</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 6L6 18M6 6l12 12"/></svg></div><span>And repeat…</span></div>
         </div>
-        <div class="q-line">You asked —</div>
-        <div class="q-text-wrap"><span id="demo-q" class="q-text"></span></div>
-        <div id="demo-answer" class="answer-block">
-          <div class="a-text" id="demo-a"></div>
-          <div id="demo-table-wrap"></div>
-          <div class="citation-row">
-            <span class="leader-line"></span>
-            <span class="citation-tag" id="demo-cite"></span>
-          </div>
+        <p class="compare-note">500+ pages. Multiple tables. Multiple clauses. You know the answer exists — you just can't find it.</p>
+      </div>
+      <div class="compare-col better">
+        <div class="eyebrow" style="color:var(--amber-deep);">The better way</div>
+        <h3>Just ask.</h3>
+        <div class="flow">
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span>Ask your question</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8V4M8 4h8"/></svg></div><span>DCR Copilot finds it</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h6"/></svg></div><span>Get clause, table &amp; reference</span></div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 6L9 17l-5-5"/></svg></div><span>Verify &amp; move on</span></div>
         </div>
-        <div class="fine" style="margin-top:14px;color:var(--ink-dim);opacity:0.8;">Illustrative — actual figures depend on your site.</div>
+        <p class="compare-note">Ask → find → verify → done. Back to designing, not searching.</p>
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-cell">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z"/></svg></div>
+        <h4>UDCPR &amp; DCPR-2034</h4>
+        <p>Search across the official regulations you use every day.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h4>Find what you need</h4>
+        <p>Ask in plain language. Get relevant clauses, tables &amp; provisions.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></div>
+        <h4>Exact references</h4>
+        <p>Every answer comes with clause, regulation, table &amp; page reference.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h4>Save hours</h4>
+        <p>Stop digging through hundreds of pages. Get answers in seconds.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v13m0 0l-4-4m4 4l4-4M5 21h14"/></svg></div>
+        <h4>Instant access</h4>
+        <p>Download once. Install in Claude. Use whenever you need it.</p>
       </div>
     </div>
   </div>
 </section>
 
-<div class="wrap"><hr class="cut"></div>
-<div class="cut-label"><span>Section A — the problem</span></div>
-
-<section class="problems">
+<section class="claude-compare">
   <div class="wrap">
-    <h2>You already know UDCPR. Finding the exact clause fast is the problem.</h2>
-    <div class="problem-list">
-      <div class="problem-item">
-        <span class="mark">✕ Redline 01</span>
-        <p>Which edition is actually current — the one your office has, or the one the authority is checking against?</p>
-      </div>
-      <div class="problem-item">
-        <span class="mark">✕ Redline 02</span>
-        <p>Is this a UDCPR site or a DCPR‑2034 (Mumbai) site? The two regulations don't agree, and mixing them up is expensive.</p>
-      </div>
-      <div class="problem-item">
-        <span class="mark">✕ Redline 03</span>
-        <p>You remember the rule, not the regulation number — and a client or authority wants the citation, not your memory.</p>
-      </div>
+    <div class="section-head">
+      <div class="eyebrow">Why not just ask Claude?</div>
+      <h2>Claude already knows what UDCPR is. <span style="color:var(--amber-deep);">But</span> it doesn't reliably know the table.</h2>
+      <p>Ask a plain Claude chat for an FSI number and it's working from general training knowledge — not the current, exact regulation text. This skill answers from the actual document, every time, with the table row it came from.</p>
     </div>
-  </div>
-</section>
 
-<div class="wrap"><hr class="cut"></div>
-<div class="cut-label"><span>Section B — why not just ask Claude?</span></div>
-
-<section class="comparison">
-  <div class="wrap">
-    <h2>Claude already knows what UDCPR is. It doesn't reliably know the table.</h2>
-    <p class="comparison-sub">Ask a plain Claude chat for an FSI number and it's working from general training knowledge — not the current, exact regulation text. It'll hedge, approximate, or occasionally just be wrong. This skill answers from the actual document, every time, with the table row it came from.</p>
-
-    <div class="compare-grid">
-      <div class="compare-card compare-off">
-        <div class="compare-tag">Without this skill</div>
-        <div class="compare-q">"What's the permissible FSI for a residential plot on a 12m road?"</div>
-        <div class="compare-a">Generally around 1.1 for most residential zones, but this can vary — I'd recommend checking the current UDCPR table or confirming with your local Planning Authority, since I don't have the exact figures in front of me.</div>
-        <div class="compare-flag">No table. No citation. No way to verify.</div>
+    <div class="compare-grid2">
+      <div class="cc-card cc-off">
+        <div class="cc-tag">Without this skill</div>
+        <div class="cc-q">"What's the permissible FSI for a residential plot on a 12m road?"</div>
+        <div class="cc-a">Generally around 1.1 for most residential zones, but this can vary — I'd recommend checking the current UDCPR table or confirming with your local Planning Authority.</div>
+        <div class="cc-flag">No table. No citation. No way to verify.</div>
       </div>
-
       <div class="vs-badge">VS</div>
-
-      <div class="compare-card compare-on">
-        <div class="compare-badge">Grounded in the actual text</div>
-        <div class="compare-tag compare-tag-on">With DCR Copilot</div>
-        <div class="compare-q">"What's the permissible FSI for a residential plot on a 12m road?"</div>
+      <div class="cc-card cc-on">
+        <div class="cc-badge">Grounded in the actual text</div>
+        <div class="cc-tag">With DCR Copilot</div>
+        <div class="cc-q">"What's the permissible FSI for a residential plot on a 12m road?"</div>
         <table class="mini-table">
           <thead><tr><th>Road width</th><th>Basic FSI</th><th>+ Premium</th><th>Permissible</th></tr></thead>
           <tbody>
@@ -655,78 +497,33 @@
             <tr><td>&gt; 12m</td><td>1.2</td><td>0.6</td><td>1.8</td></tr>
           </tbody>
         </table>
-        <div class="citation-row" style="margin-top:12px;">
-          <span class="leader-line"></span>
-          <span class="citation-tag">Table 12, Reg. 30</span>
-        </div>
-      </div>
-    </div>
-    <p class="fine" style="margin-top:16px;">Illustrative example — actual figures depend on your plot's zone, road width, and the current regulation revision.</p>
-  </div>
-</section>
-
-<div class="wrap"><hr class="cut"></div>
-<div class="cut-label"><span>Section C — what's included</span></div>
-
-<section class="features">
-  <div class="wrap">
-    <h2>Both regulation sets. One install. Answers you can show a client.</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <span class="f-tag">Coverage</span>
-        <h3>UDCPR + DCPR‑2034, routed automatically</h3>
-        <p>Ask about a plot in Pune or a redevelopment in Mumbai — it identifies which regulation applies and answers from that text only, never a blend of the two.</p>
-      </div>
-      <div class="feature-card">
-        <span class="f-tag">Grounded</span>
-        <h3>Every answer cites the clause</h3>
-        <p>Direct answer first, then the regulation number, so you can verify it yourself or drop it straight into a client note.</p>
-      </div>
-      <div class="feature-card">
-        <span class="f-tag">Current</span>
-        <h3>Checks live for amendment-prone figures</h3>
-        <p>FSI, premium charges, TDR rates — the numbers that actually change — get checked against a live source before answering, not just the packaged snapshot.</p>
-      </div>
-      <div class="feature-card">
-        <span class="f-tag">Accessible</span>
-        <h3>Works on a free Claude account</h3>
-        <p>No paid plan required to use it. Install once, ask whenever a question comes up on site or at your desk.</p>
+        <div class="cite-row"><span class="cite-tag">Table 6-G, Reg. 6.3</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<div class="wrap"><hr class="cut"></div>
-<div class="cut-label"><span>Section D — how it works</span></div>
-
-<section class="steps" id="how">
+<section class="how" id="how">
   <div class="wrap">
+    <div class="eyebrow">How it works</div>
     <h2>Three steps. No terminal, no setup beyond a toggle.</h2>
+    <p class="how-lede">From purchase to your first answered question, this takes about two minutes — most of it is waiting for a download.</p>
     <div class="step-row">
       <div class="step">
         <span class="num">01</span>
-        <h3>Buy &amp; download</h3>
-        <p>One purchase, one zip file, delivered instantly with your own copy of the Skill.</p>
+        <h3>Download</h3>
+        <p>Purchase and download the DCR Copilot skill file instantly — one zip, delivered right away.</p>
       </div>
       <div class="step">
         <span class="num">02</span>
         <h3>Install in Claude</h3>
-        <p>Settings → Capabilities → Skills → upload. Same process on the free plan or a paid one.</p>
+        <p>Open Claude, go to Settings → Capabilities, enable Code execution, then Skills → Add skill → upload the zip. Works the same on a free or paid Claude account.</p>
       </div>
       <div class="step">
         <span class="num">03</span>
-        <h3>Ask, anytime</h3>
-        <p>Bring up any Claude chat and ask your regulation question — no separate app to open.</p>
+        <h3>Start asking</h3>
+        <p>Ask any UDCPR or DCPR-2034 question in a normal Claude chat. You'll get a direct answer, the table it came from, and the exact clause to cite.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="credibility">
-  <div class="wrap">
-    <div class="cred-card">
-      <div class="cred-mark">Designhaus<br>Collective</div>
-      <p>Built by a Mumbai‑based architecture and design practice that files real permissions and reads this regulation for a living — not a legal-tech vendor guessing at what architects need.</p>
     </div>
   </div>
 </section>
@@ -735,72 +532,136 @@
   <div class="wrap">
     <div class="price-block">
       <div class="price-left">
-        <h2>DCR Copilot</h2>
-        <p style="color:var(--ink-dim);font-size:14.5px;margin-top:-6px;">Everything you need to ask Maharashtra's development regulations directly inside Claude.</p>
-        <ul>
-          <li>UDCPR — full text, structured by chapter</li>
-          <li>DCPR‑2034 — full text, structured by part</li>
-          <li>Location‑aware routing between the two</li>
-          <li>Cited, verifiable answers</li>
-          <li>Works on free Claude accounts</li>
-          <li>Install guide + starter question sheet included</li>
-        </ul>
+        <h2>Why keep searching?</h2>
+        <p>Get the answer you need for less than the cost of a coffee. No subscription, no recurring payment — download once, use whenever you need it.</p>
       </div>
       <div class="price-right">
-        <span class="price-tag">One‑time purchase</span>
         <div class="price-amount-row">
           <span class="price-original">₹299</span>
           <span class="price-amount">₹79</span>
         </div>
-        <p class="price-note">Pay via UPI, card, or netbanking. No subscription — yours to keep.</p>
-        <a class="btn" href="#" id="pay-link">Pay ₹79 →</a>
-        <div class="fine" style="margin-top:12px;">Secure checkout · Instant delivery to your email</div>
+        <p class="price-note">One-time purchase · Instant download · Secure payment</p>
+        <a class="btn" href="#" id="pay-link">Get DCR Copilot — ₹79 →</a>
       </div>
     </div>
   </div>
 </section>
 
-<section class="faq">
+<section id="faq">
   <div class="wrap">
-    <h2>Before you ask</h2>
+    <div class="section-head">
+      <div class="eyebrow">FAQ</div>
+      <h2>Before you ask</h2>
+    </div>
 
     <details>
       <summary>Does this replace checking with the Planning Authority?</summary>
       <p>No. This is a reference and verification tool — it gets you to the right clause fast, but the local Planning Authority (or MCGM, for Mumbai) has the final word, and some authorities apply modified provisions on top of the base text.</p>
     </details>
-
     <details>
       <summary>Do I need a paid Claude plan?</summary>
-      <p>No. It works on a free Claude account — just enable Code execution in Settings → Capabilities. Heavy back‑to‑back usage in one sitting may hit Claude's own free‑tier daily limit, which is a Claude account limit, not something this tool controls.</p>
+      <p>No. It works on a free Claude account — just enable Code execution in Settings → Capabilities. Heavy back-to-back usage in one sitting may hit Claude's own free-tier daily limit, which is a Claude account limit, not something this tool controls.</p>
     </details>
-
     <details>
-      <summary>What happens when UDCPR or DCPR‑2034 gets amended?</summary>
-      <p>For amendment‑prone figures — FSI, premium charges, TDR rates — it checks a live source before answering, so you're not relying solely on the packaged snapshot date.</p>
+      <summary>What happens when UDCPR or DCPR-2034 gets amended?</summary>
+      <p>For amendment-prone figures — FSI, premium charges, TDR rates — it checks a live source before answering, so you're not relying solely on the packaged snapshot date.</p>
     </details>
-
     <details>
       <summary>Can I use it for both a Pune project and a Mumbai project?</summary>
       <p>Yes — that's the point of bundling both regulation sets. It identifies which one applies to your question and answers from that text only.</p>
     </details>
-
     <details>
       <summary>Is this official or affiliated with the government?</summary>
-      <p>No. It's an independent reference tool built from the publicly published UDCPR and DCPR‑2034 regulation text, not a government product.</p>
+      <p>No. It's an independent reference tool built from the publicly published UDCPR and DCPR-2034 regulation text, not a government product.</p>
     </details>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <div class="fmark">DCR · COPILOT — SHEET 01/01</div>
-    <div class="disclaimer">This is a reference and verification tool, not legal or professional advice, and not affiliated with the Government of Maharashtra or MCGM. Always confirm with the relevant Planning Authority before acting on a regulation answer. © Designhaus Collective.</div>
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">DCR<span class="logo-copilot">COPILOT</span></div>
+        <p class="footer-credibility">Built by a Mumbai-based architecture and design practice that files real permissions and reads this regulation for a living — not a legal-tech vendor guessing at what architects need.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Product</h5>
+          <a href="#how">How it works</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h5>Support</h5>
+          <a href="mailto:connect@designhauscollective.in">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <a href="#" data-open-modal="modal-terms">Terms of use</a>
+          <a href="#" data-open-modal="modal-refund">Refund policy</a>
+          <a href="#" data-open-modal="modal-privacy">Privacy policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>This is a reference and verification tool, not legal or professional advice, and not affiliated with the Government of Maharashtra or MCGM. Always confirm with the relevant Planning Authority before acting on a regulation answer.</p>
+      <span>© 2026 DCR Copilot, by Designhaus Collective. All rights reserved.</span>
+    </div>
   </div>
 </footer>
 
+<div class="modal" id="modal-terms">
+  <div class="modal-backdrop"></div>
+  <div class="modal-panel">
+    <button class="modal-close" data-close-modal="modal-terms" aria-label="Close">✕</button>
+    <h3>Terms of use</h3>
+    <div class="modal-body">
+      <p>DCR Copilot is a digital reference tool ("Skill") for Claude, covering UDCPR and DCPR-2034, sold by Designhaus Collective.</p>
+      <p><strong>What you're buying.</strong> A one-time purchase grants you a personal license to download, install, and use the DCR Copilot skill file. It's for your own use — not for resale, redistribution, or sharing with others outside your own practice.</p>
+      <p><strong>What it is, and isn't.</strong> This is a reference and verification aid, built from the publicly published UDCPR and DCPR-2034 regulation text. It is not legal or professional advice, and it does not replace confirming with the relevant Planning Authority (or MCGM, for Mumbai) before acting on any answer it gives.</p>
+      <p><strong>Accuracy.</strong> Regulations get amended over time. While the skill checks a live source for amendment-prone figures where possible, we don't guarantee it reflects every amendment the moment it's notified.</p>
+      <p><strong>Changes.</strong> We may update these terms from time to time; continued use after an update means you accept the revised terms.</p>
+      <p>Questions: <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-refund">
+  <div class="modal-backdrop"></div>
+  <div class="modal-panel">
+    <button class="modal-close" data-close-modal="modal-refund" aria-label="Close">✕</button>
+    <h3>Refund policy</h3>
+    <div class="modal-body">
+      <p>DCR Copilot is delivered instantly as a digital download, so refunds work a little differently than a physical product.</p>
+      <p><strong>General policy.</strong> Because the product is delivered immediately upon payment, we're generally not able to offer refunds once your activation key and download link have been issued.</p>
+      <p><strong>When we will refund you.</strong> If the product genuinely doesn't work as described — for example, your activation key won't validate and we can't resolve it — contact us within 7 days of purchase and we'll sort it out, including a refund if the issue can't be fixed.</p>
+      <p><strong>How to request one.</strong> Email <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a> with your Razorpay payment ID and a description of the problem.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-privacy">
+  <div class="modal-backdrop"></div>
+  <div class="modal-panel">
+    <button class="modal-close" data-close-modal="modal-privacy" aria-label="Close">✕</button>
+    <h3>Privacy policy</h3>
+    <div class="modal-body">
+      <p><strong>What we collect.</strong> Your email address and payment details at checkout. Payment is processed by Razorpay — we never see or store your card or UPI details ourselves.</p>
+      <p><strong>Why we collect it.</strong> Your email is used to generate and deliver your personal activation key and the download link. Nothing more.</p>
+      <p><strong>Usage tracking.</strong> We log a basic daily count of how many questions each activation key is used for — this helps us catch a key that's being shared well beyond normal use. We do not see, store, or review the content of your questions.</p>
+      <p><strong>Sharing.</strong> We don't sell or share your data with third parties, beyond what's needed to process payment (Razorpay) and deliver email (Resend).</p>
+      <p>Questions: <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a></p>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ---- Query log demo: cycles through several sample Q&As ----
+  // ---- Hero query-log demo: cycles through several sample Q&As ----
   const demoQueries = [
+    {
+      reg: "DCPR-2034 §16", q: "max building height on a narrow plot?",
+      a: "Above 24m height, minimum marginal open space is 3.00 metres on all sides, subject to fire safety clearances.",
+      cite: "DCPR-2034 · Reg. 16(1)(b), Table 1"
+    },
     {
       reg: "UDCPR §6", q: "permissible FSI for a residential plot?",
       table: {
@@ -808,7 +669,7 @@
         rows: [["< 9m","1.0","0.4","1.4"],["9–12m","1.1","0.5","1.6"],["> 12m","1.2","0.6","1.8"]],
         hit: 1
       },
-      cite: "Table 12, Reg. 30"
+      cite: "Table 6-G, Reg. 6.3"
     },
     {
       reg: "DCPR-2034 §33", q: "FSI for a Mumbai redevelopment?",
@@ -819,7 +680,11 @@
       },
       cite: "Table 12, Reg. 33(7)"
     },
-    { reg: "UDCPR §8", q: "parking for a residential building?", a: "One car space per unit above 70 sq.m carpet area; below that, one space per 2 units — per the off-street parking table.", cite: "Reg. 8.2, Table" },
+    {
+      reg: "UDCPR §8", q: "parking for a residential building?",
+      a: "2 car spaces + 1 scooter space per tenement above 150 sq.m carpet area, plus 5% visitor parking, in non-congested areas.",
+      cite: "Table 8B, Reg. 8.2.1"
+    },
     {
       reg: "DCPR-2034 §52", q: "TDR for a heritage building?",
       table: {
@@ -828,26 +693,25 @@
         hit: 1
       },
       cite: "Reg. 52.5"
-    },
-    { reg: "UDCPR §7", q: "higher FSI in a congested area?", a: "Permissible for specified uses in notified congested localities, subject to road width and premium payment conditions.", cite: "Reg. 7.1" }
+    }
   ];
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const regEl = document.getElementById('demo-reg');
-  const qEl = document.getElementById('demo-q');
-  const aBlock = document.getElementById('demo-answer');
-  const aEl = document.getElementById('demo-a');
-  const tableWrap = document.getElementById('demo-table-wrap');
-  const citeEl = document.getElementById('demo-cite');
+  const regEl = document.getElementById('cf-reg');
+  const qEl = document.getElementById('cf-q');
+  const aBlock = document.getElementById('cf-answer');
+  const aEl = document.getElementById('cf-a');
+  const tableWrap = document.getElementById('cf-table-wrap');
+  const citeEl = document.getElementById('cf-cite');
 
   function renderAnswer(entry){
     if (entry.table){
       aEl.textContent = '';
       const t = entry.table;
-      let html = '<table class="mini-table"><thead><tr>' +
+      let html = '<table class="cf-table"><thead><tr>' +
         t.headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
       t.rows.forEach((row, i) => {
-        html += `<tr class="${i === t.hit ? 'row-hit' : ''}">` +
+        html += `<tr class="${i === t.hit ? 'hit' : ''}">` +
           row.map(c => `<td>${c}</td>`).join('') + '</tr>';
       });
       html += '</tbody></table>';
@@ -903,16 +767,10 @@
   }
 
   // ---- Payment link ----
-  // PAYMENT LINK — replace with your live Razorpay Payment Page URL once
-  // your account is verified and the payment page is created. Set the
-  // Payment Page's "Redirect URL after payment" (in Razorpay dashboard)
-  // to: https://designhauscollective.in/thank-you.html — that page reads
-  // the payment ID Razorpay appends to the URL and reveals the key.
   const PAYMENT_URL = null; // e.g. "https://pages.razorpay.com/pl_xxxxxxxxxxxx"
-
   function handlePayClick(e){
+    e.preventDefault();
     if (!PAYMENT_URL){
-      e.preventDefault();
       alert('Add your Razorpay Payment Page URL to PAYMENT_URL in this script once your account is verified.');
       return;
     }
@@ -920,6 +778,24 @@
   }
   document.getElementById('pay-link').addEventListener('click', handlePayClick);
   document.getElementById('pay-link-hero').addEventListener('click', handlePayClick);
+
+  // ---- Policy modals ----
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('[data-open-modal]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); openModal(el.dataset.openModal); });
+  });
+  document.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); closeModal(el.dataset.closeModal); });
+  });
+  document.querySelectorAll('.modal-backdrop').forEach(el => {
+    el.addEventListener('click', () => el.closest('.modal').classList.remove('open'));
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){
+      document.querySelectorAll('.modal.open').forEach(m => m.classList.remove('open'));
+    }
+  });
 </script>
 
 </body>
