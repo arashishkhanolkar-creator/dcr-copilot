@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
 <title>DCR Copilot — Ask the regulation. Get the clause.</title>
 <meta name="description" content="A Claude Skill covering UDCPR and DCPR-2034 — ask Maharashtra's development regulations directly inside Claude and get cited, table-backed answers. Built by Designhaus Collective.">
 <link rel="canonical" href="https://designhauscollective.in">
@@ -21,8 +22,8 @@
     --blue-900:#122238;
     --blue-700:#1D4573;
     --blue-600:#28588f;
-    --line:#DCE8F2;
-    --line-dim:#9FB6CC;
+    --line:#EAF2FA;
+    --line-dim:#B7CBDe;
     --paper:#F5F1E8;
     --paper-dim:#EAE4D5;
     --ink:#16232E;
@@ -33,10 +34,15 @@
     --radius:2px;
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{
+    scroll-behavior:smooth;
+    background:var(--blue-900);
+    min-height:100%;
+  }
   body{
     margin:0;
-    background:var(--blue-900);
+    min-height:100vh;
+    background-color:var(--blue-900);
     color:var(--line);
     font-family:'IBM Plex Sans',sans-serif;
     line-height:1.5;
@@ -44,7 +50,7 @@
       linear-gradient(rgba(40,88,143,0.35) 1px, transparent 1px),
       linear-gradient(90deg, rgba(40,88,143,0.35) 1px, transparent 1px);
     background-size:40px 40px;
-    background-attachment:fixed;
+    background-repeat:repeat;
   }
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
@@ -569,7 +575,7 @@
         <h1>Ask the regulation.<br>Get the <em>clause</em>.</h1>
         <p class="sub">A Claude Skill covering UDCPR and DCPR‑2034 — built by a practicing Mumbai architect for architects, designers, and liaisoners who need a straight answer with a citation, not a 500‑page PDF.</p>
         <div class="cta-row">
-          <a class="btn" href="#" id="pay-link-hero">Get DCR Copilot — ₹149</a>
+          <a class="btn" href="#" id="pay-link-hero">Get DCR Copilot — ₹79</a>
           <a class="btn-outline" href="#how">See how it works ↓</a>
         </div>
         <div class="fine">One‑time purchase · UPI / cards / netbanking · Works on free or paid Claude</div>
@@ -743,11 +749,11 @@
       <div class="price-right">
         <span class="price-tag">One‑time purchase</span>
         <div class="price-amount-row">
-          <span class="price-original">₹499</span>
-          <span class="price-amount">₹149</span>
+          <span class="price-original">₹299</span>
+          <span class="price-amount">₹79</span>
         </div>
         <p class="price-note">Pay via UPI, card, or netbanking. No subscription — yours to keep.</p>
-        <a class="btn" href="#" id="pay-link">Pay ₹149 →</a>
+        <a class="btn" href="#" id="pay-link">Pay ₹79 →</a>
         <div class="fine" style="margin-top:12px;">Secure checkout · Instant delivery to your email</div>
       </div>
     </div>
@@ -898,9 +904,10 @@
 
   // ---- Payment link ----
   // PAYMENT LINK — replace with your live Razorpay Payment Page URL once
-  // your account is verified and the payment page is created:
-  // Dashboard -> Payment Pages -> Create -> set price to ₹149,
-  // enable UPI/cards/netbanking, copy the generated link here.
+  // your account is verified and the payment page is created. Set the
+  // Payment Page's "Redirect URL after payment" (in Razorpay dashboard)
+  // to: https://designhauscollective.in/thank-you.html — that page reads
+  // the payment ID Razorpay appends to the URL and reveals the key.
   const PAYMENT_URL = null; // e.g. "https://pages.razorpay.com/pl_xxxxxxxxxxxx"
 
   function handlePayClick(e){
