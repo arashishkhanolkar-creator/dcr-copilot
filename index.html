@@ -133,6 +133,7 @@
     padding:150px 0 90px;
     width:100%;
   }
+  @media (max-width:600px){ .hero-inner{padding:110px 0 60px;} }
   .hero .eyebrow{color:var(--hero-text);margin-bottom:22px;}
   .hero h1{
     font-size:clamp(40px,6.4vw,74px);
@@ -151,7 +152,7 @@
   .badge{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--hero-text-dim);}
   .badge svg{flex:0 0 auto;opacity:0.85;}
 
-  /* signature element: floating rotating demo card */
+  /* signature element: floating rotating demo card (desktop only, see mobile override below) */
   .citation-float{
     position:absolute;
     right:6%;
@@ -191,7 +192,8 @@
   .cf-table tr.hit td{background:rgba(232,163,61,0.16);font-weight:500;}
   .cf-table tr.hit td:first-child::before{content:'→ ';color:var(--amber);}
   .cf-cite{font-size:11.5px;color:var(--amber);margin-top:12px;display:block;}
-  @media (max-width:780px){ .citation-float{position:static;width:auto;max-width:none;margin:36px 0 0;} }
+  /* mobile: hide the demo card entirely — desktop keeps it */
+  @media (max-width:780px){ .citation-float{display:none;} }
 
   /* ---------- section shells ---------- */
   section{padding:96px 0;}
@@ -306,6 +308,12 @@
   .price-original{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--ink-faint);text-decoration:line-through;}
   .price-amount{font-family:'Archivo',sans-serif;font-weight:900;font-size:44px;color:var(--ink);}
   .price-note{font-size:12.5px;color:var(--ink-faint);margin:6px 0 18px;}
+  @media (max-width:640px){
+    .price-block{padding:32px 24px;}
+    .price-right{text-align:left;width:100%;}
+    .price-amount-row{justify-content:flex-start;}
+    .price-right .btn{width:100%;justify-content:center;}
+  }
 
   /* ---------- faq ---------- */
   details{border-top:1px solid var(--line);padding:20px 0;}
@@ -351,6 +359,7 @@
     border-radius:var(--radius);
     padding:40px 36px;
   }
+  @media (max-width:600px){ .modal-panel{padding:30px 22px;} }
   .modal-panel h3{font-family:'Archivo',sans-serif;font-weight:900;font-size:24px;color:var(--ink);margin-bottom:20px;}
   .modal-body p{font-size:14.5px;color:var(--ink-soft);line-height:1.7;margin:0 0 14px;}
   .modal-body strong{color:var(--ink);}
@@ -697,6 +706,7 @@
   ];
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 780px)').matches;
   const regEl = document.getElementById('cf-reg');
   const qEl = document.getElementById('cf-q');
   const aBlock = document.getElementById('cf-answer');
@@ -760,10 +770,12 @@
     }
   }
 
-  if (reducedMotion){
-    showStatic(demoQueries[0]);
-  } else {
-    runDemoLoop();
+  if (!isMobile){
+    if (reducedMotion){
+      showStatic(demoQueries[0]);
+    } else {
+      runDemoLoop();
+    }
   }
 
   // ---- Payment link ----
