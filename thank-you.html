@@ -3,63 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
 <title>You're in — DCR Copilot</title>
 <meta name="robots" content="noindex">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --blue-900:#122238; --paper:#F5F1E8; --ink:#16232E; --ink-dim:#4B5A68;
-    --ochre:#C98A32; --line-dim:#9FB6CC;
+    --paper:#FCFBF8;
+    --ink:#0A0A08;
+    --ink-soft:#57544C;
+    --ink-faint:#8B877C;
+    --line:#E7E2D6;
+    --amber:#E8A33D;
+    --amber-deep:#C4801F;
+    --radius:3px;
   }
   *{box-sizing:border-box;}
   body{
     margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-    background:var(--blue-900); font-family:'IBM Plex Sans',sans-serif; padding:24px;
+    background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif;
+    line-height:1.6; padding:24px; -webkit-font-smoothing:antialiased;
   }
   .card{
-    background:var(--paper); color:var(--ink); max-width:480px; width:100%;
-    border-radius:2px; padding:36px 32px; text-align:center;
+    max-width:480px; width:100%; text-align:center;
   }
-  h1{font-family:'Space Grotesk',sans-serif; font-size:26px; margin:0 0 8px;}
-  p{color:var(--ink-dim); font-size:15px; line-height:1.6;}
+  .logo{font-family:'Archivo',sans-serif;font-weight:900;font-size:18px;margin-bottom:36px;}
+  .logo span{color:var(--amber);}
+  h1{font-family:'Archivo',sans-serif;font-weight:900;font-size:30px;margin:0 0 10px;letter-spacing:-0.01em;}
+  p{color:var(--ink-soft);font-size:15px;margin:0;}
   .key-box{
-    font-family:'IBM Plex Mono',monospace; font-size:32px; letter-spacing:6px;
-    background:var(--blue-900); color:#fff; padding:20px; border-radius:2px;
-    margin:24px 0; word-break:break-all;
+    font-family:'IBM Plex Mono',monospace;font-size:30px;letter-spacing:5px;
+    background:var(--ink);color:#fff;padding:22px;border-radius:var(--radius);
+    margin:28px 0 10px;word-break:break-all;
   }
-  .steps{text-align:left; margin-top:28px; padding-top:20px; border-top:1px dashed #C9BFA4;}
-  .steps li{margin-bottom:10px; font-size:14.5px; color:var(--ink-dim);}
+  .copy-note{font-size:12.5px;color:var(--ink-faint);}
+  .steps{
+    text-align:left;margin-top:32px;padding-top:24px;border-top:1px solid var(--line);
+  }
+  .steps ol{margin:0;padding-left:20px;}
+  .steps li{margin-bottom:12px;font-size:14.5px;color:var(--ink-soft);line-height:1.55;}
+  .steps li::marker{color:var(--amber-deep);font-weight:700;}
   .btn{
-    display:inline-block; background:var(--ochre); color:var(--blue-900);
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;
-    padding:13px 22px; border-radius:2px; text-decoration:none; margin-top:20px;
+    display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:#1A1200;
+    font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;padding:15px 26px;
+    border-radius:var(--radius);text-decoration:none;margin-top:28px;
+    transition:background 0.15s ease, transform 0.15s ease;
   }
-  .loading, .error{padding:40px 0; color:var(--ink-dim);}
-  .copy-note{font-size:12.5px; color:var(--ink-dim); margin-top:8px;}
+  .btn:hover{background:var(--amber-deep);transform:translateY(-1px);}
+  .loading{padding:60px 0;color:var(--ink-faint);font-size:14.5px;}
+  .error{
+    padding:24px;background:#F5F2EA;border:1px dashed var(--line);border-radius:var(--radius);
+    color:var(--ink-soft);font-size:14.5px;text-align:left;
+  }
+  .error a{color:var(--amber-deep);}
 </style>
 </head>
 <body>
-<div class="card" id="card">
-  <div class="loading" id="loading">Getting your activation key…</div>
+<div class="card">
+  <div class="logo">DCR<span>COPILOT</span></div>
+  <div id="content">
+    <div class="loading">Getting your activation key…</div>
+  </div>
 </div>
 
 <script>
-  // CONFIG — set this to your deployed Worker URL
   const WORKER_BASE = "https://dcr-copilot-keys.designhaus.workers.dev";
 
   const params = new URLSearchParams(window.location.search);
   const paymentId = params.get("razorpay_payment_id") || params.get("payment_id");
-  const card = document.getElementById("card");
+  const content = document.getElementById("content");
 
   async function fetchKey(attempt = 0){
     if (!paymentId){
-      card.innerHTML = '<div class="error">No payment ID found in the URL. If you just paid, check your email — the key was sent there too.</div>';
+      content.innerHTML = '<div class="error">No payment ID found in the URL. If you just paid, check your email — the key was sent there too.</div>';
       return;
     }
     try {
       const res = await fetch(`${WORKER_BASE}/reveal?payment_id=${encodeURIComponent(paymentId)}`);
       if (res.status === 404 && attempt < 5){
-        // webhook may take a few seconds to land — retry briefly
         setTimeout(() => fetchKey(attempt + 1), 2000);
         return;
       }
@@ -75,7 +97,7 @@
   }
 
   function showKey(key){
-    card.innerHTML = `
+    content.innerHTML = `
       <h1>You're in.</h1>
       <p>Here's your activation key — also emailed to you, so it's safe either way.</p>
       <div class="key-box">${key}</div>
@@ -92,7 +114,7 @@
   }
 
   function showFallback(){
-    card.innerHTML = '<div class="error">Payment received — but we couldn\'t load your key here. Check your email (it\'s sent automatically within a minute), or contact connect@designhauscollective.in with your payment ID.</div>';
+    content.innerHTML = '<div class="error">Payment received — but we couldn\'t load your key here. Check your email (it\'s sent automatically within a minute), or contact <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a> with your payment ID.</div>';
   }
 
   fetchKey();
