@@ -654,8 +654,9 @@
     <button class="modal-close" data-close-modal="modal-privacy" aria-label="Close">✕</button>
     <h3>Privacy policy</h3>
     <div class="modal-body">
-      <p><strong>What we collect.</strong> Your email address and payment details at checkout. Payment is processed by Razorpay — we never see or store your card or UPI details ourselves.</p>
+      <p><strong>What we collect.</strong> Your email address on the payment page, used to send your activation key and download link. Razorpay's payment page also asks for a phone number as part of their own payment verification — that number goes to Razorpay, not to us, and we never use it for anything on our end.</p>
       <p><strong>Why we collect it.</strong> Your email is used to generate and deliver your personal activation key and the download link. Nothing more.</p>
+      <p><strong>Payment details.</strong> Payment itself is processed entirely by Razorpay — we never see or store your card, UPI, or bank details ourselves.</p>
       <p><strong>Usage tracking.</strong> We log a basic daily count of how many questions each activation key is used for — this helps us catch a key that's being shared well beyond normal use. We do not see, store, or review the content of your questions.</p>
       <p><strong>Sharing.</strong> We don't sell or share your data with third parties, beyond what's needed to process payment (Razorpay) and deliver email (Resend).</p>
       <p>Questions: <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a></p>
@@ -779,7 +780,7 @@
   }
 
   // ---- Payment link ----
-  const PAYMENT_URL = null; // e.g. "https://pages.razorpay.com/pl_xxxxxxxxxxxx"
+  const PAYMENT_URL = "https://rzp.io/rzp/DCRCOPILOT";
   function handlePayClick(e){
     e.preventDefault();
     if (!PAYMENT_URL){
