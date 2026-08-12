@@ -25,22 +25,21 @@
     background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif;
     line-height:1.6; padding:24px; -webkit-font-smoothing:antialiased;
   }
-  .card{
-    max-width:480px; width:100%; text-align:center;
-  }
+  .card{max-width:480px; width:100%; text-align:center;}
   .logo{font-family:'Archivo',sans-serif;font-weight:900;font-size:18px;margin-bottom:36px;}
   .logo span{color:var(--amber);}
-  h1{font-family:'Archivo',sans-serif;font-weight:900;font-size:30px;margin:0 0 10px;letter-spacing:-0.01em;}
+  .check{
+    width:56px;height:56px;border-radius:50%;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 24px;
+  }
+  h1{font-family:'Archivo',sans-serif;font-weight:900;font-size:28px;margin:0 0 10px;letter-spacing:-0.01em;}
   p{color:var(--ink-soft);font-size:15px;margin:0;}
-  .key-box{
-    font-family:'IBM Plex Mono',monospace;font-size:30px;letter-spacing:5px;
-    background:var(--ink);color:#fff;padding:22px;border-radius:var(--radius);
-    margin:28px 0 10px;word-break:break-all;
+  .email-note{
+    background:#F5F2EA;border:1px dashed var(--line);border-radius:var(--radius);
+    padding:18px 20px;margin:26px 0;font-size:14px;color:var(--ink-soft);text-align:left;
   }
-  .copy-note{font-size:12.5px;color:var(--ink-faint);}
-  .steps{
-    text-align:left;margin-top:32px;padding-top:24px;border-top:1px solid var(--line);
-  }
+  .email-note strong{color:var(--ink);}
+  .steps{text-align:left;margin-top:30px;padding-top:24px;border-top:1px solid var(--line);}
   .steps ol{margin:0;padding-left:20px;}
   .steps li{margin-bottom:12px;font-size:14.5px;color:var(--ink-soft);line-height:1.55;}
   .steps li::marker{color:var(--amber-deep);font-weight:700;}
@@ -51,73 +50,49 @@
     transition:background 0.15s ease, transform 0.15s ease;
   }
   .btn:hover{background:var(--amber-deep);transform:translateY(-1px);}
-  .loading{padding:60px 0;color:var(--ink-faint);font-size:14.5px;}
-  .error{
-    padding:24px;background:#F5F2EA;border:1px dashed var(--line);border-radius:var(--radius);
-    color:var(--ink-soft);font-size:14.5px;text-align:left;
-  }
-  .error a{color:var(--amber-deep);}
+  .support{margin-top:22px;font-size:13px;color:var(--ink-faint);}
+  .support a{color:var(--amber-deep);}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">DCR<span>COPILOT</span></div>
-  <div id="content">
-    <div class="loading">Getting your activation key…</div>
+  <div class="check">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
   </div>
+  <h1>Payment received.</h1>
+  <p>Your download has started automatically — your activation key is on its way to your email too.</p>
+
+  <div class="email-note">
+    <strong>Check your inbox</strong> for an email from <strong>keys@designhauscollective.in</strong>, subject "Your DCR Copilot activation key." It usually arrives within a minute. If you don't see it in a few minutes, check your <strong>Spam</strong> or <strong>Promotions</strong> tab — first emails from a new sender sometimes land there.
+  </div>
+
+  <div class="steps">
+    <ol>
+      <li>Find the downloaded file (usually in your Downloads folder), or use the button below if the download didn't start.</li>
+      <li>In Claude: Settings → Capabilities → enable Code execution → Skills → Add skill → upload the zip.</li>
+      <li>Ask any UDCPR or DCPR-2034 question. The first time, Claude will ask for your key — paste in the 8-digit key from your email.</li>
+    </ol>
+  </div>
+
+  <a class="btn" href="https://designhauscollective.in/downloads/dcr-copilot.zip" id="download-btn">Download DCR Copilot →</a>
+
+  <p class="support">Payment went through but no email after 10 minutes? Email <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a> with your payment ID and we'll sort it out.</p>
 </div>
 
 <script>
-  const WORKER_BASE = "https://dcr-copilot-keys.designhaus.workers.dev";
-
-  const params = new URLSearchParams(window.location.search);
-  const paymentId = params.get("razorpay_payment_id") || params.get("payment_id");
-  const content = document.getElementById("content");
-
-  async function fetchKey(attempt = 0){
-    if (!paymentId){
-      content.innerHTML = '<div class="error">No payment ID found in the URL. If you just paid, check your email — the key was sent there too.</div>';
-      return;
-    }
-    try {
-      const res = await fetch(`${WORKER_BASE}/reveal?payment_id=${encodeURIComponent(paymentId)}`);
-      if (res.status === 404 && attempt < 5){
-        setTimeout(() => fetchKey(attempt + 1), 2000);
-        return;
-      }
-      if (!res.ok){
-        showFallback();
-        return;
-      }
-      const data = await res.json();
-      showKey(data.key);
-    } catch (e){
-      showFallback();
-    }
-  }
-
-  function showKey(key){
-    content.innerHTML = `
-      <h1>You're in.</h1>
-      <p>Here's your activation key — also emailed to you, so it's safe either way.</p>
-      <div class="key-box">${key}</div>
-      <p class="copy-note">Save this somewhere you'll find it again.</p>
-      <div class="steps">
-        <ol>
-          <li>Download the skill file (link below, and in your email).</li>
-          <li>In Claude: Settings → Capabilities → enable Code execution → Skills → Add skill → upload the zip.</li>
-          <li>Ask any UDCPR or DCPR-2034 question. The first time, Claude will ask for your key — paste the number above.</li>
-        </ol>
-      </div>
-      <a class="btn" href="https://designhauscollective.in/downloads/dcr-copilot.zip">Download DCR Copilot →</a>
-    `;
-  }
-
-  function showFallback(){
-    content.innerHTML = '<div class="error">Payment received — but we couldn\'t load your key here. Check your email (it\'s sent automatically within a minute), or contact <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a> with your payment ID.</div>';
-  }
-
-  fetchKey();
+  // Auto-trigger the download on page load. Uses a hidden anchor with the
+  // "download" attribute rather than window.location, so it doesn't
+  // navigate away from this confirmation page — the visible button stays
+  // as a manual fallback in case a browser blocks the automatic version.
+  window.addEventListener("load", function(){
+    const link = document.createElement("a");
+    link.href = "https://designhauscollective.in/downloads/dcr-copilot.zip";
+    link.download = "dcr-copilot.zip";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
 </script>
 </body>
 </html>
