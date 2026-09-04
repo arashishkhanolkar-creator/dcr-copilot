@@ -52,10 +52,14 @@
   .ph:hover .zoom{transform:scale(1.035);}
   .ph .slide{position:absolute; inset:0; opacity:0; transition:opacity 1.6s ease;}
   .ph .slide.active{opacity:1;}
-  .ph .slide:nth-child(1){background:var(--charcoal);}
-  .ph .slide:nth-child(2){background:#4a4238;}
-  .ph .slide:nth-child(3){background:var(--stone);}
-  .ph .slide:nth-child(4){background:#d8cdb8;}
+  .ph .slide img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .slideshow-credit{
+    position:absolute; right:20px; bottom:18px; z-index:6;
+    font-family:'Manrope',sans-serif; font-weight:500; font-size:11px;
+    letter-spacing:0.08em; text-transform:uppercase; color:rgba(243,239,232,0.92);
+    text-shadow:0 1px 6px rgba(0,0,0,0.55); pointer-events:none; text-align:right;
+    transition:opacity .5s ease;
+  }
 
   .link-u{position:relative; display:inline-block;}
   .link-u::after{
@@ -234,20 +238,10 @@
 </header>
 
 <section class="hero">
-  <div class="ph charcoal" data-slideshow>
-    <div class="slide active"></div>
-    <div class="slide"></div>
-    <div class="slide"></div>
-    <div class="slide"></div>
-    <span class="fillnote">Photography placeholder — selected work</span>
+  <div class="ph charcoal" data-slideshow id="heroSlideshow">
+    <span class="slideshow-credit" id="heroSlideshowCredit"></span>
   </div>
   <div class="hero-plate">Fig. 01</div>
-</section>
-
-<section class="intro">
-  <span class="micro">Mumbai — Est. Practice</span>
-  <h2>Architecture and interiors shaped by material, context, and restraint.</h2>
-  <p class="intro-desc">Designhaus Collective — Architecture / Interiors / Spatial Design</p>
 </section>
 
 
@@ -360,7 +354,50 @@
   });
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!reduceMotion){
+    // Selected-work slideshow: real project renders, shuffled to a random
+    // order each time the page loads (not grouped by project on purpose).
+    // Each image carries a "Designhaus X <collaborator>" credit line, shown
+    // bottom-right, synced to whichever image is currently on screen.
+    var HERO_SLIDESHOW_ITEMS = [{"src": "assets/slideshow/anushka-01.jpg", "credit": "Residential Interior Design"}, {"src": "assets/slideshow/anushka-02.jpg", "credit": "Residential Interior Design"}, {"src": "assets/slideshow/kunal-01.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/kunal-02.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/kunal-03.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/kunal-04.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/mayur-01.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/mayur-02.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/mayur-03.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/mayur-04.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/mayur-05.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/rakesh-01.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/rakesh-02.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/rakesh-03.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/rakesh-04.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/rakesh-05.jpg", "credit": "Designhaus X TDA"}, {"src": "assets/slideshow/nesterra-01.jpg", "credit": "Designhaus X Nesterra"}, {"src": "assets/slideshow/nesterra-02.jpg", "credit": "Designhaus X Nesterra"}, {"src": "assets/slideshow/nesterra-03.jpg", "credit": "Designhaus X Nesterra"}, {"src": "assets/slideshow/nesterra-04.jpg", "credit": "Designhaus X Nesterra"}, {"src": "assets/slideshow/nesterra-05.jpg", "credit": "Designhaus X Nesterra"}, {"src": "assets/slideshow/rampelli-01.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/rampelli-02.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/rampelli-03.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/rampelli-04.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/rampelli-05.jpg", "credit": "Designhaus X ITERUM Design Studio"}, {"src": "assets/slideshow/rampelli-06.jpg", "credit": "Designhaus X ITERUM Design Studio"}];
+
+    (function () {
+      var host = document.getElementById('heroSlideshow');
+      var creditEl = document.getElementById('heroSlideshowCredit');
+      if (!host || !HERO_SLIDESHOW_ITEMS.length) return;
+
+      var items = HERO_SLIDESHOW_ITEMS.slice();
+      for (var i = items.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = items[i]; items[i] = items[j]; items[j] = tmp;
+      }
+
+      items.forEach(function (item, idx) {
+        var slide = document.createElement('div');
+        slide.className = 'slide' + (idx === 0 ? ' active' : '');
+        var img = document.createElement('img');
+        img.src = item.src;
+        img.alt = 'Designhaus Collective — selected work';
+        img.loading = idx === 0 ? 'eager' : 'lazy';
+        slide.appendChild(img);
+        host.insertBefore(slide, creditEl);
+      });
+
+      if (creditEl) creditEl.textContent = items[0].credit;
+
+      if (items.length > 1) {
+        var slides = host.querySelectorAll('.slide');
+        var current = 0;
+        setInterval(function () {
+          slides[current].classList.remove('active');
+          current = (current + 1) % slides.length;
+          slides[current].classList.add('active');
+          if (creditEl) creditEl.textContent = items[current].credit;
+        }, 5000);
+      }
+    })();
+
     document.querySelectorAll('[data-slideshow]').forEach(el=>{
+      if (el.id === 'heroSlideshow') return; // handled above with real images
       const slides = el.querySelectorAll('.slide');
       if(slides.length < 2) return;
       let i = 0;
