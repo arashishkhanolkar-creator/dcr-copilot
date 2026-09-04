@@ -140,17 +140,18 @@
   .services{background:var(--stone); padding:140px 56px;}
   .services-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:80px; flex-wrap:wrap; gap:20px;}
   .services-head h2{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(28px,3.2vw,42px); max-width:520px; line-height:1.2;}
-  .service-list{border-top:1px solid var(--line);}
-  .service-row{border-bottom:1px solid var(--line); padding:30px 0; cursor:pointer;}
-  .service-row-head{display:grid; grid-template-columns:60px 1fr 24px; align-items:center; gap:20px;}
-  .service-row .num{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--earth); font-weight:500;}
-  .service-row h3{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(20px,2.4vw,30px);}
-  .service-row .plus{font-size:20px; font-weight:300; color:var(--concrete); transition:transform .3s ease;}
-  .service-row.open .plus{transform:rotate(45deg);}
-  .service-desc{max-height:0; overflow:hidden; transition:max-height .4s ease;}
-  .service-row.open .service-desc{max-height:120px;}
-  .service-desc p{padding:18px 0 0 80px; max-width:560px; font-size:13.5px; line-height:1.7; color:var(--concrete); font-weight:300;}
-  @media(max-width:700px){ .service-desc p{padding-left:0; margin-top:4px;} }
+  .service-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+  }
+  .service-tile{
+    background:var(--ivory); padding:40px 32px; display:flex; flex-direction:column; gap:18px;
+  }
+  .service-tile .num{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--earth); font-weight:500;}
+  .service-tile h3{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(19px,2vw,24px); line-height:1.25;}
+  .service-tile p{font-size:13.5px; line-height:1.7; color:var(--concrete); font-weight:300; max-width:340px;}
+  @media(max-width:900px){ .service-grid{grid-template-columns:repeat(2, 1fr);} }
+  @media(max-width:600px){ .service-grid{grid-template-columns:1fr;} }
 
   /* ---------- STUDIO STATEMENT ---------- */
   .studio{padding:150px 56px 60px;}
@@ -252,46 +253,31 @@
       <h2>Five disciplines, one point of view.</h2>
     </div>
   </div>
-  <div class="service-list">
-    <div class="service-row" data-svc>
-      <div class="service-row-head">
-        <span class="num">01</span>
-        <h3>Architecture</h3>
-        <span class="plus">+</span>
-      </div>
-      <div class="service-desc"><p>Ground-up and adaptive projects across residential, commercial, and mixed-use typologies — from concept through construction detailing.</p></div>
+  <div class="service-grid">
+    <div class="service-tile">
+      <span class="num">01</span>
+      <h3>Architecture</h3>
+      <p>Ground-up and adaptive projects across residential, commercial, and mixed-use typologies — from concept through construction detailing.</p>
     </div>
-    <div class="service-row" data-svc>
-      <div class="service-row-head">
-        <span class="num">02</span>
-        <h3>Interior Design</h3>
-        <span class="plus">+</span>
-      </div>
-      <div class="service-desc"><p>Spatial and material planning for residences, retail, and hospitality — considered down to joinery and finish.</p></div>
+    <div class="service-tile">
+      <span class="num">02</span>
+      <h3>Interior Design</h3>
+      <p>Spatial and material planning for residences, retail, and hospitality — considered down to joinery and finish.</p>
     </div>
-    <div class="service-row" data-svc>
-      <div class="service-row-head">
-        <span class="num">03</span>
-        <h3>Spatial Design</h3>
-        <span class="plus">+</span>
-      </div>
-      <div class="service-desc"><p>Exhibitions, installations, and short-life environments where spatial narrative matters as much as construction.</p></div>
+    <div class="service-tile">
+      <span class="num">03</span>
+      <h3>Spatial Design</h3>
+      <p>Exhibitions, installations, and short-life environments where spatial narrative matters as much as construction.</p>
     </div>
-    <div class="service-row" data-svc>
-      <div class="service-row-head">
-        <span class="num">04</span>
-        <h3>3D Visualization</h3>
-        <span class="plus">+</span>
-      </div>
-      <div class="service-desc"><p>Presentation and sales visualization for developers and design partners, built from working drawings, not stock assets.</p></div>
+    <div class="service-tile">
+      <span class="num">04</span>
+      <h3>3D Visualization</h3>
+      <p>Presentation and sales visualization for developers and design partners, built from working drawings, not stock assets.</p>
     </div>
-    <div class="service-row" data-svc>
-      <div class="service-row-head">
-        <span class="num">05</span>
-        <h3>Branding &amp; Graphic Design</h3>
-        <span class="plus">+</span>
-      </div>
-      <div class="service-desc"><p>Identity and print systems for studios and small brands adjacent to the built environment.</p></div>
+    <div class="service-tile">
+      <span class="num">05</span>
+      <h3>Branding &amp; Graphic Design</h3>
+      <p>Identity and print systems for studios and small brands adjacent to the built environment.</p>
     </div>
   </div>
 </section>
@@ -345,13 +331,6 @@
   const nav = document.getElementById('siteNav');
   window.addEventListener('scroll', ()=>{
     nav.classList.toggle('scrolled', window.scrollY > 60);
-  });
-  document.querySelectorAll('[data-svc]').forEach(row=>{
-    row.addEventListener('click', ()=>{
-      const isOpen = row.classList.contains('open');
-      document.querySelectorAll('[data-svc]').forEach(r=>r.classList.remove('open'));
-      if(!isOpen) row.classList.add('open');
-    });
   });
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!reduceMotion){
