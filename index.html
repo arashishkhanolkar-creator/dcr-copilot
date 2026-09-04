@@ -52,7 +52,8 @@
   .ph:hover .zoom{transform:scale(1.035);}
   .ph .slide{position:absolute; inset:0; opacity:0; transition:opacity 1.6s ease;}
   .ph .slide.active{opacity:1;}
-  .ph .slide img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .ph .slide .slide-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(32px) brightness(0.72) saturate(1.1); transform:scale(1.15); z-index:0;}
+  .ph .slide .slide-fg{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; z-index:1;}
   .slideshow-credit{
     position:absolute; right:20px; bottom:18px; z-index:6;
     font-family:'Manrope',sans-serif; font-weight:500; font-size:11px;
@@ -374,11 +375,19 @@
       items.forEach(function (item, idx) {
         var slide = document.createElement('div');
         slide.className = 'slide' + (idx === 0 ? ' active' : '');
-        var img = document.createElement('img');
-        img.src = item.src;
-        img.alt = 'Designhaus Collective — selected work';
-        img.loading = idx === 0 ? 'eager' : 'lazy';
-        slide.appendChild(img);
+        var bg = document.createElement('img');
+        bg.className = 'slide-bg';
+        bg.src = item.src;
+        bg.alt = '';
+        bg.setAttribute('aria-hidden', 'true');
+        bg.loading = idx === 0 ? 'eager' : 'lazy';
+        var fg = document.createElement('img');
+        fg.className = 'slide-fg';
+        fg.src = item.src;
+        fg.alt = 'Designhaus Collective — selected work';
+        fg.loading = idx === 0 ? 'eager' : 'lazy';
+        slide.appendChild(bg);
+        slide.appendChild(fg);
         host.insertBefore(slide, creditEl);
       });
 
