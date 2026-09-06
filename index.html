@@ -120,9 +120,12 @@
     .work-section{padding:140px 24px 60px;}
   }
 
-  .work-image-col{display:flex; flex-direction:column; height:100%;}
-  .work-image-col .ph{flex:1; min-height:0;}
-  .work-credit{margin-top:16px; display:block; color:var(--earth); transition:opacity .5s ease;}
+  .work-image-col{position:relative; height:100%;}
+  .work-image-col .ph{height:100%;}
+  .work-credit{
+    position:absolute; top:100%; left:0; margin-top:16px;
+    display:block; color:var(--earth); transition:opacity .5s ease;
+  }
   .slide-nav{
     position:absolute; top:50%; transform:translateY(-50%); z-index:10;
     width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;
