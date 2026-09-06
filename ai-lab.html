@@ -95,16 +95,14 @@
   .dropdown a:last-child{border-bottom:none;}
   .dropdown a:hover{opacity:0.6;}
 
-  /* ---------- PAGE HERO (shorter banner) ---------- */
-  .page-hero{position:relative; height:56vh; min-height:400px;}
-  .page-hero .ph{position:absolute; inset:0;}
-  .page-hero-overlay{position:absolute; left:56px; bottom:56px; z-index:2; color:#f3efe8; max-width:640px;}
-  .page-hero-overlay .micro{color:#e3dccb; margin-bottom:20px; display:block;}
-  .page-hero h1{
-    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(32px,5vw,60px);
-    line-height:1.05; letter-spacing:-0.005em;
+  /* ---------- PAGE HERO ---------- */
+  .lab-hero{padding:170px 56px 90px; background:var(--ivory);}
+  .lab-hero .micro{margin-bottom:24px; display:block;}
+  .lab-hero h1{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(38px,7vw,84px);
+    line-height:1.03; letter-spacing:-0.01em; max-width:900px;
   }
-  .page-hero .desc{margin-top:18px; font-size:14px; color:#e3dccb; font-weight:300; max-width:480px; line-height:1.6;}
+  .lab-hero .desc{margin-top:28px; font-size:15px; color:var(--concrete); font-weight:300; max-width:480px; line-height:1.8;}
 
   /* ---------- SECTIONS ---------- */
   section{padding:120px 56px;}
@@ -145,11 +143,17 @@
   .waitlist button{border:none; background:none; padding:12px 0 12px 14px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-weight:500; cursor:pointer; color:var(--charcoal);}
 
   /* ---------- CTA ---------- */
-  .cta-section{padding:130px 56px 150px;}
+  .cta-section{background:var(--charcoal); color:var(--ivory); padding:150px 56px 130px;}
   .cta-section h2{
-    font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(28px,4vw,48px); line-height:1.25; max-width:760px; margin-bottom:30px;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(30px,5vw,54px); line-height:1.2;
+    text-transform:uppercase; letter-spacing:-0.005em; max-width:760px; margin-bottom:40px;
   }
-  .cta-btn{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; border-bottom:1px solid var(--charcoal); padding-bottom:4px;}
+  .cta-btn{
+    display:inline-block; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600;
+    color:var(--charcoal); background:var(--ivory); padding:16px 32px; border-radius:999px;
+    transition:opacity .3s ease;
+  }
+  .cta-btn:hover{opacity:0.8;}
 
   /* ---------- FOOTER ---------- */
   footer{background:var(--charcoal); color:#8f8879; padding:40px 56px; border-top:1px solid var(--line-light);}
@@ -189,13 +193,10 @@
   </nav>
 </header>
 
-<section class="page-hero" style="padding:0;">
-  <div class="ph charcoal"><span class="fillnote">Photography placeholder</span></div>
-  <div class="page-hero-overlay">
-    <span class="micro">AI Lab</span>
-    <h1>Design intelligence,<br>built in-house.</h1>
-    <p class="desc">Internal tools — digital products — AI consulting. Systems built for our own practice first, shared when they hold up.</p>
-  </div>
+<section class="lab-hero">
+  <span class="micro">AI Lab</span>
+  <h1>Design intelligence,<br>built in-house.</h1>
+  <p class="desc">Internal tools — digital products — AI consulting. Systems built for our own practice first, shared when they hold up.</p>
 </section>
 
 <section class="intro">
