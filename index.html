@@ -47,14 +47,13 @@
     --line-light: rgba(243,239,232,0.22);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; overflow-x:hidden;}
   body{
     background:var(--ivory);
     color:var(--charcoal);
     font-family:'Manrope', sans-serif;
     font-weight:400;
     -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
   }
   a{color:inherit; text-decoration:none;}
   img,svg{display:block;}
@@ -114,7 +113,17 @@
     opacity:0; pointer-events:none; transition:opacity .6s ease .15s;
   }
   .hero-work.active .work-frame{opacity:1; pointer-events:auto;}
-  .work-frame .ph{position:absolute; inset:0; border-radius:4px;}
+  .work-frame-inner{display:grid; grid-template-columns:38.2% 61.8%; height:100%; border-radius:4px; overflow:hidden;}
+  .work-disciplines{background:var(--ivory); padding:8px 40px; display:flex; flex-direction:column; justify-content:center;}
+  .work-disciplines .wd-item{padding:16px 0; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:16px;}
+  .work-disciplines .wd-item:last-child{border-bottom:none;}
+  .work-disciplines .wd-item .num{font-family:'Space Grotesk',sans-serif; font-size:11px; color:var(--earth); font-weight:500;}
+  .work-disciplines .wd-item h4{font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500; color:var(--charcoal); line-height:1.3;}
+  .work-frame-inner .ph{height:100%;}
+  @media(max-width:860px){
+    .work-frame-inner{grid-template-columns:1fr; grid-template-rows:auto 1fr;}
+    .work-disciplines{padding:20px 24px;}
+  }
   @media(max-width:700px){
     .hero-work-about{max-width:260px; left:24px; bottom:120px;}
     .hero-intro-work{right:24px; bottom:26px;}
@@ -202,14 +211,7 @@
   /* ---------- SERVICES ---------- */
   .services{background:var(--ivory); padding:140px 56px;}
   .services-layout{display:grid; grid-template-columns:240px 1fr; gap:60px;}
-  .services-side{display:flex; flex-direction:column; justify-content:space-between; gap:60px;}
-  .services-cta{display:flex; flex-direction:column; align-items:flex-start; gap:16px;}
-  .btn-pill{
-    display:inline-block; background:var(--charcoal); color:var(--ivory);
-    padding:14px 28px; border-radius:999px; font-size:11px; font-weight:500;
-    letter-spacing:0.08em; text-transform:uppercase; transition:opacity .3s ease;
-  }
-  .btn-pill:hover{opacity:0.75;}
+  .services-side{display:flex; flex-direction:column;}
   .services-rows{border-top:1px solid var(--line);}
   .services-row{
     display:grid; grid-template-columns:260px 1fr; gap:40px;
@@ -223,36 +225,22 @@
   }
 
   /* ---------- STUDIO STATEMENT ---------- */
-  .studio{background:var(--charcoal); padding:100px 56px 120px;}
-  .studio-meta{
-    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
-    color:rgba(243,239,232,0.7); font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
-    padding-bottom:36px; border-bottom:1px solid var(--line-light); margin-bottom:36px;
+  .studio{background:var(--ivory); padding:120px 56px 100px;}
+  .studio-name{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(48px,8vw,110px);
+    line-height:1; margin-bottom:140px; letter-spacing:-0.01em;
   }
-  .studio-card{background:var(--ivory); border-radius:20px; padding:56px;}
-  .studio-card-top{
-    display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px;
-    margin-bottom:70px;
-  }
-  .studio-card-top h2{
-    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(28px,4vw,46px); line-height:1.15; max-width:600px;
-  }
-  .studio-tags{display:flex; gap:26px; flex-wrap:wrap; padding-top:12px;}
-  .studio-tags span{font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--concrete);}
-  .studio-card-image{
-    width:280px; max-width:100%; aspect-ratio:4/5; margin:0 auto 56px; position:relative;
-  }
-  .studio-card-bottom{
+  .studio-photo{width:280px; max-width:100%; aspect-ratio:4/5; margin:0 auto 56px; position:relative;}
+  .studio-bottom{
     display:grid; grid-template-columns:160px 1fr; gap:40px;
     padding-top:40px; border-top:1px solid var(--line);
   }
-  .studio-card-copy{display:grid; grid-template-columns:1fr 1fr; gap:40px;}
-  .studio-card-copy p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
+  .studio-copy{display:grid; grid-template-columns:1fr 1fr; gap:40px;}
+  .studio-copy p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
   @media(max-width:860px){
-    .studio-card{padding:32px;}
-    .studio-card-top{margin-bottom:40px;}
-    .studio-card-bottom{grid-template-columns:1fr; gap:16px;}
-    .studio-card-copy{grid-template-columns:1fr;}
+    .studio-name{margin-bottom:80px;}
+    .studio-bottom{grid-template-columns:1fr; gap:16px;}
+    .studio-copy{grid-template-columns:1fr;}
   }
 
   /* ---------- CONTACT ---------- */
@@ -320,8 +308,18 @@
     </svg>
   </a>
   <div class="work-frame">
-    <div class="ph charcoal" data-slideshow id="heroSlideshow">
-      <span class="slideshow-credit" id="heroSlideshowCredit"></span>
+    <div class="work-frame-inner">
+      <div class="work-disciplines">
+        <div class="wd-item"><span class="num">01</span><h4>Architecture</h4></div>
+        <div class="wd-item"><span class="num">02</span><h4>Interior Design</h4></div>
+        <div class="wd-item"><span class="num">03</span><h4>Spatial Design</h4></div>
+        <div class="wd-item"><span class="num">04</span><h4>3D Visualization</h4></div>
+        <div class="wd-item"><span class="num">05</span><h4>Branding &amp; Graphic Design</h4></div>
+        <div class="wd-item"><span class="num">06</span><h4>AI &amp; Design Tools</h4></div>
+      </div>
+      <div class="ph charcoal" data-slideshow id="heroSlideshow">
+        <span class="slideshow-credit" id="heroSlideshowCredit"></span>
+      </div>
     </div>
   </div>
 </section>
@@ -331,10 +329,6 @@
   <div class="services-layout">
     <div class="services-side">
       <span class="micro">What We Do</span>
-      <div class="services-cta">
-        <a href="#contact" class="btn-pill">Start a Project</a>
-        <a href="#work" class="link-u">See Our Work</a>
-      </div>
     </div>
     <div class="services-rows">
       <div class="services-row">
@@ -366,25 +360,13 @@
 </section>
 
 <section id="studio" class="studio">
-  <div class="studio-meta">
-    <span>Designhaus Collective</span>
-    <span>Architecture &amp; Interiors</span>
-    <span>Mumbai, India</span>
-  </div>
-  <div class="studio-card">
-    <div class="studio-card-top">
-      <h2>Architecture, interiors, and the ideas between them.</h2>
-      <div class="studio-tags">
-        <span>Architecture</span><span>Materiality</span><span>Context</span><span>Craft</span>
-      </div>
-    </div>
-    <div class="ph studio-card-image"><span class="fillnote">Photography placeholder</span></div>
-    <div class="studio-card-bottom">
-      <span class="micro">About</span>
-      <div class="studio-card-copy">
-        <p>Designhaus Collective is a Mumbai-based architecture and design studio led by Ashish Khanolkar, working across architecture, interiors, and visualization.</p>
-        <p>Projects are shaped by context, material, and restraint — considered from the first sketch through to the smallest detail.</p>
-      </div>
+  <h2 class="studio-name">Ashish Khanolkar</h2>
+  <div class="ph studio-photo"><span class="fillnote">Photography placeholder</span></div>
+  <div class="studio-bottom">
+    <span class="micro">About</span>
+    <div class="studio-copy">
+      <p>Designhaus Collective is a Mumbai-based architecture and design studio led by Ashish Khanolkar, working across architecture, interiors, and visualization.</p>
+      <p>Projects are shaped by context, material, and restraint — considered from the first sketch through to the smallest detail.</p>
     </div>
   </div>
 </section>
