@@ -83,30 +83,45 @@
   .ph .slide.active{opacity:1;}
   .ph .slide .slide-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(32px) brightness(0.72) saturate(1.1); transform:scale(1.15); z-index:0;}
   .ph .slide .slide-fg{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; z-index:1;}
-  .hero-intro-about{
+  .hero-work{position:relative; height:100vh; min-height:640px; background:var(--stone); overflow:hidden;}
+  .hero-work-about{
     position:absolute; left:56px; bottom:36px; z-index:5; max-width:420px;
+    transition:opacity .5s ease;
   }
-  .hero-intro-about .micro{margin-bottom:14px; display:block;}
-  .hero-intro-about p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
+  .hero-work-about .micro{color:var(--earth); margin-bottom:14px; display:block;}
+  .hero-work-about p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
   .hero-intro-work{
-    position:absolute; right:56px; bottom:30px; z-index:5;
-    display:flex; align-items:center; gap:14px;
+    position:absolute; right:56px; bottom:30px; z-index:6;
+    display:flex; align-items:center; gap:14px; cursor:pointer;
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(34px,6vw,72px);
     text-transform:uppercase; letter-spacing:-0.01em; line-height:1; color:var(--charcoal);
-    transition:opacity .3s ease;
+    transition:top .6s cubic-bezier(.16,.8,.24,1), right .6s cubic-bezier(.16,.8,.24,1), opacity .3s ease;
   }
   .hero-intro-work:hover{opacity:0.65;}
-  .hero-intro-work svg{width:20px; height:26px; flex-shrink:0; animation:heroArrowBounce 1.8s ease-in-out infinite;}
+  .hero-intro-work svg{width:20px; height:26px; flex-shrink:0; animation:heroArrowBounce 1.8s ease-in-out infinite; transition:opacity .3s ease, width .3s ease;}
   @keyframes heroArrowBounce{
     0%, 100%{transform:translateY(0);}
     50%{transform:translateY(8px);}
   }
+  .hero-work.active .hero-work-about{opacity:0; pointer-events:none;}
+  .hero-work.active .hero-intro-work{
+    top:180px; bottom:auto; right:56px;
+    font-size:14px; letter-spacing:0.12em; gap:0;
+  }
+  .hero-work.active .hero-intro-work svg{opacity:0; width:0;}
+  .work-frame{
+    position:absolute; top:250px; right:56px; bottom:56px; left:56px;
+    opacity:0; pointer-events:none; transition:opacity .6s ease .15s;
+  }
+  .hero-work.active .work-frame{opacity:1; pointer-events:auto;}
+  .work-frame .ph{position:absolute; inset:0; border-radius:4px;}
   @media(max-width:700px){
-    .hero-intro-about{max-width:260px; left:24px; bottom:120px;}
+    .hero-work-about{max-width:260px; left:24px; bottom:120px;}
     .hero-intro-work{right:24px; bottom:26px;}
     .hero-intro-work svg{width:14px; height:18px;}
+    .hero-work.active .hero-intro-work{top:170px; right:24px;}
+    .work-frame{top:220px; left:24px; right:24px; bottom:24px;}
   }
-  .work-label{padding:70px 56px 24px;}
 
   .slideshow-credit{
     position:absolute; right:24px; bottom:22px; z-index:6;
@@ -133,7 +148,7 @@
   .nav-mark img{height:92px; width:auto; transition:height .4s ease, filter .4s ease;}
   header.nav.scrolled .nav-mark img{height:58px;}
   header.nav.scrolled .nav-mark img{filter:none;}
-  nav.links{display:flex; gap:40px; align-items:center;}
+  nav.links{display:flex; gap:72px; align-items:center;}
   nav.links a{font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:500;}
   @media (max-width:860px){ nav.links{display:none;} }
 
@@ -185,36 +200,60 @@
   .intro-desc{font-size:13px; letter-spacing:0.04em; color:var(--concrete); font-weight:400;}
 
   /* ---------- SERVICES ---------- */
-  .services{background:var(--charcoal); padding:140px 56px; color:var(--ivory);}
-  .services .micro{color:#8f8879;}
-  .services-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:80px; flex-wrap:wrap; gap:20px;}
-  .services-head h2{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(28px,3.2vw,42px); max-width:520px; line-height:1.2;}
-  .service-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
-    background:var(--line-light); border:1px solid var(--line-light);
+  .services{background:var(--ivory); padding:140px 56px;}
+  .services-layout{display:grid; grid-template-columns:240px 1fr; gap:60px;}
+  .services-side{display:flex; flex-direction:column; justify-content:space-between; gap:60px;}
+  .services-cta{display:flex; flex-direction:column; align-items:flex-start; gap:16px;}
+  .btn-pill{
+    display:inline-block; background:var(--charcoal); color:var(--ivory);
+    padding:14px 28px; border-radius:999px; font-size:11px; font-weight:500;
+    letter-spacing:0.08em; text-transform:uppercase; transition:opacity .3s ease;
   }
-  .service-tile{
-    background:var(--earth); padding:40px 32px; display:flex; flex-direction:column; gap:18px;
+  .btn-pill:hover{opacity:0.75;}
+  .services-rows{border-top:1px solid var(--line);}
+  .services-row{
+    display:grid; grid-template-columns:260px 1fr; gap:40px;
+    padding:34px 0; border-bottom:1px solid var(--line);
   }
-  .service-tile .num{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--taupe); font-weight:500;}
-  .service-tile h3{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(19px,2vw,24px); line-height:1.25; color:var(--ivory);}
-  .service-tile p{font-size:13.5px; line-height:1.7; color:#c9c2b0; font-weight:300; max-width:340px;}
-  @media(max-width:900px){ .service-grid{grid-template-columns:repeat(2, 1fr);} }
-  @media(max-width:600px){ .service-grid{grid-template-columns:1fr;} }
+  .services-row h3{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(20px,2vw,26px); line-height:1.25;}
+  .services-row p{font-size:14px; line-height:1.75; color:var(--concrete); font-weight:300; max-width:420px;}
+  @media(max-width:860px){
+    .services-layout{grid-template-columns:1fr; gap:40px;}
+    .services-row{grid-template-columns:1fr; gap:12px;}
+  }
 
   /* ---------- STUDIO STATEMENT ---------- */
-  .studio{padding:150px 56px 60px;}
-  .studio-headline{
-    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(30px,5vw,58px);
-    text-transform:uppercase; line-height:1.08; max-width:1100px; margin-bottom:100px; letter-spacing:-0.005em;
+  .studio{background:var(--charcoal); padding:100px 56px 120px;}
+  .studio-meta{
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    color:rgba(243,239,232,0.7); font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    padding-bottom:36px; border-bottom:1px solid var(--line-light); margin-bottom:36px;
   }
-  .studio-body{display:grid; grid-template-columns:0.4fr 0.6fr; gap:60px; align-items:end; margin-bottom:60px;}
-  .studio-body .ph{aspect-ratio:4/5; max-width:340px;}
-  .studio-body-copy{padding-top:60px;}
-  .studio-body-copy p{font-size:14.5px; line-height:1.8; color:var(--concrete); font-weight:300; max-width:480px; margin-bottom:20px;}
-  .studio-tags{display:flex; gap:26px; flex-wrap:wrap; margin-top:30px;}
+  .studio-card{background:var(--ivory); border-radius:20px; padding:56px;}
+  .studio-card-top{
+    display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px;
+    margin-bottom:70px;
+  }
+  .studio-card-top h2{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(28px,4vw,46px); line-height:1.15; max-width:600px;
+  }
+  .studio-tags{display:flex; gap:26px; flex-wrap:wrap; padding-top:12px;}
   .studio-tags span{font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--concrete);}
-  @media(max-width:860px){.studio-body{grid-template-columns:1fr;} .studio-body-copy{padding-top:0;}}
+  .studio-card-image{
+    width:280px; max-width:100%; aspect-ratio:4/5; margin:0 auto 56px; position:relative;
+  }
+  .studio-card-bottom{
+    display:grid; grid-template-columns:160px 1fr; gap:40px;
+    padding-top:40px; border-top:1px solid var(--line);
+  }
+  .studio-card-copy{display:grid; grid-template-columns:1fr 1fr; gap:40px;}
+  .studio-card-copy p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
+  @media(max-width:860px){
+    .studio-card{padding:32px;}
+    .studio-card-top{margin-bottom:40px;}
+    .studio-card-bottom{grid-template-columns:1fr; gap:16px;}
+    .studio-card-copy{grid-template-columns:1fr;}
+  }
 
   /* ---------- CONTACT ---------- */
   .contact{background:var(--charcoal); color:var(--ivory); padding:150px 56px 110px;}
@@ -269,82 +308,82 @@
   </nav>
 </header>
 
-<section class="hero">
-  <div class="ph">
-    <div class="hero-intro-about">
-      <span class="micro">About Designhaus</span>
-      <p>Designhaus Collective is a multidisciplinary design studio creating thoughtful spaces, compelling visual experiences, and innovative ideas at the intersection of design, technology, and culture. In addition to spatial design, we engage in AI research and explore emerging creative tools to deliver distinctive, purposeful, and contemporary work.</p>
-    </div>
-    <a href="#work" class="hero-intro-work">Work
-      <svg viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M10 1V24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M2 17L10 25L18 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
+<section class="hero-work" id="work">
+  <div class="hero-work-about">
+    <span class="micro">About Designhaus</span>
+    <p>Designhaus Collective is a multidisciplinary design studio creating thoughtful spaces, compelling visual experiences, and innovative ideas at the intersection of design, technology, and culture. In addition to spatial design, we engage in AI research and explore emerging creative tools to deliver distinctive, purposeful, and contemporary work.</p>
   </div>
-</section>
-
-<div id="work" class="work-label">
-  <span class="micro">Selected Work</span>
-</div>
-
-<section class="hero">
-  <div class="ph charcoal" data-slideshow id="heroSlideshow">
-    <span class="slideshow-credit" id="heroSlideshowCredit"></span>
+  <a href="#" id="workTrigger" class="hero-intro-work">Work
+    <svg viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M10 1V24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M2 17L10 25L18 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+  <div class="work-frame">
+    <div class="ph charcoal" data-slideshow id="heroSlideshow">
+      <span class="slideshow-credit" id="heroSlideshowCredit"></span>
+    </div>
   </div>
 </section>
 
 
 <section id="services" class="services">
-  <div class="services-head">
-    <div>
-      <span class="micro" style="margin-bottom:20px; display:block;">What We Do</span>
-      <h2>Six disciplines, one point of view.</h2>
+  <div class="services-layout">
+    <div class="services-side">
+      <span class="micro">What We Do</span>
+      <div class="services-cta">
+        <a href="#contact" class="btn-pill">Start a Project</a>
+        <a href="#work" class="link-u">See Our Work</a>
+      </div>
     </div>
-  </div>
-  <div class="service-grid">
-    <div class="service-tile">
-      <span class="num">01</span>
-      <h3>Architecture</h3>
-      <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character.<br>From concept to construction, every detail is considered.</p>
-    </div>
-    <div class="service-tile">
-      <span class="num">02</span>
-      <h3>Interior Design</h3>
-      <p>Interiors shaped through material, proportion, light, and detail.<br>We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
-    </div>
-    <div class="service-tile">
-      <span class="num">03</span>
-      <h3>Spatial Design</h3>
-      <p>We create temporary and permanent environments where space becomes part of the story.<br>From exhibitions to installations, every element is designed to create an experience.</p>
-    </div>
-    <div class="service-tile">
-      <span class="num">04</span>
-      <h3>3D Visualization</h3>
-      <p>We turn design intent into compelling visual experiences.<br>Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
-    </div>
-    <div class="service-tile">
-      <span class="num">05</span>
-      <h3>Branding &amp; Graphic Design</h3>
-      <p>We build identities that extend beyond the logo into a cohesive visual language.<br>Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
-    </div>
-    <div class="service-tile">
-      <span class="num">06</span>
-      <h3>AI &amp; Design Tools</h3>
-      <p>We explore how AI can make design work smarter, faster, and more capable.<br>From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
+    <div class="services-rows">
+      <div class="services-row">
+        <h3>Architecture</h3>
+        <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character. From concept to construction, every detail is considered.</p>
+      </div>
+      <div class="services-row">
+        <h3>Interior Design</h3>
+        <p>Interiors shaped through material, proportion, light, and detail. We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
+      </div>
+      <div class="services-row">
+        <h3>Spatial Design</h3>
+        <p>We create temporary and permanent environments where space becomes part of the story. From exhibitions to installations, every element is designed to create an experience.</p>
+      </div>
+      <div class="services-row">
+        <h3>3D Visualization</h3>
+        <p>We turn design intent into compelling visual experiences. Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
+      </div>
+      <div class="services-row">
+        <h3>Branding &amp; Graphic Design</h3>
+        <p>We build identities that extend beyond the logo into a cohesive visual language. Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
+      </div>
+      <div class="services-row">
+        <h3>AI &amp; Design Tools</h3>
+        <p>We explore how AI can make design work smarter, faster, and more capable. From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="studio" class="studio">
-  <h2 class="studio-headline">Architecture, interiors, and the ideas between them.</h2>
-  <div class="studio-body">
-    <div class="ph"><span class="fillnote">Photography placeholder</span></div>
-    <div class="studio-body-copy">
-      <span class="micro" style="margin-bottom:16px; display:block;">The Studio</span>
-      <p>Designhaus Collective is a Mumbai-based architecture and design studio led by Ashish Khanolkar, working across architecture, interiors, and visualization. Projects are shaped by context, material, and restraint.</p>
+  <div class="studio-meta">
+    <span>Designhaus Collective</span>
+    <span>Architecture &amp; Interiors</span>
+    <span>Mumbai, India</span>
+  </div>
+  <div class="studio-card">
+    <div class="studio-card-top">
+      <h2>Architecture, interiors, and the ideas between them.</h2>
       <div class="studio-tags">
         <span>Architecture</span><span>Materiality</span><span>Context</span><span>Craft</span>
+      </div>
+    </div>
+    <div class="ph studio-card-image"><span class="fillnote">Photography placeholder</span></div>
+    <div class="studio-card-bottom">
+      <span class="micro">About</span>
+      <div class="studio-card-copy">
+        <p>Designhaus Collective is a Mumbai-based architecture and design studio led by Ashish Khanolkar, working across architecture, interiors, and visualization.</p>
+        <p>Projects are shaped by context, material, and restraint — considered from the first sketch through to the smallest detail.</p>
       </div>
     </div>
   </div>
@@ -384,12 +423,12 @@
   window.addEventListener('scroll', ()=>{
     nav.classList.toggle('scrolled', window.scrollY > 60);
   });
-  const workLink = document.querySelector('.hero-intro-work');
-  const workTarget = document.getElementById('work');
-  if(workLink && workTarget){
+  const workLink = document.getElementById('workTrigger');
+  const workSection = document.getElementById('work');
+  if(workLink && workSection){
     workLink.addEventListener('click', (e)=>{
       e.preventDefault();
-      workTarget.scrollIntoView({behavior:'smooth', block:'start'});
+      workSection.classList.add('active');
     });
   }
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
