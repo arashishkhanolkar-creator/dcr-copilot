@@ -123,6 +123,20 @@
   .work-image-col{display:flex; flex-direction:column; height:100%;}
   .work-image-col .ph{flex:1; min-height:0;}
   .work-credit{margin-top:16px; display:block; color:var(--earth); transition:opacity .5s ease;}
+  .slide-nav{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:10;
+    width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(0,0,0,0.25); color:#f3efe8; display:flex; align-items:center; justify-content:center;
+    transition:background .25s ease;
+  }
+  .slide-nav:hover{background:rgba(0,0,0,0.45);}
+  .slide-nav svg{width:18px; height:18px;}
+  .slide-prev{left:16px;}
+  .slide-next{right:16px;}
+  @media(max-width:700px){
+    .slide-nav{width:32px; height:32px;}
+    .slide-nav svg{width:14px; height:14px;}
+  }
 
   .link-u{position:relative; display:inline-block;}
   .link-u::after{
@@ -288,7 +302,14 @@
 <section id="work" class="work-section">
   <div class="work-frame-inner">
     <div class="work-image-col">
-      <div class="ph charcoal" data-slideshow id="heroSlideshow"></div>
+      <div class="ph charcoal" data-slideshow id="heroSlideshow">
+        <button type="button" class="slide-nav slide-prev" id="slidePrev" aria-label="Previous image">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="slide-nav slide-next" id="slideNext" aria-label="Next image">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
       <span class="micro work-credit" id="heroSlideshowCredit"></span>
     </div>
     <div class="work-disciplines">
@@ -424,12 +445,34 @@
       if (items.length > 1) {
         var slides = host.querySelectorAll('.slide');
         var current = 0;
-        setInterval(function () {
+        var timer = null;
+
+        function showSlide(nextIndex) {
           slides[current].classList.remove('active');
-          current = (current + 1) % slides.length;
+          current = ((nextIndex % slides.length) + slides.length) % slides.length;
           slides[current].classList.add('active');
           if (creditEl) creditEl.textContent = items[current].credit;
-        }, 5000);
+        }
+
+        function startAutoplay() {
+          if (timer) clearInterval(timer);
+          timer = setInterval(function () { showSlide(current + 1); }, 5000);
+        }
+
+        startAutoplay();
+
+        var prevBtn = document.getElementById('slidePrev');
+        var nextBtn = document.getElementById('slideNext');
+        if (prevBtn) prevBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showSlide(current - 1);
+          startAutoplay();
+        });
+        if (nextBtn) nextBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showSlide(current + 1);
+          startAutoplay();
+        });
       }
     })();
 
