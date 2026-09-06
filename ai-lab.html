@@ -184,13 +184,12 @@
     text-transform:uppercase; letter-spacing:-0.005em; max-width:760px; margin-bottom:40px;
   }
   .cta-btn{
-    display:inline-block; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600;
-    color:var(--charcoal); background:var(--ivory); padding:16px 32px; border-radius:999px;
-    transition:opacity .3s ease;
+    font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(20px,2.6vw,30px);
+    display:inline-block; margin-bottom:20px; word-break:break-word; color:var(--ivory);
   }
-  .cta-btn:hover{opacity:0.8;}
-  .cta-links{display:flex; align-items:center; gap:32px; flex-wrap:wrap;}
-  .cta-link{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; color:var(--ivory);}
+  .cta-links{display:flex; flex-direction:column; align-items:flex-start;}
+  .cta-social{display:flex; gap:26px;}
+  .cta-social a{font-size:13px; color:#d8cdb8;}
 
   /* ---------- FOOTER ---------- */
   footer{background:var(--charcoal); color:#8f8879; padding:40px 56px; border-top:1px solid var(--line-light);}
@@ -298,9 +297,11 @@
 <section class="cta-section">
   <h2>Interested in AI consulting for your own studio or team?</h2>
   <div class="cta-links">
-    <a href="mailto:connect@designhauscollective.in" class="cta-btn">connect@designhauscollective.in</a>
-    <a href="https://instagram.com/designhaus_collective" class="cta-link link-u">Instagram</a>
-    <a href="https://wa.me/918849159559" class="cta-link link-u">WhatsApp</a>
+    <a href="mailto:connect@designhauscollective.in" class="cta-btn link-u">connect@designhauscollective.in</a>
+    <div class="cta-social">
+      <a href="https://instagram.com/designhaus_collective" class="link-u">Instagram</a>
+      <a href="https://wa.me/918849159559" class="link-u">WhatsApp</a>
+    </div>
   </div>
 </section>
 
