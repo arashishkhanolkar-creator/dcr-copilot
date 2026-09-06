@@ -210,13 +210,12 @@
   .brand-header-name{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; letter-spacing:-0.01em;}
   .brand-header-count{font-size:13px; color:var(--text-tertiary); margin-top:4px;}
 
-  .brand-info-row{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:36px;}
+  .brand-info-row{margin-bottom:36px;}
   .brand-info-card{
     background:var(--bg-secondary); border-radius:16px; padding:20px 22px;
   }
   .brand-info-title{font-size:13px; font-weight:600; margin-bottom:14px; color:var(--text);}
   .brand-info-line{display:flex; justify-content:space-between; gap:12px; padding:6px 0; font-size:13px; border-bottom:1px solid var(--border-light);}
-  .vendor-contact-block-sep{margin-top:14px; padding-top:10px; border-top:1px dashed var(--border);}
   .brand-info-line:last-of-type{border-bottom:none;}
   .brand-info-label{color:var(--text-tertiary); flex-shrink:0;}
   .brand-info-value{color:var(--text); text-align:right; word-break:break-word;}
@@ -442,7 +441,6 @@
     #brandsIndexView{padding:118px 14px 40px;}
     #elementCompareIndexView{padding:118px 14px 40px;}
     #elementCompareDetailView{padding:118px 14px 40px;}
-    .brand-info-row{grid-template-columns:1fr;}
     .two-col{grid-template-columns:1fr;}
     .panel-inner{padding:26px 22px 50px;}
 
@@ -501,23 +499,12 @@
   .compare-head-thumb img{width:100%; height:100%; object-fit:cover; filter:grayscale(100%);}
   .compare-head-thumb:hover img{filter:grayscale(0%);}
   .compare-head-line{font-size:12px; color:var(--text-secondary); line-height:1.5; font-weight:400; margin-top:6px;}
-  .vc-list{display:flex; flex-direction:column; gap:8px;}
-  .vc-row{display:flex; gap:12px; align-items:baseline; font-size:13px; line-height:1.5;}
-  .vc-brand{font-weight:600; min-width:150px; flex-shrink:0;}
-  .vc-detail{color:var(--text-secondary);}
-  .vc-empty{font-size:13px; color:var(--text-tertiary);}
-  .brand-chip.has-contact{border-color:var(--text-tertiary);}
-  .chip-dot{font-size:10px; opacity:0.75; margin-left:2px;}
   .panel-back{
     position:absolute; top:20px; left:20px; background:var(--bg-secondary); border:none;
     border-radius:8px; padding:7px 12px; font-size:12.5px; cursor:pointer; color:var(--text-secondary); z-index:3;
   }
   .panel-back:hover{background:var(--border-light); color:var(--text);}
   .brands-toolbar{display:flex; align-items:center; gap:18px;}
-  .contact-filter-label{
-    display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-secondary); cursor:pointer;
-  }
-  .contact-filter-label input{cursor:pointer;}
   @media print{
     .top-bar, .sidebar, .shortlist-actions, .shortlist-picker, .compare-clear,
     .overlay, .panel, #homeView, #resultsView, #brandsIndexView, #brandView,
@@ -624,12 +611,10 @@
         <div class="brand-header-count" id="brandsIndexCount"></div>
       </div>
       <div class="brands-toolbar">
-        <label class="contact-filter-label"><input type="checkbox" id="brandsContactFilter"> Only brands with a contact on file</label>
         <select class="sort-select" id="brandsSortSelect">
           <option value="name-asc">Name (A–Z)</option>
           <option value="name-desc">Name (Z–A)</option>
           <option value="products-desc">Most products</option>
-          <option value="contacts-desc">Most vendor contacts</option>
         </select>
       </div>
     </div>
@@ -672,7 +657,6 @@
     </div>
 
     <div class="brand-info-row">
-      <div class="brand-info-card" id="brandContactCard"></div>
       <div class="brand-info-card" id="brandCatalogueCard"></div>
     </div>
 
@@ -10592,13 +10576,6 @@ function saveShortlist(){
   try{ localStorage.setItem(SHORTLIST_KEY, JSON.stringify(state.compare)); }catch(e){}
 }
 
-/* ============================================================
-   BRAND_DATA — vendor contact details and catalogue links, per
-   brand. Left blank for now; fill in as data becomes available.
-   Any brand not listed here just shows blank placeholder fields.
-   Only add an entry once a brand has given consent to list their
-   contact details here.
-   ============================================================ */
 const ELEMENT_COMPARISON_LISTS = {
   "Load bearing walls": [
     { excelName: "Burnt bricks", id: "burntclaybrick" },
@@ -10967,14 +10944,9 @@ const ELEMENT_COMPARISON_LISTS = {
   ]
 };
 
-const BRAND_DATA = {};
-
 /* ============================================================
-   BRAND_CATALOGUES — catalogue file/link per brand, separate
-   from vendor contacts since a brand can have several vendor
-   contacts but one shared catalogue. Left blank for now.
-   Example once populated:
-   "Kajaria Ceramics": { catalogueLabel: "Kajaria 2026 Product Catalogue", catalogueUrl: "https://example.com/catalogue.pdf" }
+   BRAND_CATALOGUES — catalogue file/link per brand. Left blank
+   for now; fill in as data becomes available.
    ============================================================ */
 const BRAND_CATALOGUES = {};
 
@@ -11180,10 +11152,6 @@ function init(){
   });
   document.getElementById("copySummaryBtn").addEventListener("click", copyShortlistSummary);
   document.getElementById("printShortlistBtn").addEventListener("click", ()=> window.print());
-  document.getElementById("brandsContactFilter").addEventListener("change", e=>{
-    brandsContactOnly = e.target.checked;
-    renderBrandsIndexPage();
-  });
   document.getElementById("mobileFilterBtn").addEventListener("click", openMobileFilters);
   document.getElementById("sidebarBackdrop").addEventListener("click", closeMobileFilters);
   document.getElementById("sortSelect").addEventListener("change", e=>{ state.sort = e.target.value; renderResults(); });
@@ -11307,7 +11275,7 @@ function toggleTabDropdown(groupKey){
 
     if(groupKey==="brands"){
       // Brands dropdown navigates straight to the brand's dedicated page
-      // (vendor contact + catalogue + full material list), rather than filtering.
+      // (catalogue + full material list), rather than filtering.
       const listHtml = filtered.map(opt=>{
         const count = DATA.filter(m=>matchFn(m,opt)).length;
         return `
@@ -11856,34 +11824,32 @@ function renderResults(){
 }
 
 /* ============================================================
-   BRAND PAGE — vendor contact card, catalogue link, and every
-   material in the bank associated with this brand.
+   BRAND PAGE — every material in the bank associated with this
+   brand.
    ============================================================ */
 /* ============================================================
    BRANDS INDEX — a browsable grid of every brand in the bank,
-   each showing how many vendor contacts and how many materials
-   are on file, using a real material photo as the thumbnail
-   when that brand has one available.
+   each showing how many materials are on file, using a real
+   material photo as the thumbnail when that brand has one
+   available.
    ============================================================ */
 let brandSortOrder = "name-asc";
-let brandsContactOnly = false;
 function brandDescriptionOf(brand){
   const materials = DATA.filter(m=>m.brands.includes(brand));
   if(materials.length===0){
-    return "Vendor contact on file — no products in bank yet";
+    return "No products in bank yet";
   }
   const categories = uniqueSorted(materials.map(m=>m.category));
   return `Makes: ${categories.slice(0,3).join(", ")}${categories.length>3 ? ", …" : ""}`;
 }
 function brandCardHtml(brand){
   const materials = DATA.filter(m=>m.brands.includes(brand));
-  const contactCount = (BRAND_DATA[brand] || []).length;
   return `
     <div class="card brand-index-card" data-brand="${esc(brand)}">
       <div class="card-body">
         <div class="card-name">${esc(brand)}</div>
         <div class="card-line brand-desc-line">${esc(brandDescriptionOf(brand))}</div>
-        <div class="card-line">${materials.length} product${materials.length===1?'':'s'} · ${contactCount} vendor contact${contactCount===1?'':'s'}</div>
+        <div class="card-line">${materials.length} product${materials.length===1?'':'s'}</div>
       </div>
     </div>
   `;
@@ -11891,12 +11857,10 @@ function brandCardHtml(brand){
 function sortBrands(brands){
   const withStats = brands.map(b=>({
     name: b,
-    products: DATA.filter(m=>m.brands.includes(b)).length,
-    contacts: (BRAND_DATA[b] || []).length
+    products: DATA.filter(m=>m.brands.includes(b)).length
   }));
   if(brandSortOrder==="name-desc") withStats.sort((a,b)=>b.name.localeCompare(a.name));
   else if(brandSortOrder==="products-desc") withStats.sort((a,b)=>b.products-a.products || a.name.localeCompare(b.name));
-  else if(brandSortOrder==="contacts-desc") withStats.sort((a,b)=>b.contacts-a.contacts || a.name.localeCompare(b.name));
   else withStats.sort((a,b)=>a.name.localeCompare(b.name)); // name-asc (default)
   return withStats.map(w=>w.name);
 }
@@ -12059,11 +12023,8 @@ function renderElementCompareDetail(){
 function renderBrandsIndexPage(){
   let brands = uniqueSorted(DATA.flatMap(d=>d.brands));
   const total = brands.length;
-  if(brandsContactOnly) brands = brands.filter(b=>(BRAND_DATA[b] || []).length > 0);
   brands = sortBrands(brands);
-  document.getElementById("brandsIndexCount").textContent = brandsContactOnly
-    ? `${brands.length} of ${total} brands have a vendor contact on file`
-    : `${total} brands on file`;
+  document.getElementById("brandsIndexCount").textContent = `${total} brands on file`;
   const grid = document.getElementById("brandsIndexGrid");
   grid.innerHTML = brands.map(brandCardHtml).join("");
   grid.querySelectorAll(".brand-index-card").forEach(card=>{
@@ -12075,32 +12036,10 @@ function renderBrandPage(){
   const brand = currentBrand;
   if(!brand) return;
   const materials = DATA.filter(m=>m.brands.includes(brand));
-  const contacts = BRAND_DATA[brand] || [];
 
   document.getElementById("brandHeaderName").textContent = brand;
   document.getElementById("brandHeaderCount").textContent =
-    `${materials.length} material${materials.length===1?'':'s'} · ${contacts.length} vendor contact${contacts.length===1?'':'s'} on file`;
-
-  const contactCard = document.getElementById("brandContactCard");
-  if(contacts.length===0){
-    contactCard.innerHTML = `
-      <div class="brand-info-title">Vendor Contact</div>
-      <div class="brand-info-empty-note">Contact details not added yet</div>
-    `;
-  } else {
-    contactCard.innerHTML = `
-      <div class="brand-info-title">Vendor Contact${contacts.length>1 ? `s (${contacts.length})` : ""}</div>
-      ${contacts.map((info,i)=>`
-        <div class="vendor-contact-block ${i>0 ? 'vendor-contact-block-sep' : ''}">
-          <div class="brand-info-line"><span class="brand-info-label">Contact person</span><span class="brand-info-value">${info.contactName ? esc(info.contactName) : "—"}</span></div>
-          <div class="brand-info-line"><span class="brand-info-label">Phone</span><span class="brand-info-value">${info.phone ? esc(info.phone) : "—"}</span></div>
-          <div class="brand-info-line"><span class="brand-info-label">Email</span><span class="brand-info-value">${info.email ? esc(info.email) : "—"}</span></div>
-          <div class="brand-info-line"><span class="brand-info-label">Address</span><span class="brand-info-value">${info.address ? esc(info.address) : "—"}</span></div>
-          <div class="brand-info-line"><span class="brand-info-label">Website</span><span class="brand-info-value">${info.website ? `<a href="${esc(info.website)}" target="_blank" rel="noopener">${esc(info.website)}</a>` : "—"}</span></div>
-        </div>
-      `).join("")}
-    `;
-  }
+    `${materials.length} material${materials.length===1?'':'s'} on file`;
 
   const catInfo = BRAND_CATALOGUES[brand] || {};
   document.getElementById("brandCatalogueCard").innerHTML = `
@@ -12119,28 +12058,9 @@ function renderBrandPage(){
    MATERIAL DETAIL PANEL — full profile shown at once, centered
    ============================================================ */
 function brandChips(brands){
-  return `<div class="brand-chip-row">${brands.map(b=>{
-    const hasContact = (BRAND_DATA[b] || []).length > 0;
-    return `<button class="brand-chip${hasContact?' has-contact':''}" data-brand="${esc(b)}" title="${hasContact?'Vendor contact on file':'No vendor contact on file yet'}">${esc(b)}${hasContact?' <span class="chip-dot">\u260E</span>':''}</button>`;
-  }).join("")}</div>`;
-}
-
-/* Vendor contacts shown as plain text directly in the detail panel, so the
-   "who do I call about this?" question is answered without navigating away. */
-function contactRowsFor(brands){
-  const rows = [];
-  brands.forEach(b=>{
-    (BRAND_DATA[b] || []).forEach(c=>{
-      const detail = [c.contactName, c.phone, c.email].filter(Boolean).join(" \u00B7 ");
-      rows.push(`<div class="vc-row"><div class="vc-brand">${esc(b)}</div><div class="vc-detail">${esc(detail) || "\u2014"}</div></div>`);
-    });
-  });
-  return rows;
-}
-function panelContactsBlock(brands){
-  const rows = contactRowsFor(brands);
-  if(rows.length===0) return `<div class="vc-empty">No vendor contact on file for these brands yet \u2014 click a brand above for its product range.</div>`;
-  return `<div class="vc-list">${rows.join("")}</div>`;
+  return `<div class="brand-chip-row">${brands.map(b=>
+    `<button class="brand-chip" data-brand="${esc(b)}">${esc(b)}</button>`
+  ).join("")}</div>`;
 }
 
 function toggleCompare(id){
@@ -12279,11 +12199,6 @@ function openPanel(id){
         ${brandChips(m.brands)}
       </div>
 
-      <div class="section">
-        <div class="section-title">Vendor contacts on file</div>
-        ${panelContactsBlock(m.brands)}
-      </div>
-
       <div class="disclaimer">Ratings and specifications above are simplified for comparison. Confirm exact test standards, certifications, and current product specifications with the manufacturer before use in tender or construction documents. Click a brand to see every other material it's associated with.</div>
     </div>
   `;
@@ -12381,17 +12296,7 @@ function shortlistSummaryText(){
     lines.push(`   Fire: ${m.fireRating}`);
     lines.push(`   Acoustic: ${m.acousticRating}`);
     lines.push(`   Sustainability: ${m.sustainability}`);
-    lines.push("   Brands & vendor contacts:");
-    m.brands.forEach(b=>{
-      const contacts = BRAND_DATA[b] || [];
-      if(contacts.length===0){
-        lines.push(`     - ${b} — no contact on file`);
-      } else {
-        contacts.forEach(c=>{
-          lines.push(`     - ${b} — ${[c.contactName, c.phone, c.email].filter(Boolean).join(", ")}`);
-        });
-      }
-    });
+    lines.push(`   Brands: ${m.brands.join(", ")}`);
     lines.push("");
   });
   lines.push("Specifications above are simplified for comparison — confirm exact test standards and current product specs with the manufacturer before tender or construction documents.");
@@ -12501,20 +12406,6 @@ function renderCompare(){
       return `<td class="${isBest?'compare-cell-best':''}">${esc(m[key])}</td>`;
     }).join("")}</tr>`;
   }
-  /* Vendor contacts inline — the whole point of the shortlist is knowing
-     who to call, so it lives in the comparison rather than three clicks away. */
-  function contactsCell(m){
-    const parts = m.brands.map(b=>{
-      const contacts = BRAND_DATA[b] || [];
-      if(contacts.length===0) return `<li><strong>${esc(b)}</strong> — no contact on file</li>`;
-      return contacts.map(c=>{
-        const detail = [c.contactName, c.phone, c.email].filter(Boolean).join(" · ");
-        return `<li><strong>${esc(b)}</strong> — ${esc(detail)}</li>`;
-      }).join("");
-    }).join("");
-    return `<ul class="plain">${parts}</ul>`;
-  }
-
   scroll.innerHTML = `
     <table class="compare-table">
       <thead>
@@ -12541,7 +12432,6 @@ function renderCompare(){
         ${row("Disadvantages", m=>listCell(m.disadvantages))}
         ${row("Properties", m=>listCell(m.properties))}
         ${row("Brands available in India", m=>listCell(m.brands))}
-        ${row("Vendor contacts on file", contactsCell)}
       </tbody>
     </table>
   `;
