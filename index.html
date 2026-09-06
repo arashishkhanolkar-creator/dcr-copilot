@@ -85,7 +85,6 @@
   .hero-work{position:relative; height:100vh; min-height:640px; background:var(--stone); overflow:hidden;}
   .hero-work-about{
     position:absolute; left:56px; bottom:36px; z-index:5; max-width:420px;
-    transition:opacity .5s ease;
   }
   .hero-work-about .micro{color:var(--earth); margin-bottom:14px; display:block;}
   .hero-work-about p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
@@ -94,26 +93,16 @@
     display:flex; align-items:center; gap:14px; cursor:pointer;
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(34px,6vw,72px);
     text-transform:uppercase; letter-spacing:-0.01em; line-height:1; color:var(--charcoal);
-    transition:top .6s cubic-bezier(.16,.8,.24,1), right .6s cubic-bezier(.16,.8,.24,1), opacity .3s ease;
+    transition:opacity .3s ease;
   }
   .hero-intro-work:hover{opacity:0.65;}
-  .hero-intro-work svg{width:20px; height:26px; flex-shrink:0; animation:heroArrowBounce 1.8s ease-in-out infinite; transition:opacity .3s ease, width .3s ease;}
+  .hero-intro-work svg{width:20px; height:26px; flex-shrink:0; animation:heroArrowBounce 1.8s ease-in-out infinite;}
   @keyframes heroArrowBounce{
     0%, 100%{transform:translateY(0);}
     50%{transform:translateY(8px);}
   }
-  .hero-work.active .hero-work-about{opacity:0; pointer-events:none;}
-  .hero-work.active .hero-intro-work{
-    top:220px; bottom:auto; right:56px;
-    font-size:14px; letter-spacing:0.12em; gap:0;
-  }
-  .hero-work.active .hero-intro-work svg{opacity:0; width:0;}
-  .work-frame{
-    position:absolute; top:264px; right:56px; bottom:56px; left:56px;
-    opacity:0; pointer-events:none; transition:opacity .6s ease .15s;
-  }
-  .hero-work.active .work-frame{opacity:1; pointer-events:auto;}
-  .work-frame-inner{display:grid; grid-template-columns:38.2% 61.8%; height:100%; border-radius:4px; overflow:hidden;}
+  .work-section{background:var(--stone); padding:170px 56px 100px; min-height:100vh; display:flex; align-items:center;}
+  .work-frame-inner{display:grid; grid-template-columns:38.2% 61.8%; width:100%; height:70vh; min-height:460px; border-radius:4px; overflow:hidden;}
   .work-disciplines{background:var(--ivory); padding:8px 40px; display:flex; flex-direction:column; justify-content:center;}
   .work-disciplines .wd-item{padding:16px 0; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:16px;}
   .work-disciplines .wd-item:last-child{border-bottom:none;}
@@ -121,15 +110,14 @@
   .work-disciplines .wd-item h4{font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500; color:var(--charcoal); line-height:1.3;}
   .work-frame-inner .ph{height:100%;}
   @media(max-width:860px){
-    .work-frame-inner{grid-template-columns:1fr; grid-template-rows:auto 1fr;}
+    .work-frame-inner{grid-template-columns:1fr; grid-template-rows:auto 1fr; height:auto;}
     .work-disciplines{padding:20px 24px;}
   }
   @media(max-width:700px){
     .hero-work-about{max-width:260px; left:24px; bottom:120px;}
     .hero-intro-work{right:24px; bottom:26px;}
     .hero-intro-work svg{width:14px; height:18px;}
-    .hero-work.active .hero-intro-work{top:210px; right:24px;}
-    .work-frame{top:250px; left:24px; right:24px; bottom:24px;}
+    .work-section{padding:140px 24px 60px;}
   }
 
   .slideshow-credit{
@@ -296,30 +284,31 @@
   </nav>
 </header>
 
-<section class="hero-work" id="work">
+<section class="hero-work">
   <div class="hero-work-about">
     <span class="micro">About Designhaus</span>
     <p>Designhaus Collective is a multidisciplinary design studio creating thoughtful spaces, compelling visual experiences, and innovative ideas at the intersection of design, technology, and culture. In addition to spatial design, we engage in AI research and explore emerging creative tools to deliver distinctive, purposeful, and contemporary work.</p>
   </div>
-  <a href="#" id="workTrigger" class="hero-intro-work">Work
+  <a href="#work" id="workTrigger" class="hero-intro-work">Work
     <svg viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M10 1V24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
       <path d="M2 17L10 25L18 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </a>
-  <div class="work-frame">
-    <div class="work-frame-inner">
-      <div class="work-disciplines">
-        <div class="wd-item"><span class="num">01</span><h4>Architecture</h4></div>
-        <div class="wd-item"><span class="num">02</span><h4>Interior Design</h4></div>
-        <div class="wd-item"><span class="num">03</span><h4>Spatial Design</h4></div>
-        <div class="wd-item"><span class="num">04</span><h4>3D Visualization</h4></div>
-        <div class="wd-item"><span class="num">05</span><h4>Branding &amp; Graphic Design</h4></div>
-        <div class="wd-item"><span class="num">06</span><h4>AI &amp; Design Tools</h4></div>
-      </div>
-      <div class="ph charcoal" data-slideshow id="heroSlideshow">
-        <span class="slideshow-credit" id="heroSlideshowCredit"></span>
-      </div>
+</section>
+
+<section id="work" class="work-section">
+  <div class="work-frame-inner">
+    <div class="work-disciplines">
+      <div class="wd-item"><span class="num">01</span><h4>Architecture</h4></div>
+      <div class="wd-item"><span class="num">02</span><h4>Interior Design</h4></div>
+      <div class="wd-item"><span class="num">03</span><h4>Spatial Design</h4></div>
+      <div class="wd-item"><span class="num">04</span><h4>3D Visualization</h4></div>
+      <div class="wd-item"><span class="num">05</span><h4>Branding &amp; Graphic Design</h4></div>
+      <div class="wd-item"><span class="num">06</span><h4>AI &amp; Design Tools</h4></div>
+    </div>
+    <div class="ph charcoal" data-slideshow id="heroSlideshow">
+      <span class="slideshow-credit" id="heroSlideshowCredit"></span>
     </div>
   </div>
 </section>
@@ -410,8 +399,8 @@
   if(workLink && workSection){
     workLink.addEventListener('click', (e)=>{
       e.preventDefault();
-      workSection.classList.add('active');
-      var startY = window.scrollY, targetY = 100, startTime = null, duration = 600;
+      var startY = window.scrollY, targetY = workSection.getBoundingClientRect().top + window.scrollY;
+      var startTime = null, duration = 700;
       function step(ts){
         if(startTime === null) startTime = ts;
         var t = Math.min((ts - startTime) / duration, 1);
