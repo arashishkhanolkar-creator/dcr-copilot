@@ -104,12 +104,12 @@
   }
   .hero-work.active .hero-work-about{opacity:0; pointer-events:none;}
   .hero-work.active .hero-intro-work{
-    top:180px; bottom:auto; right:56px;
+    top:220px; bottom:auto; right:56px;
     font-size:14px; letter-spacing:0.12em; gap:0;
   }
   .hero-work.active .hero-intro-work svg{opacity:0; width:0;}
   .work-frame{
-    position:absolute; top:250px; right:56px; bottom:56px; left:56px;
+    position:absolute; top:264px; right:56px; bottom:56px; left:56px;
     opacity:0; pointer-events:none; transition:opacity .6s ease .15s;
   }
   .hero-work.active .work-frame{opacity:1; pointer-events:auto;}
@@ -128,8 +128,8 @@
     .hero-work-about{max-width:260px; left:24px; bottom:120px;}
     .hero-intro-work{right:24px; bottom:26px;}
     .hero-intro-work svg{width:14px; height:18px;}
-    .hero-work.active .hero-intro-work{top:170px; right:24px;}
-    .work-frame{top:220px; left:24px; right:24px; bottom:24px;}
+    .hero-work.active .hero-intro-work{top:210px; right:24px;}
+    .work-frame{top:250px; left:24px; right:24px; bottom:24px;}
   }
 
   .slideshow-credit{
@@ -411,6 +411,15 @@
     workLink.addEventListener('click', (e)=>{
       e.preventDefault();
       workSection.classList.add('active');
+      var startY = window.scrollY, targetY = 100, startTime = null, duration = 600;
+      function step(ts){
+        if(startTime === null) startTime = ts;
+        var t = Math.min((ts - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - t, 3);
+        window.scrollTo(0, startY + (targetY - startY) * eased);
+        if(t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     });
   }
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
