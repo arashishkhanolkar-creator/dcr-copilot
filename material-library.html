@@ -8,19 +8,21 @@
 <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <title>Material Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#ffffff;
-    --bg-secondary:#f5f5f7;
-    --bg-tertiary:#fbfbfd;
-    --text:#1d1d1f;
-    --text-secondary:#6e6e73;
-    --text-tertiary:#86868b;
-    --border:#d2d2d7;
-    --border-light:#e8e8ed;
-    --accent:#0071e3;
-    --radius:14px;
-    --radius-sm:8px;
+    --bg:#f3efe8;
+    --bg-secondary:#e8e1d3;
+    --bg-tertiary:#f8f5ef;
+    --text:#2b2724;
+    --text-secondary:#8b8478;
+    --text-tertiary:#a39c8e;
+    --border:#ddd4c4;
+    --border-light:#ece6da;
+    --accent:#c1653e;
+    --radius:4px;
+    --radius-sm:2px;
     --maxw:1240px;
   }
   *{box-sizing:border-box;}
@@ -30,7 +32,7 @@
     margin:0;
     background:var(--bg);
     color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif;
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
     -webkit-font-smoothing:antialiased;
     overflow:hidden;
   }
@@ -94,7 +96,7 @@
     padding:110px 24px 60px; overflow-y:auto;
   }
   .home-hero{max-width:640px; text-align:center; flex-shrink:0;}
-  .home-title{font-size:34px; font-weight:600; letter-spacing:-0.02em; margin:0 0 10px;}
+  .home-title{font-family:'Space Grotesk',sans-serif; font-size:34px; font-weight:600; letter-spacing:-0.02em; margin:0 0 10px;}
   .home-subtitle{font-size:15px; color:var(--text-secondary); line-height:1.6; margin:0 0 10px;}
   .home-stat{font-size:13px; color:var(--text-tertiary); margin:0 0 28px;}
 
@@ -205,7 +207,7 @@
   .brand-back-btn:hover{color:var(--text);}
   .brand-header{margin-bottom:20px;}
   .brand-header-with-sort{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;}
-  .brand-header-name{font-size:26px; font-weight:600; letter-spacing:-0.01em;}
+  .brand-header-name{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; letter-spacing:-0.01em;}
   .brand-header-count{font-size:13px; color:var(--text-tertiary); margin-top:4px;}
 
   .brand-info-row{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:36px;}
@@ -329,7 +331,7 @@
   }
   .panel-thumb.has-image:hover img{filter:grayscale(0%);}
   .panel-cat{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); font-weight:600; margin-bottom:10px;}
-  .panel h2{font-size:27px; font-weight:600; letter-spacing:-0.015em; margin:0 0 16px; max-width:88%;}
+  .panel h2{font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:600; letter-spacing:-0.015em; margin:0 0 16px; max-width:88%;}
   .panel-desc{font-size:15px; line-height:1.65; color:var(--text-secondary); margin-bottom:20px;}
 
   .compare-btn{
@@ -388,7 +390,7 @@
   }
   .compare-shell{max-width:var(--maxw); margin:0 auto; width:100%; display:flex; flex-direction:column; flex:1; min-height:0;}
   .compare-top{display:flex; align-items:center; justify-content:space-between; flex-shrink:0; margin-bottom:18px;}
-  .compare-title{font-size:22px; font-weight:600; letter-spacing:-0.01em;}
+  .compare-title{font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:600; letter-spacing:-0.01em;}
   .compare-clear{font-size:13px; color:var(--accent); background:none; border:none; cursor:pointer;}
   .compare-scroll{overflow:auto; flex:1; min-height:0;}
   .compare-table{border-collapse:collapse; width:100%; min-width:640px;}
