@@ -84,20 +84,27 @@
   .ph .slide .slide-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(32px) brightness(0.72) saturate(1.1); transform:scale(1.15); z-index:0;}
   .ph .slide .slide-fg{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; z-index:1;}
   .hero-intro-about{
-    position:absolute; left:56px; bottom:36px; z-index:5; max-width:400px;
+    position:absolute; left:56px; bottom:36px; z-index:5; max-width:420px;
   }
-  .hero-intro-about .micro{color:rgba(243,239,232,0.7); margin-bottom:14px; display:block;}
-  .hero-intro-about p{font-size:14px; line-height:1.8; color:rgba(243,239,232,0.92); font-weight:300;}
+  .hero-intro-about .micro{margin-bottom:14px; display:block;}
+  .hero-intro-about p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
   .hero-intro-work{
     position:absolute; right:56px; bottom:30px; z-index:5;
+    display:flex; align-items:center; gap:14px;
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(34px,6vw,72px);
-    text-transform:uppercase; letter-spacing:-0.01em; line-height:1; color:#f3efe8;
+    text-transform:uppercase; letter-spacing:-0.01em; line-height:1; color:var(--charcoal);
     transition:opacity .3s ease;
   }
   .hero-intro-work:hover{opacity:0.65;}
+  .hero-intro-work svg{width:20px; height:26px; flex-shrink:0; animation:heroArrowBounce 1.8s ease-in-out infinite;}
+  @keyframes heroArrowBounce{
+    0%, 100%{transform:translateY(0);}
+    50%{transform:translateY(8px);}
+  }
   @media(max-width:700px){
     .hero-intro-about{max-width:260px; left:24px; bottom:120px;}
     .hero-intro-work{right:24px; bottom:26px;}
+    .hero-intro-work svg{width:14px; height:18px;}
   }
   .work-label{padding:70px 56px 24px;}
 
@@ -120,13 +127,12 @@
   header.nav{
     position:fixed; top:0; left:0; right:0; z-index:200;
     display:flex; align-items:center; justify-content:space-between;
-    padding:32px 56px; color:#f3efe8; transition:background .5s ease, color .5s ease, padding .4s ease;
+    padding:32px 56px; color:var(--charcoal); transition:background .5s ease, color .5s ease, padding .4s ease;
   }
   header.nav.scrolled{background:rgba(243,239,232,0.92); backdrop-filter:blur(6px); color:var(--charcoal); padding:20px 56px; border-bottom:1px solid var(--line);}
   .nav-mark img{height:92px; width:auto; transition:height .4s ease, filter .4s ease;}
   header.nav.scrolled .nav-mark img{height:58px;}
   header.nav.scrolled .nav-mark img{filter:none;}
-  header.nav:not(.scrolled) .nav-mark img{filter:brightness(0) invert(1);}
   nav.links{display:flex; gap:40px; align-items:center;}
   nav.links a{font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:500;}
   @media (max-width:860px){ nav.links{display:none;} }
@@ -179,19 +185,20 @@
   .intro-desc{font-size:13px; letter-spacing:0.04em; color:var(--concrete); font-weight:400;}
 
   /* ---------- SERVICES ---------- */
-  .services{background:var(--stone); padding:140px 56px;}
+  .services{background:var(--charcoal); padding:140px 56px; color:var(--ivory);}
+  .services .micro{color:#8f8879;}
   .services-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:80px; flex-wrap:wrap; gap:20px;}
   .services-head h2{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(28px,3.2vw,42px); max-width:520px; line-height:1.2;}
   .service-grid{
     display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
-    background:var(--line); border:1px solid var(--line);
+    background:var(--line-light); border:1px solid var(--line-light);
   }
   .service-tile{
-    background:var(--ivory); padding:40px 32px; display:flex; flex-direction:column; gap:18px;
+    background:var(--earth); padding:40px 32px; display:flex; flex-direction:column; gap:18px;
   }
-  .service-tile .num{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--earth); font-weight:500;}
-  .service-tile h3{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(19px,2vw,24px); line-height:1.25;}
-  .service-tile p{font-size:13.5px; line-height:1.7; color:var(--concrete); font-weight:300; max-width:340px;}
+  .service-tile .num{font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--taupe); font-weight:500;}
+  .service-tile h3{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(19px,2vw,24px); line-height:1.25; color:var(--ivory);}
+  .service-tile p{font-size:13.5px; line-height:1.7; color:#c9c2b0; font-weight:300; max-width:340px;}
   @media(max-width:900px){ .service-grid{grid-template-columns:repeat(2, 1fr);} }
   @media(max-width:600px){ .service-grid{grid-template-columns:1fr;} }
 
@@ -263,12 +270,17 @@
 </header>
 
 <section class="hero">
-  <div class="ph charcoal">
+  <div class="ph">
     <div class="hero-intro-about">
       <span class="micro">About Designhaus</span>
-      <p>Designhaus Collective is a Mumbai-based architecture and design studio led by Ashish Khanolkar, working across architecture, interiors, and visualization. Projects are shaped by context, material, and restraint.</p>
+      <p>Designhaus Collective is a multidisciplinary design studio creating thoughtful spaces, compelling visual experiences, and innovative ideas at the intersection of design, technology, and culture. In addition to spatial design, we engage in AI research and explore emerging creative tools to deliver distinctive, purposeful, and contemporary work.</p>
     </div>
-    <a href="#work" class="hero-intro-work">Work</a>
+    <a href="#work" class="hero-intro-work">Work
+      <svg viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 1V24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M2 17L10 25L18 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
   </div>
 </section>
 
@@ -294,32 +306,32 @@
     <div class="service-tile">
       <span class="num">01</span>
       <h3>Architecture</h3>
-      <p>Ground-up and adaptive projects across residential, commercial, and mixed-use typologies — from concept through construction detailing.</p>
+      <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character.<br>From concept to construction, every detail is considered.</p>
     </div>
     <div class="service-tile">
       <span class="num">02</span>
       <h3>Interior Design</h3>
-      <p>Spatial and material planning for residences, retail, and hospitality — considered down to joinery and finish.</p>
+      <p>Interiors shaped through material, proportion, light, and detail.<br>We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
     </div>
     <div class="service-tile">
       <span class="num">03</span>
       <h3>Spatial Design</h3>
-      <p>Exhibitions, installations, and short-life environments where spatial narrative matters as much as construction.</p>
+      <p>We create temporary and permanent environments where space becomes part of the story.<br>From exhibitions to installations, every element is designed to create an experience.</p>
     </div>
     <div class="service-tile">
       <span class="num">04</span>
       <h3>3D Visualization</h3>
-      <p>Presentation and sales visualization for developers and design partners, built from working drawings, not stock assets.</p>
+      <p>We turn design intent into compelling visual experiences.<br>Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
     </div>
     <div class="service-tile">
       <span class="num">05</span>
       <h3>Branding &amp; Graphic Design</h3>
-      <p>Identity and print systems for studios and small brands adjacent to the built environment.</p>
+      <p>We build identities that extend beyond the logo into a cohesive visual language.<br>Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
     </div>
     <div class="service-tile">
       <span class="num">06</span>
       <h3>AI &amp; Design Tools</h3>
-      <p>In-house tools and AI systems built to speed up studio work — regulation lookup, material sourcing, client visualization — built for us first, now in the AI Lab.</p>
+      <p>We explore how AI can make design work smarter, faster, and more capable.<br>From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
     </div>
   </div>
 </section>
