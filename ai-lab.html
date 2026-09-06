@@ -167,8 +167,6 @@
     .lab-row .status{text-align:left;}
   }
 
-  .products{background:var(--stone);}
-
   .waitlist{
     margin-top:64px; padding-top:44px; border-top:1px solid var(--line);
     display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap;
@@ -191,6 +189,8 @@
     transition:opacity .3s ease;
   }
   .cta-btn:hover{opacity:0.8;}
+  .cta-links{display:flex; align-items:center; gap:32px; flex-wrap:wrap;}
+  .cta-link{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; color:var(--ivory);}
 
   /* ---------- FOOTER ---------- */
   footer{background:var(--charcoal); color:#8f8879; padding:40px 56px; border-top:1px solid var(--line-light);}
@@ -295,39 +295,13 @@
   </div>
 </section>
 
-<section class="products">
-  <div class="lab-section-head">
-    <div>
-      <span class="micro" style="margin-bottom:20px; display:block;">AI Lab Products</span>
-      <h2>Three tools, built here first.</h2>
-    </div>
-    <p>Each one started as something the studio needed day to day. Try them yourself.</p>
-  </div>
-  <div class="lab-list">
-    <a class="lab-row" href="dcr-copilot.html">
-      <span class="num">01</span>
-      <h3>DCR Copilot</h3>
-      <p>UDCPR and DCPR-2034 inside Claude — ask a question in plain language, get the clause, table, and page reference back.</p>
-      <span class="status">₹79 · One-time</span>
-    </a>
-    <a class="lab-row" href="material-library.html">
-      <span class="num">02</span>
-      <h3>Material Library</h3>
-      <p>Browse and compare materials by building element or brand, and build curated shortlists for a project.</p>
-      <span class="status">Studio tool</span>
-    </a>
-    <a class="lab-row" href="kitchen-visualiser.html">
-      <span class="num">03</span>
-      <h3>Kitchen Visualiser</h3>
-      <p>Swap real laminate finishes onto a kitchen elevation and see the material on the wall, not just a swatch, before it's specified.</p>
-      <span class="status">Studio tool</span>
-    </a>
-  </div>
-</section>
-
 <section class="cta-section">
   <h2>Interested in AI consulting for your own studio or team?</h2>
-  <a href="index.html#contact" class="cta-btn">Get in touch</a>
+  <div class="cta-links">
+    <a href="mailto:connect@designhauscollective.in" class="cta-btn">connect@designhauscollective.in</a>
+    <a href="https://instagram.com/designhaus_collective" class="cta-link link-u">Instagram</a>
+    <a href="https://wa.me/918849159559" class="cta-link link-u">WhatsApp</a>
+  </div>
 </section>
 
 <footer>
