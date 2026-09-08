@@ -49,97 +49,145 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 .hero-import-btn:hover{background:#ecd8d0}
 .htag{font-family:var(--fb);font-size:10px;color:var(--tm);white-space:nowrap}
 
-/* ---------- CONTROLS STRIP ---------- */
-.controls-strip{
-  background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;
-  padding:9px 20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;
-}
-.ctl-group{display:flex;align-items:center;gap:8px;}
-.ctl-label{font-family:var(--fb);font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tm);white-space:nowrap}
-.ctl-select{
-  font-family:var(--fb);font-size:11.5px;font-weight:500;color:var(--text);
-  border:1px solid var(--border);border-radius:6px;padding:5px 8px;background:var(--s2);cursor:pointer;
-}
-.orient-btn{
-  width:30px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--ts);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
-.orient-btn:hover{border-color:var(--bstrong);color:var(--text)}
-.style-swatches{display:flex;gap:6px}
+.hdr-sep{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.style-swatches{display:flex;gap:6px;flex-shrink:0}
 .style-sw{
-  width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative;
+  width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);flex-shrink:0;
 }
 .style-sw.on{border-color:var(--accent);}
-.ctl-sep{width:1px;height:22px;background:var(--border)}
-.strip-warn{font-family:var(--fb);font-size:10.5px;color:var(--accent);font-weight:600;margin-left:auto;white-space:nowrap}
 
 /* ---------- LAYOUT ---------- */
-.app{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:1fr 262px;overflow:hidden}
+.app{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:1fr 360px;overflow:hidden}
+@media(max-width:900px){ .app{grid-template-columns:1fr 320px} }
 
-/* SIDEBAR (edit column, now on the right) */
-.sb{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-.sb::-webkit-scrollbar{width:3px}
-.sb::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:2px}
+/* ---------- EDIT PANEL (tabbed) ---------- */
+.sb{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-tab{
+  flex:1;padding:13px 0;font-family:var(--font);font-size:13px;font-weight:600;color:var(--tm);
+  background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
+}
+.sb-tab:hover{color:var(--text)}
+.sb-tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.sb-body{flex:1;min-height:0;overflow-y:auto}
+.sb-body::-webkit-scrollbar{width:5px}
+.sb-body::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:3px}
+.sb-pane[hidden]{display:none}
 
-.ss{padding:12px 15px;border-bottom:1px solid var(--border)}
+.ss{padding:16px 18px;border-bottom:1px solid var(--border)}
 .ss:last-child{border-bottom:none}
-.sl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tm);margin-bottom:10px}
+.sl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ts);margin-bottom:13px}
 
 /* Layer colour rows */
-.lrow{display:flex;align-items:flex-start;gap:9px;padding:8px 9px;border-radius:7px;border:1px solid var(--border);background:var(--s2);margin-bottom:6px}
+.lrow{padding:11px 12px;border-radius:9px;border:1px solid var(--border);background:var(--s2);margin-bottom:8px}
 .lrow:last-child{margin-bottom:0}
-.lsw{width:24px;height:24px;border-radius:5px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s;margin-top:1px}
-.lsw:hover{transform:scale(1.08)}
+.lrow-head{display:flex;align-items:flex-start;gap:10px}
+.lsw{width:28px;height:28px;border-radius:6px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s;margin-top:1px}
+.lsw:hover{transform:scale(1.06)}
 .linfo{flex:1;min-width:0}
-.lname{font-size:11px;font-weight:500;color:var(--text);font-family:var(--fb)}
-.ldesc{font-size:9px;color:var(--tm);font-family:var(--fb);margin-top:1px}
-.leye{margin-top:2px}
-.leye{background:none;border:none;cursor:pointer;color:var(--tm);padding:0;display:flex;align-items:center;flex-shrink:0;transition:color .15s}
+.lname{font-size:13.5px;font-weight:600;color:var(--text);font-family:var(--fb)}
+.ldesc{font-size:10.5px;color:var(--tm);font-family:var(--fb);margin-top:1px;letter-spacing:.02em}
+.lrow-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-top:2px}
+.leye,.lchev{background:none;border:none;cursor:pointer;color:var(--tm);padding:0;display:flex;align-items:center;transition:color .15s}
+.leye svg,.lchev svg{width:16px;height:16px}
 .leye.off{color:var(--border)}
-.leye:hover{color:var(--text)}
+.leye:hover,.lchev:hover{color:var(--text)}
+.lchev svg{transition:transform .2s ease}
+.lchev.collapsed svg{transform:rotate(-90deg)}
+.lrow-details{margin-top:10px;padding-top:2px}
+.lrow-details[hidden]{display:none}
 
-/* Sub-sliders inside layer rows */
-.sub-row{display:flex;align-items:center;gap:7px;margin-top:5px}
-.sub-row label{font-size:9px;color:var(--tm);font-family:var(--fb);white-space:nowrap;min-width:42px}
-.sub-row input[type=range]{flex:1;min-width:0;height:3px;accent-color:var(--accent)}
-.sub-row span{font-size:9px;color:var(--ts);font-family:var(--fb);min-width:28px;text-align:right}
-.lsw-sm{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s}
-.lsw-sm:hover{transform:scale(1.12)}
+/* Sub-sliders inside layer rows — label, slider, and value share one line */
+.sub-row{display:flex;align-items:center;gap:8px;margin-top:9px}
+.sub-row:first-child{margin-top:0}
+.sub-row-name{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;color:var(--ts);font-family:var(--fb);white-space:nowrap;flex-shrink:0}
+.sub-row input[type=range]{flex:1;min-width:0;height:4px;accent-color:var(--accent)}
+.sub-row-val{font-size:11.5px;font-weight:600;color:var(--text);font-family:var(--fb);flex-shrink:0;min-width:34px;text-align:right}
+.lsw-sm{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s}
+.lsw-sm:hover{transform:scale(1.1)}
 
 /* Overlay toggles */
-.tog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .tog-row:last-child{margin-bottom:0}
-.tog-label{font-size:11px;color:var(--text);font-family:var(--fb)}
-.tog{position:relative;width:34px;height:18px;flex-shrink:0}
+.tog-label{font-size:13.5px;font-weight:500;color:var(--text);font-family:var(--fb)}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0}
 .tog input{display:none}
-.togtr{position:absolute;inset:0;background:var(--bstrong);border-radius:9px;cursor:pointer;transition:background .2s}
+.togtr{position:absolute;inset:0;background:var(--bstrong);border-radius:10px;cursor:pointer;transition:background .2s}
 .tog input:checked+.togtr{background:var(--accent)}
-.togtr::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.togtr::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .tog input:checked+.togtr::after{transform:translateX(16px)}
+.tog-sub{margin:8px 0 14px}
+.tog-sub:last-child{margin-bottom:0}
 
-/* Export */
-.resg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px}
-.rb{padding:6px 4px;font-family:var(--fb);font-size:10px;font-weight:500;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--ts);cursor:pointer;text-align:center;transition:all .15s;line-height:1.3}
-.rb:hover,.rb.on{border-color:var(--accent);color:var(--accent)}
-.rb.on{background:var(--al);font-weight:600}
-.bexp{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:background .2s,opacity .2s;letter-spacing:.03em}
+/* Export — pinned below the tabs, always visible regardless of which
+   tab is open. */
+.sb-export{flex-shrink:0;border-top:1px solid var(--border);padding:16px 18px}
+.resg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.rb{
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:10px;
+  font-family:var(--fb);border:1px solid var(--border);border-radius:8px;background:var(--s2);color:var(--ts);
+  cursor:pointer;text-align:left;transition:all .15s;
+}
+.rb:hover{border-color:var(--bstrong)}
+.rb.on{border-color:var(--accent);background:var(--al)}
+.rb-title{font-size:12px;font-weight:600;color:var(--text)}
+.rb.on .rb-title{color:var(--accent)}
+.rb-sub{font-size:10px;color:var(--tm);line-height:1.3}
+.bexp{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,opacity .2s;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px}
 .bexp:hover{background:#a8522f}
 .bexp:disabled{opacity:.35;cursor:default}
 
 /* CANVAS */
 .ca{display:flex;flex-direction:column;overflow:hidden}
-.tb{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 13px;display:flex;align-items:center;gap:7px;flex-shrink:0}
-.tbb{padding:4px 8px;font-family:var(--fb);font-size:10px;font-weight:500;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--ts);cursor:pointer;transition:all .15s}
-.tbb:hover{border-color:var(--bstrong);color:var(--text)}
-.tbsep{width:1px;height:15px;background:var(--border)}
-.tbinfo{font-family:var(--fb);font-size:10px;color:var(--tm);margin-left:auto}
 
 .vp{flex:1;overflow:hidden;position:relative;cursor:grab;background:var(--bg);
   background-image:radial-gradient(var(--border) 1px, transparent 1px);background-size:16px 16px;}
 .vp.pan{cursor:grabbing}
 .ci{position:absolute;transform-origin:0 0;will-change:transform}
 #rsvg{display:block;box-shadow:0 10px 34px rgba(0,0,0,.16);}
+
+/* Floating canvas toolbar (pan/zoom), matching a CAD-tool convention
+   of overlaying controls on the canvas instead of a separate bar. */
+.canvas-toolbar{
+  position:absolute;top:16px;right:16px;z-index:5;display:flex;align-items:center;gap:2px;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;
+  box-shadow:0 6px 20px rgba(0,0,0,.1);
+}
+.ctb-btn{
+  width:30px;height:30px;border:none;background:none;border-radius:7px;color:var(--ts);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.ctb-btn:hover{background:var(--s2);color:var(--text)}
+.ctb-zoom{font-family:var(--fb);font-size:11.5px;font-weight:600;color:var(--text);min-width:40px;text-align:center}
+.ctb-sep{width:1px;height:20px;background:var(--border);margin:0 2px}
+
+/* Scale bar — a live real-world ruler on the canvas, like a map's
+   scale indicator, reflecting the current paper/scale/zoom. */
+.scale-bar{position:absolute;bottom:16px;left:16px;z-index:5;display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none}
+.scale-bar-line{height:6px;border-left:1.5px solid var(--text);border-right:1.5px solid var(--text);border-bottom:1.5px solid var(--text)}
+.scale-bar-label{font-family:var(--fb);font-size:10.5px;font-weight:600;color:var(--text);background:rgba(255,255,255,.75);padding:0 4px;border-radius:3px}
+
+/* Status bar — persistent scale/paper controls + live cursor position */
+.status-bar{
+  flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);
+  padding:7px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.status-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.status-sep{color:var(--border);font-size:11px}
+.stat-select{
+  font-family:var(--fb);font-size:11.5px;font-weight:500;color:var(--text);
+  border:1px solid transparent;border-radius:5px;padding:3px 4px;background:none;cursor:pointer;
+}
+.stat-select:hover{border-color:var(--border);background:var(--s2)}
+.stat-orient{
+  width:22px;height:22px;border:1px solid transparent;border-radius:5px;background:none;color:var(--ts);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.stat-orient:hover{border-color:var(--border);background:var(--s2);color:var(--text)}
+.status-dims{font-family:var(--fb);font-size:11.5px;color:var(--tm)}
+.status-warn{font-family:var(--fb);font-size:11px;color:var(--accent);font-weight:600}
+.status-right{font-family:var(--fb);font-size:11px;color:var(--tm);white-space:nowrap}
 
 /* Colour picker / info popup */
 .cpop{position:fixed;z-index:999;background:var(--surface);border:1px solid var(--bstrong);border-radius:9px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.14);display:none;width:200px}
@@ -157,8 +205,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 
 @media(max-width:820px){
   .app{grid-template-columns:1fr;grid-template-rows:1fr auto}
-  .sb{border-left:none;border-top:1px solid var(--border);max-height:38vh}
-  .controls-strip{gap:14px}
+  .sb{border-left:none;border-top:1px solid var(--border);max-height:44vh}
+  .status-bar{flex-wrap:wrap}
 }
 </style>
 </head>
@@ -173,229 +221,291 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
   </a>
   <button class="btn-info" id="btn-info" title="How to prepare your DXF">?</button>
   <div class="spacer"></div>
-  <div class="import-group">
-    <span class="htag" id="htag-filename">Trial floor plan</span>
-    <button id="btn-import" class="hero-import-btn">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      Import DXF
-    </button>
-    <input type="file" id="dxf-input" accept=".dxf" style="display:none">
-  </div>
+  <div class="style-swatches" id="stylePresets" title="Style"></div>
+  <div class="hdr-sep"></div>
+  <span class="htag" id="htag-filename">Trial floor plan</span>
+  <button id="btn-import" class="hero-import-btn">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    Import DXF
+  </button>
+  <input type="file" id="dxf-input" accept=".dxf" style="display:none">
 </header>
-
-<div class="controls-strip">
-  <div class="ctl-group">
-    <span class="ctl-label">Paper</span>
-    <select class="ctl-select" id="paperSizeSelect">
-      <option value="A4">A4</option>
-      <option value="A3" selected>A3</option>
-      <option value="A2">A2</option>
-      <option value="A1">A1</option>
-      <option value="A0">A0</option>
-    </select>
-    <button class="orient-btn" id="orientBtn" title="Toggle orientation">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="1.5"/></svg>
-    </button>
-  </div>
-  <div class="ctl-sep"></div>
-  <div class="ctl-group">
-    <span class="ctl-label">Scale</span>
-    <select class="ctl-select" id="scaleSelect">
-      <option value="fit" selected>Fit to page</option>
-      <option value="20">1:20</option>
-      <option value="25">1:25</option>
-      <option value="50">1:50</option>
-      <option value="75">1:75</option>
-      <option value="100">1:100</option>
-      <option value="150">1:150</option>
-      <option value="200">1:200</option>
-    </select>
-  </div>
-  <div class="ctl-sep"></div>
-  <div class="ctl-group">
-    <span class="ctl-label">Style</span>
-    <div class="style-swatches" id="stylePresets"></div>
-  </div>
-  <span class="strip-warn" id="stripWarn"></span>
-</div>
 
 <div class="app">
 
 <div class="ca">
-  <div class="tb">
-    <button class="tbb" id="btn-fit">Fit view</button>
-    <button class="tbb" id="btn-zi">＋</button>
-    <button class="tbb" id="btn-zo">－</button>
-    <span class="tbinfo" id="tbinfo">Trial floor plan · 8 layers</span>
-  </div>
   <div class="vp" id="vp">
     <div class="ci" id="ci">
       <svg id="rsvg" width="900" height="650"></svg>
     </div>
+    <div class="canvas-toolbar">
+      <button class="ctb-btn" id="btn-fit" title="Fit view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+      </button>
+      <div class="ctb-sep"></div>
+      <button class="ctb-btn" id="btn-zo" title="Zoom out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg>
+      </button>
+      <span class="ctb-zoom" id="zoomLabel">100%</span>
+      <button class="ctb-btn" id="btn-zi" title="Zoom in">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+      </button>
+    </div>
+    <div class="scale-bar" id="scaleBar">
+      <span class="scale-bar-label" id="scaleBarLabel">1 m</span>
+      <div class="scale-bar-line" id="scaleBarLine"></div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="status-left">
+      <select class="stat-select" id="scaleSelect">
+        <option value="fit" selected>Fit to page</option>
+        <option value="20">1:20</option>
+        <option value="25">1:25</option>
+        <option value="50">1:50</option>
+        <option value="75">1:75</option>
+        <option value="100">1:100</option>
+        <option value="150">1:150</option>
+        <option value="200">1:200</option>
+      </select>
+      <span class="status-sep">·</span>
+      <select class="stat-select" id="paperSizeSelect">
+        <option value="A4">A4</option>
+        <option value="A3" selected>A3</option>
+        <option value="A2">A2</option>
+        <option value="A1">A1</option>
+        <option value="A0">A0</option>
+      </select>
+      <button class="stat-orient" id="orientBtn" title="Toggle orientation">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="1.5"/></svg>
+      </button>
+      <span class="status-sep">·</span>
+      <span class="status-dims" id="paperDimsLabel">420 × 297 mm</span>
+      <span class="status-warn" id="stripWarn"></span>
+    </div>
+    <div class="status-right" id="cursorCoords">X: — &nbsp; Y: —</div>
   </div>
 </div>
 
 <aside class="sb">
 
-  <!-- LAYERS -->
-  <div class="ss">
-    <div class="sl">Layer Colours</div>
+  <div class="sb-tabs">
+    <button class="sb-tab on" data-pane="pane-layers">Layers</button>
+    <button class="sb-tab" data-pane="pane-overlays">Overlays</button>
+  </div>
 
+  <div class="sb-body">
+  <div class="sb-pane" id="pane-layers">
+  <div class="ss">
     <!-- WALL -->
     <div class="lrow">
-      <div class="lsw" id="sw-wall" style="background:#1c1a18" title="Fill colour"></div>
-      <div class="linfo">
-        <div class="lname">Walls</div>
-        <div class="ldesc">DC-A-WALL</div>
-        <div class="sub-row">
-          <label>Fill wt</label>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-wall">
-          <span id="lw-wall-val">1.0×</span>
+      <div class="lrow-head">
+        <div class="lsw" id="sw-wall" style="background:#1c1a18" title="Fill colour"></div>
+        <div class="linfo">
+          <div class="lname">Walls</div>
+          <div class="ldesc">DXF layer: DC-A-WALL</div>
         </div>
-        <div class="sub-row">
-          <div class="lsw-sm" id="sw-wall-stroke" style="background:#1c1a18" title="Outline colour"></div>
-          <label style="min-width:0">Outline</label>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-wall-stroke">
-          <span id="lw-wall-stroke-val">1.0×</span>
+        <div class="lrow-actions">
+          <button class="leye" id="eye-wall" title="Toggle visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="lchev" id="chev-wall" title="Expand/collapse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </div>
-      <button class="leye" id="eye-wall" title="Toggle visibility">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="lrow-details" id="details-wall">
+        <div class="sub-row">
+          <span class="sub-row-name">Fill weight</span>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-wall">
+          <span class="sub-row-val" id="lw-wall-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name"><span class="lsw-sm" id="sw-wall-stroke" style="background:#1c1a18" title="Outline colour"></span>Outline</span>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-wall-stroke">
+          <span class="sub-row-val" id="lw-wall-stroke-val">1.0×</span>
+        </div>
+      </div>
     </div>
 
     <!-- FLOOR HATCH -->
     <div class="lrow">
-      <div class="lsw" id="sw-floor" style="background:#e8e3d8" title="Fill colour"></div>
-      <div class="linfo">
-        <div class="lname">Floor</div>
-        <div class="ldesc">DC-A-FLOOR HATCH</div>
-        <div class="sub-row">
-          <label>Opacity</label>
-          <input type="range" min="0" max="100" value="100" step="5" id="lw-floor">
-          <span id="lw-floor-val">100%</span>
+      <div class="lrow-head">
+        <div class="lsw" id="sw-floor" style="background:#e8e3d8" title="Fill colour"></div>
+        <div class="linfo">
+          <div class="lname">Floor</div>
+          <div class="ldesc">DXF layer: DC-A-FLOOR HATCH</div>
         </div>
-        <div class="sub-row">
-          <div class="lsw-sm" id="sw-floor-stroke" style="background:#b8b2a8" title="Outline colour"></div>
-          <label style="min-width:0">Outline</label>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-floor-stroke">
-          <span id="lw-floor-stroke-val">1.0×</span>
+        <div class="lrow-actions">
+          <button class="leye" id="eye-floor" title="Toggle visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="lchev" id="chev-floor" title="Expand/collapse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </div>
-      <button class="leye" id="eye-floor" title="Toggle visibility">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="lrow-details" id="details-floor">
+        <div class="sub-row">
+          <span class="sub-row-name">Opacity</span>
+          <input type="range" min="0" max="100" value="100" step="5" id="lw-floor">
+          <span class="sub-row-val" id="lw-floor-val">100%</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name"><span class="lsw-sm" id="sw-floor-stroke" style="background:#b8b2a8" title="Outline colour"></span>Outline</span>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-floor-stroke">
+          <span class="sub-row-val" id="lw-floor-stroke-val">1.0×</span>
+        </div>
+      </div>
     </div>
 
     <!-- FURNITURE -->
     <div class="lrow">
-      <div class="lsw" id="sw-furn" style="background:#d4ccbf" title="Fill colour"></div>
-      <div class="linfo">
-        <div class="lname">Furniture</div>
-        <div class="ldesc">DC-A-FURN</div>
-        <div class="sub-row">
-          <label>Fill wt</label>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-furn">
-          <span id="lw-furn-val">1.0×</span>
+      <div class="lrow-head">
+        <div class="lsw" id="sw-furn" style="background:#d4ccbf" title="Fill colour"></div>
+        <div class="linfo">
+          <div class="lname">Furniture</div>
+          <div class="ldesc">DXF layer: DC-A-FURN</div>
         </div>
-        <div class="sub-row">
-          <div class="lsw-sm" id="sw-furn-stroke" style="background:#a8a29a" title="Outline colour"></div>
-          <label style="min-width:0">Outline</label>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-furn-stroke">
-          <span id="lw-furn-stroke-val">1.0×</span>
-        </div>
-        <div class="sub-row">
-          <label>Opacity</label>
-          <input type="range" min="0" max="100" value="90" step="5" id="furn-opacity">
-          <span id="furn-op-val">90%</span>
+        <div class="lrow-actions">
+          <button class="leye" id="eye-furn" title="Toggle visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="lchev" id="chev-furn" title="Expand/collapse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </div>
-      <button class="leye" id="eye-furn" title="Toggle visibility">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="lrow-details" id="details-furn">
+        <div class="sub-row">
+          <span class="sub-row-name">Fill weight</span>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-furn">
+          <span class="sub-row-val" id="lw-furn-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name"><span class="lsw-sm" id="sw-furn-stroke" style="background:#a8a29a" title="Outline colour"></span>Outline</span>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-furn-stroke">
+          <span class="sub-row-val" id="lw-furn-stroke-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name">Opacity</span>
+          <input type="range" min="0" max="100" value="90" step="5" id="furn-opacity">
+          <span class="sub-row-val" id="furn-op-val">90%</span>
+        </div>
+      </div>
     </div>
 
     <!-- WINDOWS -->
     <div class="lrow">
-      <div class="lsw" id="sw-win" style="background:#cce4f0" title="Fill colour"></div>
-      <div class="linfo">
-        <div class="lname">Windows</div>
-        <div class="ldesc">DC-A-WINDOW</div>
-        <div class="sub-row">
-          <label>Fill wt</label>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-win">
-          <span id="lw-win-val">1.0×</span>
+      <div class="lrow-head">
+        <div class="lsw" id="sw-win" style="background:#cce4f0" title="Fill colour"></div>
+        <div class="linfo">
+          <div class="lname">Windows</div>
+          <div class="ldesc">DXF layer: DC-A-WINDOW</div>
         </div>
-        <div class="sub-row">
-          <div class="lsw-sm" id="sw-win-stroke" style="background:#88b8d0" title="Outline colour"></div>
-          <label style="min-width:0">Outline</label>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-win-stroke">
-          <span id="lw-win-stroke-val">1.0×</span>
+        <div class="lrow-actions">
+          <button class="leye" id="eye-win" title="Toggle visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="lchev" id="chev-win" title="Expand/collapse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </div>
-      <button class="leye" id="eye-win" title="Toggle visibility">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="lrow-details" id="details-win">
+        <div class="sub-row">
+          <span class="sub-row-name">Fill weight</span>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-win">
+          <span class="sub-row-val" id="lw-win-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name"><span class="lsw-sm" id="sw-win-stroke" style="background:#88b8d0" title="Outline colour"></span>Outline</span>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-win-stroke">
+          <span class="sub-row-val" id="lw-win-stroke-val">1.0×</span>
+        </div>
+      </div>
     </div>
 
     <!-- DOORS -->
     <div class="lrow">
-      <div class="lsw" id="sw-door" style="background:#3a3530" title="Click to change door colour"></div>
-      <div class="linfo">
-        <div class="lname">Doors</div>
-        <div class="ldesc">DC-A-DOOR · stroke only</div>
-        <div class="sub-row">
-          <label>Weight</label>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-door">
-          <span id="lw-door-val">1.0×</span>
+      <div class="lrow-head">
+        <div class="lsw" id="sw-door" style="background:#3a3530" title="Click to change door colour"></div>
+        <div class="linfo">
+          <div class="lname">Doors</div>
+          <div class="ldesc">DXF layer: DC-A-DOOR · stroke only</div>
+        </div>
+        <div class="lrow-actions">
+          <button class="leye" id="eye-door" title="Toggle visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="lchev" id="chev-door" title="Expand/collapse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
         </div>
       </div>
-      <button class="leye" id="eye-door" title="Toggle visibility">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div class="lrow-details" id="details-door">
+        <div class="sub-row">
+          <span class="sub-row-name">Weight</span>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-door">
+          <span class="sub-row-val" id="lw-door-val">1.0×</span>
+        </div>
+      </div>
     </div>
   </div>
+  </div>
 
-  <!-- OVERLAYS -->
+  <div class="sb-pane" id="pane-overlays" hidden>
   <div class="ss">
-    <div class="sl">Overlays</div>
     <div class="tog-row">
       <span class="tog-label">Dimensions</span>
       <label class="tog"><input type="checkbox" id="tog-dim" checked><span class="togtr"></span></label>
     </div>
-    <div class="sub-row" style="margin-bottom:8px">
-      <label>Weight</label>
+    <div class="sub-row tog-sub">
+      <span class="sub-row-name">Weight</span>
       <input type="range" min="5" max="400" value="100" step="5" id="lw-dim">
-      <span id="lw-dim-val">1.0×</span>
+      <span class="sub-row-val" id="lw-dim-val">1.0×</span>
     </div>
     <div class="tog-row">
       <span class="tog-label">Room labels</span>
       <label class="tog"><input type="checkbox" id="tog-txt" checked><span class="togtr"></span></label>
     </div>
-    <div class="sub-row" style="margin-bottom:8px">
-      <label>Size</label>
+    <div class="sub-row tog-sub">
+      <span class="sub-row-name">Size</span>
       <input type="range" min="20" max="300" value="100" step="10" id="lw-txt">
-      <span id="lw-txt-val">1.0×</span>
+      <span class="sub-row-val" id="lw-txt-val">1.0×</span>
     </div>
     <div class="tog-row">
       <span class="tog-label">Dashed lines</span>
       <label class="tog"><input type="checkbox" id="tog-dash" checked><span class="togtr"></span></label>
     </div>
-    <div class="sub-row">
-      <label>Weight</label>
+    <div class="sub-row tog-sub">
+      <span class="sub-row-name">Weight</span>
       <input type="range" min="5" max="400" value="100" step="5" id="lw-dash">
-      <span id="lw-dash-val">1.0×</span>
+      <span class="sub-row-val" id="lw-dash-val">1.0×</span>
     </div>
   </div>
+  </div>
+  </div>
 
-  <!-- EXPORT -->
-  <div class="ss">
+  <!-- EXPORT — pinned below the tabs, always visible -->
+  <div class="sb-export">
     <div class="sl">Export PNG</div>
     <div class="resg">
-      <button class="rb on" data-q="print">Print · 150dpi</button>
-      <button class="rb" data-q="screen">Screen · 2×</button>
+      <button class="rb on" data-q="print">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span class="rb-title">Print · 150dpi</span>
+        <span class="rb-sub">High quality for print</span>
+      </button>
+      <button class="rb" data-q="screen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span class="rb-title">Screen · 2×</span>
+        <span class="rb-sub">Optimised for digital</span>
+      </button>
     </div>
-    <button class="bexp" id="btn-exp">Export PNG</button>
+    <button class="bexp" id="btn-exp">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Export PNG
+    </button>
   </div>
 
 </aside>
@@ -495,7 +605,7 @@ function makePageTransform(pxPerMM) {
   const dw = (B.x1 - B.x0) * s, dh = (B.y1 - B.y0) * s;
   const ox = (W - dw) / 2, oy = (H - dh) / 2;
   return {
-    s, W, H, N,
+    s, W, H, N, ox, oy,
     overflow: dw > W || dh > H,
     tx: x => ox + (x - B.x0) * s,
     ty: y => oy + (B.y1 - y) * s,
@@ -752,17 +862,36 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 // ══════════════════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════════════════
+let lastTransform = null; // kept for cursor-coordinate inversion + the scale bar
+
 function render() {
   const t = makePageTransform(PAPER_PX_PER_MM);
+  lastTransform = t;
   const svg = document.getElementById('rsvg');
   svg.setAttribute('width', t.W); svg.setAttribute('height', t.H);
   const str = buildSVG(t);
   svg.innerHTML = str.replace(/<svg[^>]*>/, '').replace(/<\/svg>$/, '');
 
   const { wmm, hmm } = getPaperDims();
-  const label = `${C.paperSize} ${C.orientation === 'landscape' ? 'Landscape' : 'Portrait'} · 1:${Math.round(t.N)}`;
-  document.getElementById('tbinfo').textContent = label;
-  document.getElementById('stripWarn').textContent = t.overflow ? 'Drawing exceeds page at this scale — try a smaller scale or larger paper' : '';
+  document.getElementById('paperDimsLabel').textContent = `${Math.round(wmm)} × ${Math.round(hmm)} mm`;
+  document.getElementById('stripWarn').textContent = t.overflow ? 'Exceeds page at this scale' : '';
+  updateScaleBar(t);
+}
+
+// Google-Maps-style scale bar: picks a "nice" round metre value whose
+// on-screen width (accounting for the current pan/zoom) lands in a
+// comfortable range, rather than a fixed multi-tick ruler.
+const NICE_METRES = [0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000];
+function updateScaleBar(t) {
+  const pxPerMetre = t.s * C.scale * 1000;
+  if (!isFinite(pxPerMetre) || pxPerMetre <= 0) return;
+  let chosen = NICE_METRES[0];
+  for (const m of NICE_METRES) {
+    if (m * pxPerMetre <= 140) chosen = m; else break;
+  }
+  const widthPx = chosen * pxPerMetre;
+  document.getElementById('scaleBarLine').style.width = Math.max(20, widthPx) + 'px';
+  document.getElementById('scaleBarLabel').textContent = chosen >= 1 ? `${chosen} m` : `${chosen*100} cm`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -959,6 +1088,31 @@ document.querySelectorAll('.rb').forEach(b => b.addEventListener('click', () => 
 }));
 
 // ══════════════════════════════════════════════════════
+// SIDEBAR TABS — Layers / Overlays
+// ══════════════════════════════════════════════════════
+document.querySelectorAll('.sb-tab').forEach(tabBtn => {
+  tabBtn.addEventListener('click', () => {
+    document.querySelectorAll('.sb-tab').forEach(b => b.classList.remove('on'));
+    tabBtn.classList.add('on');
+    const target = tabBtn.dataset.pane;
+    document.querySelectorAll('.sb-pane').forEach(p => { p.hidden = (p.id !== target); });
+  });
+});
+
+// ══════════════════════════════════════════════════════
+// LAYER CARD EXPAND/COLLAPSE
+// ══════════════════════════════════════════════════════
+document.querySelectorAll('.lchev').forEach(chev => {
+  chev.addEventListener('click', () => {
+    const key = chev.id.replace('chev-', '');
+    const details = document.getElementById('details-' + key);
+    if (!details) return;
+    const collapsed = chev.classList.toggle('collapsed');
+    details.hidden = collapsed;
+  });
+});
+
+// ══════════════════════════════════════════════════════
 // PNG EXPORT — uses the same page transform as the live view,
 // just at print (150dpi) or screen (2×) pixel density, so the
 // export matches what's on screen.
@@ -996,7 +1150,11 @@ document.getElementById('btn-exp').addEventListener('click', async () => {
 // ══════════════════════════════════════════════════════
 const vp = document.getElementById('vp');
 const ci = document.getElementById('ci');
-function applyT() { ci.style.transform=`translate(${C.panX}px,${C.panY}px) scale(${C.scale})`; }
+function applyT() {
+  ci.style.transform=`translate(${C.panX}px,${C.panY}px) scale(${C.scale})`;
+  document.getElementById('zoomLabel').textContent = Math.round(C.scale*100)+'%';
+  if (lastTransform) updateScaleBar(lastTransform);
+}
 
 vp.addEventListener('mousedown', e => { if(e.button!==0)return; C.panning=true; C.lastPan={x:e.clientX,y:e.clientY}; vp.classList.add('pan'); });
 window.addEventListener('mousemove', e => { if(!C.panning)return; C.panX+=e.clientX-C.lastPan.x; C.panY+=e.clientY-C.lastPan.y; C.lastPan={x:e.clientX,y:e.clientY}; applyT(); });
@@ -1008,6 +1166,20 @@ vp.addEventListener('wheel', e => {
   const mx=e.clientX-r.left, my=e.clientY-r.top;
   C.panX=mx-(mx-C.panX)*d; C.panY=my-(my-C.panY)*d; C.scale*=d; applyT();
 },{passive:false});
+
+// Live cursor coordinates in real-world metres, shown in the status bar.
+const cursorCoordsEl = document.getElementById('cursorCoords');
+vp.addEventListener('mousemove', e => {
+  if (!lastTransform) return;
+  const r = vp.getBoundingClientRect();
+  const pageX = (e.clientX - r.left - C.panX) / C.scale;
+  const pageY = (e.clientY - r.top - C.panY) / C.scale;
+  const B = FP.bounds;
+  const drawX = B.x0 + (pageX - lastTransform.ox) / lastTransform.s;
+  const drawY = B.y1 - (pageY - lastTransform.oy) / lastTransform.s;
+  cursorCoordsEl.textContent = `X: ${(drawX/1000).toFixed(1)} m   Y: ${(drawY/1000).toFixed(1)} m`;
+});
+vp.addEventListener('mouseleave', () => { cursorCoordsEl.textContent = 'X: —   Y: —'; });
 
 let touches={};
 vp.addEventListener('touchstart',e=>{for(const t of e.touches)touches[t.identifier]={x:t.clientX,y:t.clientY};},{passive:true});
@@ -1302,7 +1474,7 @@ if(window.ResizeObserver) new ResizeObserver(render).observe(vp);
 
 // ── Init
 render();
-fitView();
+requestAnimationFrame(() => requestAnimationFrame(fitView));
 </script>
 </body>
 </html>
