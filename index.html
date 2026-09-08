@@ -239,8 +239,8 @@
     font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:clamp(30px,5.4vw,64px);
     text-transform:uppercase; line-height:1.05; max-width:900px; margin-bottom:100px; letter-spacing:-0.005em;
   }
-  .contact-grid{display:grid; grid-template-columns:0.4fr 0.6fr; gap:60px;}
-  @media(max-width:860px){.contact-grid{grid-template-columns:1fr; gap:60px;}}
+  .contact-grid{display:grid; grid-template-columns:0.28fr 0.32fr 0.4fr; gap:60px;}
+  @media(max-width:980px){.contact-grid{grid-template-columns:1fr; gap:60px;}}
   .contact-details p{font-size:14px; color:#d8cdb8;}
   .contact-details .micro{color:#8f8879; margin-bottom:12px; display:block;}
   .contact-email .micro{color:#8f8879; margin-bottom:14px; display:block;}
@@ -250,6 +250,32 @@
   }
   .contact-social{display:flex; gap:26px;}
   .contact-social a{font-size:13px; color:#d8cdb8;}
+  .contact-form .micro{color:#8f8879; margin-bottom:14px; display:block;}
+  .contact-form form{display:flex; flex-direction:column; gap:20px; max-width:380px;}
+  .form-row{display:flex; gap:20px;}
+  .form-group{display:flex; flex-direction:column; gap:7px; flex:1 1 0;}
+  .form-group label{
+    font-family:'Manrope',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em;
+    text-transform:uppercase; color:#8f8879;
+  }
+  .form-field{
+    background:none; border:none; border-bottom:1px solid var(--line-light);
+    color:var(--ivory); font-family:'Manrope',sans-serif; font-size:15px; font-weight:400;
+    padding:8px 0; outline:none; resize:none; transition:border-color .3s ease; width:100%;
+  }
+  .form-field::placeholder{color:#8f8879;}
+  .form-field:focus{border-bottom-color:var(--ivory);}
+  textarea.form-field{min-height:76px;}
+  .form-hint{font-size:12px; color:#8f8879; margin:-10px 0 0;}
+  .form-submit{
+    align-self:flex-start; background:none; border:none; cursor:pointer; padding:0; margin-top:2px;
+    font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:15px; color:var(--ivory);
+  }
+  .form-submit:disabled{opacity:0.5; cursor:default;}
+  .form-status{font-size:12.5px; color:#8f8879; min-height:16px; margin:0;}
+  .form-status.success{color:var(--ivory);}
+  .form-status.error{color:#c1653e;}
+  @media(max-width:480px){.form-row{flex-direction:column; gap:20px;}}
 
   /* ---------- FOOTER ---------- */
   footer{background:var(--charcoal); color:#8f8879; padding:40px 56px; border-top:1px solid var(--line-light);}
@@ -367,6 +393,32 @@
         <a href="https://instagram.com/designhaus_collective" class="link-u">Instagram</a>
         <a href="https://wa.me/918849159559" class="link-u">WhatsApp</a>
       </div>
+    </div>
+    <div class="contact-form">
+      <span class="micro">Send a message</span>
+      <form id="contactForm">
+        <input type="checkbox" name="botcheck" class="hidden" style="display:none;" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="access_key" value="WEB3FORMS_ACCESS_KEY">
+        <input type="hidden" name="subject" value="New message from designhauscollective.in">
+        <input type="hidden" name="from_name" value="Designhaus Collective website">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactEmail">Email</label>
+            <input class="form-field" type="email" name="email" id="contactEmail" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label for="contactPhone">Phone</label>
+            <input class="form-field" type="tel" name="phone" id="contactPhone" placeholder="+91 00000 00000">
+          </div>
+        </div>
+        <p class="form-hint">Share at least one — email or phone.</p>
+        <div class="form-group">
+          <label for="contactMessage">Message</label>
+          <textarea class="form-field" name="message" id="contactMessage" placeholder="Tell us about your project" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send message &rarr;</button>
+        <p class="form-status" id="contactFormStatus" aria-live="polite"></p>
+      </form>
     </div>
   </div>
 </section>
@@ -489,6 +541,48 @@
         i = (i + 1) % slides.length;
         slides[i].classList.add('active');
       }, 5000);
+    });
+  }
+
+  const contactForm = document.getElementById('contactForm');
+  const contactStatus = document.getElementById('contactFormStatus');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const emailVal = contactForm.querySelector('#contactEmail').value.trim();
+      const phoneVal = contactForm.querySelector('#contactPhone').value.trim();
+      if (!emailVal && !phoneVal) {
+        contactStatus.textContent = 'Please add your email or phone so we can reply.';
+        contactStatus.className = 'form-status error';
+        return;
+      }
+      const submitBtn = contactForm.querySelector('.form-submit');
+      const data = new FormData(contactForm);
+      submitBtn.disabled = true;
+      contactStatus.textContent = 'Sending…';
+      contactStatus.className = 'form-status';
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+          submitBtn.disabled = false;
+          if (json.success) {
+            contactStatus.textContent = "Thanks — we'll be in touch soon.";
+            contactStatus.className = 'form-status success';
+            contactForm.reset();
+          } else {
+            contactStatus.textContent = 'Something went wrong. Please email us directly.';
+            contactStatus.className = 'form-status error';
+          }
+        })
+        .catch(function () {
+          submitBtn.disabled = false;
+          contactStatus.textContent = 'Something went wrong. Please email us directly.';
+          contactStatus.className = 'form-status error';
+        });
     });
   }
 </script>
