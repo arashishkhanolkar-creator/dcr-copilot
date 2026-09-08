@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<title>Floor Plan Renderer — Designhaus Collective</title>
+<meta name="description" content="Upload a Designhaus DXF file and render a presentation-ready floor plan in seconds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f0f0;--surface:#fff;--s2:#f7f5f2;
+  --border:#e0ddd8;--bstrong:#ccc9c2;
+  --text:#1a1a18;--ts:#6b6b65;--tm:#9a9a94;
+  --accent:#c1653e;--al:#f5ede8;
+  --cream:#e9dcc0;
+  --font:'Space Grotesk',system-ui,sans-serif;
+  --fb:'Manrope',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);}
+
+/* ---------- SITE CHROME ---------- */
+.tool-wrap{min-height:100vh;display:flex;flex-direction:column;}
+
+.fp-header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 40px;display:flex;align-items:center;flex-shrink:0;
+}
+.fp-header a{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+.fp-header img{height:30px;width:auto;display:block}
+.fp-header span{font-family:var(--font);font-weight:600;font-size:14px;letter-spacing:.01em}
+
+.hero-fp{
+  background:var(--cream);padding:32px 40px;flex-shrink:0;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap;
+}
+.hero-fp-eyebrow{
+  font-family:var(--fb);font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:block;
+}
+.hero-fp h1{font-family:var(--font);font-weight:600;font-size:clamp(24px,3vw,34px);letter-spacing:-.01em;margin-bottom:8px}
+.hero-fp-text p{font-family:var(--fb);font-size:13.5px;color:var(--ts);max-width:480px;line-height:1.6}
+.hero-fp-actions{display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap}
+.hero-import-btn{
+  padding:11px 20px;font-family:var(--fb);font-size:12px;font-weight:600;
+  border:1.5px solid var(--accent);border-radius:6px;background:var(--al);color:var(--accent);
+  cursor:pointer;letter-spacing:.03em;display:flex;align-items:center;gap:7px;transition:background .15s;
+}
+.hero-import-btn:hover{background:#ecd8d0}
+
+.spec-note{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.spec-note summary{
+  padding:11px 40px;font-family:var(--fb);font-size:11.5px;font-weight:600;color:var(--ts);
+  cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;
+}
+.spec-note summary::-webkit-details-marker{display:none}
+.spec-note summary::before{content:'▸';color:var(--accent);display:inline-block;transition:transform .2s ease}
+.spec-note[open] summary::before{transform:rotate(90deg)}
+.spec-note-body{padding:0 40px 18px;max-width:720px}
+.spec-note-body p{font-family:var(--fb);font-size:12.5px;color:var(--ts);line-height:1.7;margin-bottom:8px}
+.spec-note-body code{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:11.5px}
+.spec-note-body a{color:var(--accent);font-weight:600}
+
+.fp-footer{background:#1a1a18;color:#8f8879;padding:28px 40px;flex-shrink:0}
+.fp-footer-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.fp-footer-row img{height:34px;filter:brightness(0) invert(1);opacity:.9}
+.fp-footer-links{display:flex;gap:20px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+.fp-footer-links a{color:#c9c2b0;text-decoration:none}
+.fp-foot-copy{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}
+
+@media(max-width:720px){
+  .app{grid-template-columns:1fr!important;grid-template-rows:auto 1fr}
+  .sb{border-right:none;border-bottom:1px solid var(--border);max-height:40vh}
+  .hero-fp{padding:24px 20px}
+  .fp-header{padding:12px 20px}
+  .spec-note summary,.spec-note-body{padding-left:20px;padding-right:20px}
+  .fp-footer{padding:20px}
+}
+
+.htag{font-family:var(--fb);font-size:10px;color:var(--tm)}
+
+/* LAYOUT */
+.app{flex:1 1 auto;min-height:520px;display:grid;grid-template-columns:260px 1fr;overflow:hidden}
+
+/* SIDEBAR */
+.sb{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.sb::-webkit-scrollbar{width:3px}
+.sb::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:2px}
+
+.ss{padding:14px 15px;border-bottom:1px solid var(--border)}
+.ss:last-child{border-bottom:none}
+.sl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tm);margin-bottom:11px}
+
+/* Layer colour rows */
+.lrow{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border-radius:7px;border:1px solid var(--border);background:var(--s2);margin-bottom:6px}
+.lrow:last-child{margin-bottom:0}
+.lsw{width:26px;height:26px;border-radius:5px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s;margin-top:1px}
+.lsw:hover{transform:scale(1.08)}
+.linfo{flex:1;min-width:0}
+.lname{font-size:11px;font-weight:500;color:var(--text);font-family:var(--fb)}
+.ldesc{font-size:9px;color:var(--tm);font-family:var(--fb);margin-top:1px}
+.leye{margin-top:2px}
+.leye{background:none;border:none;cursor:pointer;color:var(--tm);padding:0;display:flex;align-items:center;flex-shrink:0;transition:color .15s}
+.leye.off{color:var(--border)}
+.leye:hover{color:var(--text)}
+
+/* Sub-sliders inside layer rows */
+.sub-row{display:flex;align-items:center;gap:7px;margin-top:5px}
+.sub-row label{font-size:9px;color:var(--tm);font-family:var(--fb);white-space:nowrap;min-width:42px}
+.sub-row input[type=range]{flex:1;height:3px;accent-color:var(--accent)}
+.sub-row span{font-size:9px;color:var(--ts);font-family:var(--fb);min-width:28px;text-align:right}
+/* Small outline colour swatch inside sub-row */
+.lsw-sm{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s}
+.lsw-sm:hover{transform:scale(1.12)}
+
+/* BG toggle */
+.bgt{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:0}
+.bgo{flex:1;padding:6px 3px;font-size:10px;font-family:var(--fb);font-weight:500;border:none;cursor:pointer;background:var(--s2);color:var(--ts);transition:all .15s;text-align:center}
+.bgo:not(:last-child){border-right:1px solid var(--border)}
+.bgo.on{background:var(--accent);color:#fff}
+
+/* Overlay toggles */
+.tog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tog-row:last-child{margin-bottom:0}
+.tog-label{font-size:11px;color:var(--text);font-family:var(--fb)}
+.tog{position:relative;width:34px;height:18px;flex-shrink:0}
+.tog input{display:none}
+.togtr{position:absolute;inset:0;background:var(--bstrong);border-radius:9px;cursor:pointer;transition:background .2s}
+.tog input:checked+.togtr{background:var(--accent)}
+.togtr::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog input:checked+.togtr::after{transform:translateX(16px)}
+
+/* Export */
+.resg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px}
+.rb{padding:6px 4px;font-family:var(--fb);font-size:10px;font-weight:500;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--ts);cursor:pointer;text-align:center;transition:all .15s;line-height:1.3}
+.rb:hover,.rb.on{border-color:var(--accent);color:var(--accent)}
+.rb.on{background:var(--al);font-weight:600}
+.bexp{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:background .2s,opacity .2s;letter-spacing:.03em}
+.bexp:hover{background:#a8522f}
+.bexp:disabled{opacity:.35;cursor:default}
+
+/* CANVAS */
+.ca{display:flex;flex-direction:column;overflow:hidden}
+.tb{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 13px;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.tbb{padding:4px 8px;font-family:var(--fb);font-size:10px;font-weight:500;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--ts);cursor:pointer;transition:all .15s}
+.tbb:hover{border-color:var(--bstrong);color:var(--text)}
+.tbsep{width:1px;height:15px;background:var(--border)}
+.tbinfo{font-family:var(--fb);font-size:10px;color:var(--tm);margin-left:auto}
+
+.vp{flex:1;overflow:hidden;position:relative;cursor:grab}
+.vp.pan{cursor:grabbing}
+.ci{position:absolute;transform-origin:0 0;will-change:transform}
+#rsvg{display:block}
+
+.est{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none}
+.est svg{opacity:.1}
+.est p{font-family:var(--fb);font-size:12px;color:var(--tm);text-align:center;max-width:200px;line-height:1.6}
+
+/* Colour picker popup */
+.cpop{position:fixed;z-index:999;background:var(--surface);border:1px solid var(--bstrong);border-radius:9px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.14);display:none;width:200px}
+.cpop.on{display:block}
+.cpop input[type=color]{width:100%;height:34px;border:none;border-radius:5px;cursor:pointer;margin-bottom:7px}
+.csw{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:7px}
+.csw-c{width:22px;height:22px;border-radius:3px;cursor:pointer;border:1px solid rgba(0,0,0,.1);transition:transform .1s}
+.csw-c:hover{transform:scale(1.15)}
+.cpop-close{width:100%;padding:4px;font-family:var(--fb);font-size:10px;border:1px solid var(--border);border-radius:4px;background:none;cursor:pointer;color:var(--ts)}
+.cpop-lbl{font-size:9px;color:var(--tm);font-family:var(--fb);margin-bottom:5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="tool-wrap">
+
+<header class="fp-header">
+  <a href="index.html" aria-label="Designhaus Collective — Home">
+    <img src="assets/icons/logo-mark.png" alt="">
+    <span>Floor Plan Renderer</span>
+  </a>
+</header>
+
+<section class="hero-fp">
+  <div class="hero-fp-text">
+    <span class="hero-fp-eyebrow">Free Tool</span>
+    <h1>Floor Plan Renderer</h1>
+    <p>Upload a Designhaus DXF file and render a presentation-ready floor plan in seconds.</p>
+  </div>
+  <div class="hero-fp-actions">
+    <button id="btn-import" class="hero-import-btn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Import DXF
+    </button>
+    <span class="htag" id="htag-filename">Trial floor plan</span>
+    <input type="file" id="dxf-input" accept=".dxf" style="display:none">
+  </div>
+</section>
+
+<details class="spec-note">
+  <summary>How to prepare your DXF</summary>
+  <div class="spec-note-body">
+    <p>Draw in AutoCAD using the Designhaus layer template. Save as AutoCAD 2010 DXF before uploading. Curved elements use bulge encoding — do not explode polylines. All layers must follow the <code>DC-A-*</code> naming convention.</p>
+    <p>Download the <a href="#">Designhaus DXF Template</a> to get started.</p>
+  </div>
+</details>
+
+<div class="app">
+<aside class="sb">
+
+  <!-- LAYERS -->
+  <div class="ss">
+    <div class="sl">Layer Colours</div>
+
+    <!-- WALL -->
+    <div class="lrow">
+      <div class="lsw" id="sw-wall" style="background:#1c1a18" title="Fill colour"></div>
+      <div class="linfo">
+        <div class="lname">Walls</div>
+        <div class="ldesc">DC-A-WALL</div>
+        <div class="sub-row">
+          <label>Fill wt</label>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-wall">
+          <span id="lw-wall-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <div class="lsw-sm" id="sw-wall-stroke" style="background:#1c1a18" title="Outline colour"></div>
+          <label style="min-width:0">Outline</label>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-wall-stroke">
+          <span id="lw-wall-stroke-val">1.0×</span>
+        </div>
+      </div>
+      <button class="leye" id="eye-wall" title="Toggle visibility">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <!-- FLOOR HATCH -->
+    <div class="lrow">
+      <div class="lsw" id="sw-floor" style="background:#e8e3d8" title="Fill colour"></div>
+      <div class="linfo">
+        <div class="lname">Floor</div>
+        <div class="ldesc">DC-A-FLOOR HATCH</div>
+        <div class="sub-row">
+          <label>Opacity</label>
+          <input type="range" min="0" max="100" value="100" step="5" id="lw-floor">
+          <span id="lw-floor-val">100%</span>
+        </div>
+        <div class="sub-row">
+          <div class="lsw-sm" id="sw-floor-stroke" style="background:#b8b2a8" title="Outline colour"></div>
+          <label style="min-width:0">Outline</label>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-floor-stroke">
+          <span id="lw-floor-stroke-val">1.0×</span>
+        </div>
+      </div>
+      <button class="leye" id="eye-floor" title="Toggle visibility">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <!-- FURNITURE -->
+    <div class="lrow">
+      <div class="lsw" id="sw-furn" style="background:#d4ccbf" title="Fill colour"></div>
+      <div class="linfo">
+        <div class="lname">Furniture</div>
+        <div class="ldesc">DC-A-FURN</div>
+        <div class="sub-row">
+          <label>Fill wt</label>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-furn">
+          <span id="lw-furn-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <div class="lsw-sm" id="sw-furn-stroke" style="background:#a8a29a" title="Outline colour"></div>
+          <label style="min-width:0">Outline</label>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-furn-stroke">
+          <span id="lw-furn-stroke-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <label>Opacity</label>
+          <input type="range" min="0" max="100" value="90" step="5" id="furn-opacity">
+          <span id="furn-op-val">90%</span>
+        </div>
+      </div>
+      <button class="leye" id="eye-furn" title="Toggle visibility">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <!-- WINDOWS -->
+    <div class="lrow">
+      <div class="lsw" id="sw-win" style="background:#cce4f0" title="Fill colour"></div>
+      <div class="linfo">
+        <div class="lname">Windows</div>
+        <div class="ldesc">DC-A-WINDOW</div>
+        <div class="sub-row">
+          <label>Fill wt</label>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-win">
+          <span id="lw-win-val">1.0×</span>
+        </div>
+        <div class="sub-row">
+          <div class="lsw-sm" id="sw-win-stroke" style="background:#88b8d0" title="Outline colour"></div>
+          <label style="min-width:0">Outline</label>
+          <input type="range" min="0" max="400" value="100" step="5" id="lw-win-stroke">
+          <span id="lw-win-stroke-val">1.0×</span>
+        </div>
+      </div>
+      <button class="leye" id="eye-win" title="Toggle visibility">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <!-- DOORS -->
+    <div class="lrow">
+      <div class="lsw" id="sw-door" style="background:#3a3530" title="Click to change door colour"></div>
+      <div class="linfo">
+        <div class="lname">Doors</div>
+        <div class="ldesc">DC-A-DOOR · stroke only</div>
+        <div class="sub-row">
+          <label>Weight</label>
+          <input type="range" min="5" max="400" value="100" step="5" id="lw-door">
+          <span id="lw-door-val">1.0×</span>
+        </div>
+      </div>
+      <button class="leye" id="eye-door" title="Toggle visibility">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- OVERLAYS -->
+  <div class="ss">
+    <div class="sl">Overlays</div>
+    <div class="tog-row">
+      <span class="tog-label">Dimensions</span>
+      <label class="tog"><input type="checkbox" id="tog-dim" checked><span class="togtr"></span></label>
+    </div>
+    <div class="sub-row" style="margin-bottom:8px">
+      <label>Weight</label>
+      <input type="range" min="5" max="400" value="100" step="5" id="lw-dim">
+      <span id="lw-dim-val">1.0×</span>
+    </div>
+    <div class="tog-row">
+      <span class="tog-label">Room labels</span>
+      <label class="tog"><input type="checkbox" id="tog-txt" checked><span class="togtr"></span></label>
+    </div>
+    <div class="sub-row" style="margin-bottom:8px">
+      <label>Size</label>
+      <input type="range" min="20" max="300" value="100" step="10" id="lw-txt">
+      <span id="lw-txt-val">1.0×</span>
+    </div>
+    <div class="tog-row">
+      <span class="tog-label">Dashed lines</span>
+      <label class="tog"><input type="checkbox" id="tog-dash" checked><span class="togtr"></span></label>
+    </div>
+    <div class="sub-row">
+      <label>Weight</label>
+      <input type="range" min="5" max="400" value="100" step="5" id="lw-dash">
+      <span id="lw-dash-val">1.0×</span>
+    </div>
+  </div>
+
+
+
+  <!-- BACKGROUND -->
+  <div class="ss">
+    <div class="sl">Background</div>
+    <div class="bgt">
+      <button class="bgo on" data-bg="#faf8f4">Warm</button>
+      <button class="bgo" data-bg="#ffffff">White</button>
+      <button class="bgo" data-bg="#f5f0e8">Cream</button>
+      <button class="bgo" data-bg="#1a1a18">Dark</button>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="ss">
+    <div class="sl">Export PNG</div>
+    <div class="resg">
+      <button class="rb" data-w="1240" data-h="877">A4 150dpi</button>
+      <button class="rb on" data-w="1754" data-h="1240">A3 150dpi</button>
+      <button class="rb" data-w="3508" data-h="2480">A1 150dpi</button>
+      <button class="rb" data-w="0" data-h="0">Screen 2×</button>
+    </div>
+    <button class="bexp" id="btn-exp">Export PNG</button>
+  </div>
+
+</aside>
+
+<div class="ca">
+  <div class="tb">
+    <button class="tbb" id="btn-fit">Fit view</button>
+    <button class="tbb" id="btn-zi">＋</button>
+    <button class="tbb" id="btn-zo">－</button>
+    <div class="tbsep"></div>
+    <button class="tbb" id="btn-reset">Reset colours</button>
+    <span class="tbinfo" id="tbinfo">Trial floor plan · 8 layers</span>
+  </div>
+  <div class="vp" id="vp">
+    <div class="ci" id="ci">
+      <svg id="rsvg" width="900" height="650"></svg>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer class="fp-footer">
+  <div class="fp-footer-row">
+    <img src="assets/icons/logo-mark.png" alt="Designhaus Collective">
+    <div class="fp-footer-links">
+      <a href="index.html#studio">Studio</a>
+      <a href="index.html#work">Services</a>
+      <a href="ai-lab.html">AI Lab</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <span class="fp-foot-copy">© Designhaus Collective</span>
+  </div>
+</footer>
+
+</div>
+
+<!-- Colour picker -->
+<div class="cpop" id="cpop">
+  <div class="cpop-lbl" id="cpop-lbl">Wall colour</div>
+  <input type="color" id="cpop-native">
+  <div class="csw" id="csw"></div>
+  <button class="cpop-close" id="cpop-close">Done</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// EMBEDDED GEOMETRY — extracted from TRIAL_FLOOR_PLAN_01.dxf
+// ══════════════════════════════════════════════════════
+let FP ={"bounds":{"x0":2262.445118858302,"y0":10604.371838446998,"x1":11757.07809570866,"y1":16989.260095708658},"walls":[{"type":"LWPOLYLINE","closed":true,"verts":[{"x":3384.489,"y":16286.671},{"x":3384.489,"y":16436.671},{"x":3124.489,"y":16436.671},{"x":3124.489,"y":11791.671},{"x":3464.489,"y":11791.671},{"x":3464.489,"y":11886.671},{"x":3274.489,"y":11886.671},{"x":3274.489,"y":16286.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":5774.489,"y":16436.671},{"x":5774.489,"y":16286.671},{"x":6074.489,"y":16286.671},{"x":6074.489,"y":14566.671},{"x":6124.489,"y":14566.671},{"x":6124.489,"y":14156.671},{"x":6844.489,"y":14156.671},{"x":6844.489,"y":14336.671},{"x":6304.489,"y":14336.671},{"x":6304.489,"y":16656.671},{"x":6754.489,"y":16656.671},{"x":6754.489,"y":16806.671},{"x":6074.489,"y":16806.671},{"x":6074.489,"y":16436.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":11024.489,"y":16656.671},{"x":11454.489,"y":16656.671},{"x":11454.489,"y":13336.671},{"x":10014.489,"y":13336.671},{"x":10014.489,"y":13186.671},{"x":11424.489,"y":13186.671},{"x":11424.489,"y":11941.671},{"x":9294.489,"y":11941.671},{"x":9294.489,"y":12281.671},{"x":9154.489,"y":12281.671},{"x":9154.489,"y":11791.671},{"x":11574.489,"y":11791.671},{"x":11574.489,"y":16806.671},{"x":11024.489,"y":16806.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":5024.489,"y":11936.671},{"x":6124.489,"y":11936.671},{"x":6124.489,"y":13336.671},{"x":6384.489,"y":13336.671},{"x":6384.489,"y":11896.671},{"x":7964.489,"y":11896.671},{"x":7964.489,"y":12241.671},{"x":8114.489,"y":12241.671},{"x":8114.489,"y":11791.671},{"x":4504.489,"y":11791.671},{"x":4504.489,"y":11886.671},{"x":5024.489,"y":11886.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":7124.489,"y":13336.671},{"x":7124.489,"y":13226.671},{"x":7964.489,"y":13226.671},{"x":7964.489,"y":12856.671},{"x":8114.489,"y":12856.671},{"x":8114.489,"y":13226.671},{"x":9154.489,"y":13226.671},{"x":9154.489,"y":12856.671},{"x":9294.489,"y":12856.671},{"x":9294.489,"y":13336.671},{"x":9294.489,"y":13336.671}]},{"type":"LWPOLYLINE","closed":false,"verts":[{"x":7929.489,"y":16657.765},{"x":7929.489,"y":16806.671},{"x":8944.489,"y":16806.671},{"x":8944.489,"y":16656.671},{"x":8504.489,"y":16656.671},{"x":8504.489,"y":14206.671},{"x":8369.489,"y":14206.671},{"x":8369.489,"y":16656.671},{"x":7929.489,"y":16656.671}]}],"floor":[{"type":"LWPOLYLINE","closed":true,"verts":[{"x":3274.489,"y":16286.671},{"x":6074.489,"y":16286.671},{"x":6074.489,"y":14566.671},{"x":6124.489,"y":14566.671},{"x":6124.489,"y":14156.671},{"x":6844.489,"y":14156.671},{"x":6844.489,"y":14336.671},{"x":6304.489,"y":14336.671},{"x":6304.489,"y":16656.671},{"x":8369.489,"y":16656.671},{"x":8369.489,"y":14206.671},{"x":8504.489,"y":14206.671},{"x":8504.489,"y":16656.671},{"x":11454.489,"y":16656.671},{"x":11454.489,"y":13336.671},{"x":10014.489,"y":13336.671},{"x":10014.489,"y":13186.671},{"x":11424.489,"y":13186.671},{"x":11424.489,"y":11941.671},{"x":9294.489,"y":11941.671},{"x":9294.489,"y":13336.671},{"x":7124.489,"y":13336.671},{"x":7124.489,"y":13226.671},{"x":7964.489,"y":13226.671},{"x":7964.489,"y":11896.671},{"x":6384.489,"y":11896.671},{"x":6384.489,"y":13336.671},{"x":6124.489,"y":13336.671},{"x":6124.489,"y":11936.671},{"x":5024.489,"y":11936.671},{"x":5024.489,"y":11886.671},{"x":3274.489,"y":11886.671}]}],"furn":[{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":8804.489,"y":16506.671,"b":0.0},{"x":8504.489,"y":16506.671,"b":0.0},{"x":8504.489,"y":14231.671,"b":0.0},{"x":8804.489,"y":14231.671,"b":0.414214},{"x":8954.489,"y":14381.671,"b":0.0},{"x":8954.489,"y":16356.671,"b":0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":9554.489,"y":16156.671},{"x":11354.489,"y":16156.671},{"x":11354.489,"y":14656.671},{"x":9554.489,"y":14656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":11354.489,"y":14656.671},{"x":11454.489,"y":14656.671},{"x":11454.489,"y":16156.671},{"x":11354.489,"y":16156.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":10014.489,"y":13336.671},{"x":11454.489,"y":13336.671},{"x":11454.489,"y":13936.671},{"x":10014.489,"y":13936.671}]},{"kind":"circle","x":11204.489,"y":16406.671,"r":200.0},{"kind":"circle","x":11204.489,"y":14406.671,"r":200.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6904.489,"y":15156.671},{"x":6304.489,"y":15156.671},{"x":6304.489,"y":16656.671},{"x":6904.489,"y":16656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7769.489,"y":15906.671},{"x":8369.489,"y":15906.671},{"x":8369.489,"y":14346.671},{"x":7769.489,"y":14346.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7769.489,"y":15906.671},{"x":8369.489,"y":15906.671},{"x":8369.489,"y":16656.671},{"x":7769.489,"y":16656.671}]},{"kind":"insert","block":"G$C44963CA8","ix":5298.177,"iy":15897.444,"sx":-1.0,"sy":1.0,"rot":0.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3274.489,"y":16136.671},{"x":3274.489,"y":15586.671},{"x":4024.489,"y":15586.671},{"x":4024.489,"y":16136.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3621.824,"y":13786.671},{"x":3271.824,"y":13786.671},{"x":3274.489,"y":14986.671},{"x":3624.489,"y":14986.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3333.157,"y":14886.671},{"x":3333.157,"y":13886.671},{"x":3273.157,"y":13886.671},{"x":3273.157,"y":14886.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":5674.489,"y":12161.671,"b":1.0},{"x":6124.489,"y":12161.671,"b":0.0},{"x":6124.489,"y":13061.671,"b":1.0},{"x":5674.489,"y":13061.671,"b":0.0}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4924.489,"y":13286.671},{"x":5724.489,"y":13286.671},{"x":5724.489,"y":11986.671},{"x":4924.489,"y":11986.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4724.489,"y":13211.671,"b":0.0},{"x":4874.489,"y":13211.671,"b":-0.414214},{"x":5024.489,"y":13061.671,"b":0.0},{"x":5024.489,"y":12811.671,"b":-0.414214},{"x":4874.489,"y":12661.671,"b":0.0},{"x":4724.489,"y":12661.671,"b":-0.414214},{"x":4574.489,"y":12811.671,"b":0.0},{"x":4574.489,"y":13061.671,"b":-0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4574.489,"y":12911.671},{"x":4549.489,"y":12911.671},{"x":4549.489,"y":12961.671},{"x":4574.489,"y":12961.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4549.489,"y":12732.426,"b":-1.0},{"x":4499.489,"y":12732.426,"b":0.0},{"x":4499.489,"y":13132.426,"b":-1.0},{"x":4549.489,"y":13132.426,"b":0.0}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4724.489,"y":12061.671,"b":0.0},{"x":4874.489,"y":12061.671,"b":0.414214},{"x":5024.489,"y":12211.671,"b":0.0},{"x":5024.489,"y":12461.671,"b":0.414214},{"x":4874.489,"y":12611.671,"b":0.0},{"x":4724.489,"y":12611.671,"b":0.414214},{"x":4574.489,"y":12461.671,"b":0.0},{"x":4574.489,"y":12211.671,"b":0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4574.489,"y":12361.671},{"x":4549.489,"y":12361.671},{"x":4549.489,"y":12311.671},{"x":4574.489,"y":12311.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4549.489,"y":12540.916,"b":1.0},{"x":4499.489,"y":12540.916,"b":0.0},{"x":4499.489,"y":12140.916,"b":1.0},{"x":4549.489,"y":12140.916,"b":0.0}]},{"kind":"circle","x":4553.44,"y":14871.098,"r":300.0},{"kind":"arc","x":4593.196,"y":15168.452,"r":200.0,"sa":332.914,"ea":191.856},{"kind":"arc","x":4593.196,"y":15168.452,"r":200.0,"sa":191.856,"ea":332.914},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6454.489,"y":16156.671},{"x":6454.489,"y":16606.671},{"x":6854.489,"y":16606.671},{"x":6854.489,"y":16156.671}]},{"kind":"circle","x":6404.489,"y":16381.671,"r":25.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":8269.489,"y":15856.671},{"x":8269.489,"y":15076.671},{"x":7819.489,"y":15076.671},{"x":7819.489,"y":15856.671}]}],"windows":[{"type":"LWPOLYLINE","closed":true,"verts":[{"x":3384.489,"y":16436.671},{"x":5774.489,"y":16436.671},{"x":5774.489,"y":16286.671},{"x":3384.489,"y":16286.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":6754.489,"y":16806.671},{"x":7929.489,"y":16806.671},{"x":7929.489,"y":16656.671},{"x":6754.489,"y":16656.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":8944.489,"y":16806.671},{"x":11024.489,"y":16806.671},{"x":11024.489,"y":16656.671},{"x":8944.489,"y":16656.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":7964.489,"y":12856.671},{"x":8114.489,"y":12856.671},{"x":8114.489,"y":12241.671},{"x":7964.489,"y":12241.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":9154.489,"y":12856.671},{"x":9294.489,"y":12856.671},{"x":9294.489,"y":12281.671},{"x":9154.489,"y":12281.671}]}],"doors":[{"kind":"line","x1":3464.489,"y1":11791.671,"x2":3464.489,"y2":12846.671},{"kind":"arc","x":3474.915,"y":11816.842,"r":1029.881,"sa":358.599,"ea":90.58},{"kind":"arc","x":9308.614,"y":13293.833,"r":707.174,"sa":268.856,"ea":3.473},{"kind":"arc","x":6384.489,"y":13326.671,"r":740.068,"sa":270.774,"ea":0.774},{"kind":"arc","x":8504.489,"y":13336.671,"r":870.0,"sa":0.0,"ea":90.0},{"kind":"line","x1":8504.489,"y1":13336.671,"x2":9374.489,"y2":13336.671},{"kind":"line","x1":6394.489,"y1":12586.671,"x2":6394.489,"y2":13336.671},{"kind":"line","x1":9294.489,"y1":12586.8,"x2":9294.489,"y2":13336.671}],"dashed":[{"x1":3274.489,"y1":16136.671,"x2":6074.489,"y2":16136.671},{"x1":11454.489,"y1":16506.671,"x2":8504.489,"y2":16506.671}],"dim_lines":[{"x1":4924.489,"y1":13286.608,"x2":4924.489,"y2":13115.891},{"x1":5724.489,"y1":13286.608,"x2":5724.489,"y2":13115.891},{"x1":4914.489,"y1":13165.891,"x2":5734.489,"y2":13165.891},{"x1":5273.724,"y1":13286.671,"x2":5128.368,"y2":13286.671},{"x1":5273.724,"y1":11986.671,"x2":5128.368,"y2":11986.671},{"x1":5178.368,"y1":13296.671,"x2":5178.368,"y2":11976.671},{"x1":5724.489,"y1":13286.608,"x2":5724.489,"y2":13115.891},{"x1":6124.489,"y1":13286.608,"x2":6124.489,"y2":13115.891},{"x1":5714.489,"y1":13165.891,"x2":6134.489,"y2":13165.891},{"x1":5087.805,"y1":14211.671,"x2":4923.414,"y2":14211.671},{"x1":5087.805,"y1":16111.671,"x2":4923.414,"y2":16111.671},{"x1":4973.414,"y1":14201.671,"x2":4973.414,"y2":16121.671},{"x1":4024.489,"y1":15586.733,"x2":4024.489,"y2":15787.32},{"x1":3274.489,"y1":15586.733,"x2":3274.489,"y2":15787.32},{"x1":4034.489,"y1":15737.32,"x2":3264.489,"y2":15737.32},{"x1":4024.427,"y1":16136.671,"x2":3903.004,"y2":16136.671},{"x1":4024.427,"y1":15586.671,"x2":3903.004,"y2":15586.671},{"x1":3953.004,"y1":16146.671,"x2":3953.004,"y2":15576.671},{"x1":3274.552,"y1":15586.671,"x2":3408.391,"y2":15586.671},{"x1":3274.552,"y1":14986.671,"x2":3408.391,"y2":14986.671},{"x1":3358.391,"y1":15596.671,"x2":3358.391,"y2":14976.671},{"x1":3624.552,"y1":14986.671,"x2":3755.835,"y2":14986.671},{"x1":3621.886,"y1":13786.671,"x2":3755.835,"y2":13786.671},{"x1":3705.835,"y1":14996.671,"x2":3705.835,"y2":13776.671},{"x1":3621.824,"y1":13786.608,"x2":3621.824,"y2":13625.107},{"x1":3271.824,"y1":13786.608,"x2":3271.824,"y2":13625.107},{"x1":3631.824,"y1":13675.107,"x2":3261.824,"y2":13675.107},{"x1":7819.489,"y1":15856.608,"x2":7819.489,"y2":15733.492},{"x1":8269.489,"y1":15856.608,"x2":8269.489,"y2":15733.492},{"x1":7809.489,"y1":15783.492,"x2":8279.489,"y2":15783.492},{"x1":7819.552,"y1":15856.671,"x2":7943.359,"y2":15856.671},{"x1":7819.552,"y1":15076.671,"x2":7943.359,"y2":15076.671},{"x1":7893.359,"y1":15866.671,"x2":7893.359,"y2":15066.671},{"x1":6904.427,"y1":15156.671,"x2":6755.921,"y2":15156.671},{"x1":6904.427,"y1":16656.671,"x2":6755.921,"y2":16656.671},{"x1":6805.921,"y1":15146.671,"x2":6805.921,"y2":16666.671},{"x1":6304.489,"y1":15156.733,"x2":6304.489,"y2":15313.941},{"x1":6904.489,"y1":15156.733,"x2":6904.489,"y2":15313.941},{"x1":6294.489,"y1":15263.941,"x2":6914.489,"y2":15263.941},{"x1":7769.427,"y1":14346.671,"x2":7541.544,"y2":14346.671},{"x1":7769.427,"y1":15906.671,"x2":7541.544,"y2":15906.671},{"x1":7591.544,"y1":14336.671,"x2":7591.544,"y2":15916.671},{"x1":7769.427,"y1":15906.671,"x2":7541.544,"y2":15906.671},{"x1":7769.427,"y1":16656.671,"x2":7541.544,"y2":16656.671},{"x1":7591.544,"y1":15896.671,"x2":7591.544,"y2":16666.671},{"x1":8369.489,"y1":14346.733,"x2":8369.489,"y2":14492.84},{"x1":7769.489,"y1":14346.733,"x2":7769.489,"y2":14492.84},{"x1":8379.489,"y1":14442.84,"x2":7759.489,"y2":14442.84},{"x1":8672.231,"y1":14231.671,"x2":8571.826,"y2":14231.671},{"x1":8672.231,"y1":16506.671,"x2":8571.826,"y2":16506.671},{"x1":8621.826,"y1":14221.671,"x2":8621.826,"y2":16516.671},{"x1":8954.489,"y1":14790.415,"x2":8954.489,"y2":14840.352},{"x1":9554.489,"y1":14790.415,"x2":9554.489,"y2":14840.352},{"x1":8944.489,"y1":14790.352,"x2":9564.489,"y2":14790.352},{"x1":9554.489,"y1":14790.415,"x2":9554.489,"y2":14840.352},{"x1":11354.489,"y1":14790.415,"x2":11354.489,"y2":14840.352},{"x1":9544.489,"y1":14790.352,"x2":11364.489,"y2":14790.352},{"x1":11354.489,"y1":14790.415,"x2":11354.489,"y2":14840.352},{"x1":11454.489,"y1":14790.415,"x2":11454.489,"y2":14840.352},{"x1":11344.489,"y1":14790.352,"x2":11464.489,"y2":14790.352},{"x1":11354.427,"y1":16156.671,"x2":11237.128,"y2":16156.671},{"x1":11354.427,"y1":16506.671,"x2":11237.128,"y2":16506.671},{"x1":11287.128,"y1":16146.671,"x2":11287.128,"y2":16516.671},{"x1":11377.632,"y1":16506.671,"x2":11237.128,"y2":16506.671},{"x1":11377.632,"y1":16656.671,"x2":11237.128,"y2":16656.671},{"x1":11287.128,"y1":16496.671,"x2":11287.128,"y2":16656.671},{"x1":11287.128,"y1":16656.671,"x2":11287.128,"y2":16935.62},{"x1":11354.427,"y1":14656.671,"x2":11183.122,"y2":14656.671},{"x1":11354.427,"y1":13936.671,"x2":11183.122,"y2":13936.671},{"x1":11233.122,"y1":14666.671,"x2":11233.122,"y2":13926.671},{"x1":11233.185,"y1":13936.671,"x2":11283.122,"y2":13936.671},{"x1":11233.185,"y1":13336.671,"x2":11283.122,"y2":13336.671},{"x1":11233.122,"y1":13946.671,"x2":11233.122,"y2":13326.671},{"x1":10014.489,"y1":13936.608,"x2":10014.489,"y2":13802.573},{"x1":11454.489,"y1":13936.608,"x2":11454.489,"y2":13802.573},{"x1":10004.489,"y1":13852.573,"x2":11464.489,"y2":13852.573},{"x1":6124.552,"y1":14156.671,"x2":6174.489,"y2":14156.671},{"x1":6124.552,"y1":13336.671,"x2":6174.489,"y2":13336.671},{"x1":6124.489,"y1":14166.671,"x2":6124.489,"y2":13326.671}],"dim_texts":[{"x":5324.489,"y":13226.736,"h":80.0,"t":"800","attach":5},{"x":5117.495,"y":12636.671,"h":80.0,"t":"1300","attach":5},{"x":5924.489,"y":13226.736,"h":80.0,"t":"400","attach":5},{"x":4912.568,"y":15161.671,"h":80.0,"t":"1900","attach":5},{"x":3649.489,"y":15798.166,"h":80.0,"t":"750","attach":5},{"x":3892.158,"y":15861.671,"h":80.0,"t":"550","attach":5},{"x":3297.545,"y":15286.671,"h":80.0,"t":"600","attach":5},{"x":3644.989,"y":14386.671,"h":80.0,"t":"1200","attach":5},{"x":3446.824,"y":13735.98,"h":80.0,"t":"350","attach":5},{"x":8044.489,"y":15844.338,"h":80.0,"t":"450","attach":5},{"x":7832.513,"y":15466.671,"h":80.0,"t":"780","attach":5},{"x":6745.075,"y":15906.671,"h":80.0,"t":"1500","attach":5},{"x":6604.489,"y":15324.786,"h":80.0,"t":"600","attach":5},{"x":7530.698,"y":15126.671,"h":80.0,"t":"1560","attach":5},{"x":7530.698,"y":16281.671,"h":80.0,"t":"750","attach":5},{"x":8069.489,"y":14503.686,"h":80.0,"t":"600","attach":5},{"x":8560.98,"y":15369.171,"h":80.0,"t":"2275","attach":5},{"x":9254.489,"y":14851.198,"h":80.0,"t":"600","attach":5},{"x":10454.489,"y":14851.198,"h":80.0,"t":"1800","attach":5},{"x":11404.489,"y":14851.198,"h":80.0,"t":"100","attach":5},{"x":11226.254,"y":16331.671,"h":80.0,"t":"350","attach":5},{"x":11226.282,"y":16831.145,"h":80.0,"t":"150","attach":5},{"x":11172.276,"y":14296.671,"h":80.0,"t":"720","attach":5},{"x":11172.276,"y":13636.671,"h":80.0,"t":"600","attach":5},{"x":10734.489,"y":13913.419,"h":80.0,"t":"1440","attach":5},{"x":6063.643,"y":13746.671,"h":80.0,"t":"820","attach":5}],"room_texts":[{"x":3427.198,"y":16021.03,"h":75.0,"t":"mandir","w":587.22,"rot":0,"attach":1},{"x":5122.64,"y":14503.216,"h":75.0,"t":"3seater sofa","w":587.22,"rot":0,"attach":1},{"x":3181.979,"y":13959.172,"h":75.0,"t":"42\" TV","w":587.22,"rot":0,"attach":1},{"x":5013.143,"y":12145.638,"h":75.0,"t":"dining table","w":587.22,"rot":0,"attach":1},{"x":5606.777,"y":12145.6,"h":75.0,"t":"bench","w":587.22,"rot":0,"attach":1},{"x":7776.474,"y":14639.828,"h":75.0,"t":"main counter","w":587.22,"rot":0,"attach":1},{"x":7670.023,"y":15300.491,"h":75.0,"t":"4 burnerhob","w":587.22,"rot":0,"attach":1},{"x":6043.41,"y":16261.652,"h":75.0,"t":"sink","w":587.22,"rot":0,"attach":1},{"x":7638.343,"y":16377.703,"h":75.0,"t":"washing machine","w":587.22,"rot":0,"attach":1},{"x":6471.675,"y":14713.291,"h":75.0,"t":"fridge","w":587.22,"rot":0,"attach":1},{"x":9587.393,"y":14949.683,"h":75.0,"t":"double bed","w":587.22,"rot":0,"attach":1},{"x":10424.286,"y":13474.382,"h":75.0,"t":"main wardrobe","w":587.22,"rot":0,"attach":1},{"x":8418.763,"y":14424.379,"h":75.0,"t":"wardrobe","w":587.22,"rot":0,"attach":1}],"blocks":{"_ArchTick":[{"type":"LWPOLYLINE","closed":false,"verts":[{"x":-0.5,"y":-0.5},{"x":0.5,"y":0.5}]}],"_Oblique":[{"type":"LINE","x1":-0.5,"y1":-0.5,"x2":0.5,"y2":0.5}],"G$C44963CA8":[{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-1540.774,"b":0.0},{"x":-651.312,"y":-1080.774,"b":-0.414214},{"x":-631.312,"y":-1060.774,"b":0.0},{"x":-496.312,"y":-1060.774,"b":-0.414214},{"x":-476.312,"y":-1080.774,"b":0.0},{"x":-476.312,"y":-1540.774,"b":-0.414214},{"x":-496.312,"y":-1560.774,"b":0.0},{"x":-631.312,"y":-1560.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-1040.774,"b":0.0},{"x":-651.312,"y":-430.774,"b":-0.414214},{"x":-631.312,"y":-410.774,"b":0.0},{"x":-496.312,"y":-410.774,"b":-0.414214},{"x":-476.312,"y":-430.774,"b":0.0},{"x":-476.312,"y":-1040.774,"b":-0.414214},{"x":-496.312,"y":-1060.774,"b":0.0},{"x":-631.312,"y":-1060.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-390.774,"b":0.0},{"x":-651.312,"y":69.226,"b":-0.414214},{"x":-631.312,"y":89.226,"b":0.0},{"x":-496.312,"y":89.226,"b":-0.414214},{"x":-476.312,"y":69.226,"b":0.0},{"x":-476.312,"y":-390.774,"b":-0.414214},{"x":-496.312,"y":-410.774,"b":0.0},{"x":-631.312,"y":-410.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-1540.774,"b":0.0},{"x":-476.312,"y":-1080.774,"b":-0.414214},{"x":-456.312,"y":-1060.774,"b":0.0},{"x":210.309,"y":-1060.774,"b":-0.414214},{"x":230.309,"y":-1080.774,"b":0.0},{"x":230.309,"y":-1540.774,"b":-0.414214},{"x":210.309,"y":-1560.774,"b":0.0},{"x":-456.312,"y":-1560.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-1040.774,"b":0.0},{"x":-476.312,"y":-430.774,"b":-0.414214},{"x":-456.312,"y":-410.774,"b":0.0},{"x":210.309,"y":-410.774,"b":-0.414214},{"x":230.309,"y":-430.774,"b":0.0},{"x":230.309,"y":-1040.774,"b":-0.414214},{"x":210.309,"y":-1060.774,"b":0.0},{"x":-456.312,"y":-1060.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-390.774,"b":0.0},{"x":-476.312,"y":69.226,"b":-0.414214},{"x":-456.312,"y":89.226,"b":0.0},{"x":210.309,"y":89.226,"b":-0.414214},{"x":230.309,"y":69.226,"b":0.0},{"x":230.309,"y":-390.774,"b":-0.414214},{"x":210.309,"y":-410.774,"b":0.0},{"x":-456.312,"y":-410.774,"b":-0.414214}]},{"type":"PATH","closed":false,"verts":[{"x":-456.312,"y":89.226,"b":0.414214},{"x":-476.312,"y":69.226,"b":0.0},{"x":-476.312,"y":-1540.774,"b":0.414214},{"x":-456.312,"y":-1560.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":210.309,"y":89.226,"b":0.414214},{"x":230.309,"y":109.226,"b":0.0},{"x":230.309,"y":194.226,"b":0.414214},{"x":210.309,"y":214.226,"b":0.0},{"x":-776.312,"y":214.226,"b":0.0},{"x":-776.312,"y":-1685.774,"b":0.0},{"x":210.309,"y":-1685.774,"b":0.414214},{"x":230.309,"y":-1665.774,"b":0.0},{"x":230.309,"y":-1580.774,"b":0.414214},{"x":210.309,"y":-1560.774,"b":0.0},{"x":-631.312,"y":-1560.774,"b":-0.414214},{"x":-651.312,"y":-1540.774,"b":0.0},{"x":-651.312,"y":69.226,"b":-0.414214},{"x":-631.312,"y":89.226,"b":0.0}]}]}};
+
+// ══════════════════════════════════════════════════════
+// APP STATE + COLOUR PALETTE
+// (Restored — referenced throughout this file but missing from
+// the trial build handed off for integration; values below match
+// every default already implied by the sidebar's initial HTML:
+// checked overlay toggles, slider defaults, and the active
+// Warm/A3 buttons.)
+// ══════════════════════════════════════════════════════
+const PALETTE = [
+  '#1c1a18','#3a3530','#57534c','#6b6b65','#8a8680','#a8a29a','#c7c2b8',
+  '#e8e3d8','#f0ece2','#faf8f4','#ffffff','#e9dcc0','#d4ccbf','#cce4f0',
+  '#88b8d0','#5f95b0','#b8c9a8','#8fae7a','#c1653e','#a8522f','#e0a978'
+];
+
+let C = {
+  bg: '#faf8f4',
+  wallFill:'#1c1a18',   wallStroke:'#1c1a18',
+  floorFill:'#e8e3d8',  floorStroke:'#b8b2a8',  floorOpacity:1.0,
+  furnFill:'#d4ccbf',   furnStroke:'#a8a29a',   furnOpacity:0.9,
+  winFill:'#cce4f0',    winStroke:'#88b8d0',
+  doorStroke:'#3a3530',
+  vis:{ wall:true, floor:true, furn:true, win:true, door:true, dim:true, txt:true, dash:true },
+  lw:{ wall:1.0, wallStroke:1.0, furn:1.0, furnStroke:1.0, win:1.0, winStroke:1.0, floorStroke:1.0, door:1.0, dim:1.0, txt:1.0, dash:1.0 },
+  cpickTarget:null,
+  panning:false, lastPan:{x:0,y:0}, panX:0, panY:0, scale:1,
+  exportW:1754, exportH:1240,
+};
+
+// ══════════════════════════════════════════════════════
+// COORDINATE TRANSFORMS
+// ══════════════════════════════════════════════════════
+function makeTransform(W, H, pad) {
+  const B = FP.bounds;
+  const pw = Math.max(1, W - pad*2), ph = Math.max(1, H - pad*2);
+  const s = Math.min(pw/(B.x1-B.x0), ph/(B.y1-B.y0));
+  const ox = pad + (pw - (B.x1-B.x0)*s)/2;
+  const oy = pad + (ph - (B.y1-B.y0)*s)/2;
+  return {
+    s,
+    tx: x => ox + (x - B.x0)*s,
+    ty: y => oy + (B.y1 - y)*s,
+  };
+}
+
+// ══════════════════════════════════════════════════════
+// BULGE → SVG PATH
+// Converts LWPOLYLINE verts with bulge values to an SVG path string.
+// Bulge encodes arc segments: tan(included_angle/4).
+// Positive = CCW in DXF = sweep=0 in SVG (Y-flipped).
+// Negative = CW in DXF = sweep=1 in SVG.
+// ══════════════════════════════════════════════════════
+function bulgeToPath(verts, closed, tx, ty) {
+  if (!verts || !verts.length) return '';
+  const n = verts.length;
+  const cmds = [`M${tx(verts[0].x).toFixed(1)},${ty(verts[0].y).toFixed(1)}`];
+  for (let i = 0; i < n; i++) {
+    const cur = verts[i];
+    const nxt = verts[(i + 1) % n];
+    if (i === n - 1 && !closed) break;
+    const b = cur.b || 0;
+    if (Math.abs(b) > 1e-6) {
+      // Convert bulge to SVG arc
+      const x1 = tx(cur.x), y1 = ty(cur.y);
+      const x2 = tx(nxt.x), y2 = ty(nxt.y);
+      const d = Math.hypot(x2 - x1, y2 - y1);
+      if (d < 1e-6) { cmds.push(`L${x2.toFixed(1)},${y2.toFixed(1)}`); continue; }
+      const r = Math.abs(d * (1 + b * b) / (4 * b));
+      const large = Math.abs(b) > 1 ? 1 : 0;
+      // In SVG (Y down): DXF CCW (b>0) → sweep=0; DXF CW (b<0) → sweep=1
+      const sweep = b > 0 ? 0 : 1;
+      cmds.push(`A${r.toFixed(2)},${r.toFixed(2)} 0 ${large},${sweep} ${x2.toFixed(1)},${y2.toFixed(1)}`);
+    } else {
+      cmds.push(`L${tx(nxt.x).toFixed(1)},${ty(nxt.y).toFixed(1)}`);
+    }
+  }
+  if (closed) cmds.push('Z');
+  return cmds.join(' ');
+}
+
+// ══════════════════════════════════════════════════════
+// SVG BUILDER
+// ══════════════════════════════════════════════════════
+function buildSVG(W, H, pad) {
+  const { s, tx, ty } = makeTransform(W, H, pad);
+
+  let out = `<rect width="${W}" height="${H}" fill="${C.bg}"/>`;
+
+  // Helper: polygon from verts array (plain, no bulge)
+  function polyPts(verts) {
+    return verts.map(v=>`${tx(v.x).toFixed(1)},${ty(v.y).toFixed(1)}`).join(' ');
+  }
+
+  // Helper: render a poly entry as SVG element string (handles plain LWPOLYLINE and PATH with bulge)
+  function renderPoly(p, fill, stroke, sw_, op, extra='') {
+    if (p.type === 'PATH') {
+      const d = bulgeToPath(p.verts, p.closed, tx, ty);
+      return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw_}" opacity="${op}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
+    }
+    const pts = polyPts(p.verts);
+    if (p.closed)
+      return `<polygon points="${pts}" fill="${fill}" stroke="${stroke}" stroke-width="${sw_}" opacity="${op}" stroke-linejoin="round" ${extra}/>`;
+    return `<polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="${sw_}" opacity="${op}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
+  }
+
+  // base = nominal stroke in drawing-space px, lw = per-layer multiplier
+  function sw(base, lwMult) {
+    return Math.max(0.2, base * (lwMult||1.0) / Math.max(s*0.012, 0.25));
+  }
+
+  // ── 1. FLOOR — filled polygon with controllable outline
+  if (C.vis.floor) {
+    const fSW = C.lw.floorStroke > 0 ? sw(0.6, C.lw.floorStroke).toFixed(2) : '0';
+    for (const p of FP.floor)
+      out += renderPoly(p, C.floorFill, C.floorStroke, fSW, C.floorOpacity.toFixed(2));
+  }
+
+  // ── 2. WINDOWS — filled + controllable outline stroke
+  if (C.vis.win) {
+    const wSSW = C.lw.winStroke > 0 ? sw(0.7, C.lw.winStroke).toFixed(2) : '0';
+    for (const p of FP.windows)
+      out += renderPoly(p, C.winFill, C.winStroke, wSSW, '0.85');
+  }
+
+  // ── 3. FURNITURE — fill + separate outline stroke colour
+  if (C.vis.furn) {
+    const fFSW = sw(0.6, C.lw.furn).toFixed(2);
+    const fSSW = C.lw.furnStroke > 0 ? sw(0.5, C.lw.furnStroke).toFixed(2) : '0';
+    const fop = C.furnOpacity.toFixed(2);
+    // Resolve INSERT blocks
+    function renderFurnEntities(entities, offsetX, offsetY, scaleX, scaleY, rotDeg) {
+      const rad = rotDeg * Math.PI / 180;
+      const cos = Math.cos(rad), sin = Math.sin(rad);
+      function xform(bx, by) {
+        const lx = bx * scaleX, ly = by * scaleY;
+        return {
+          x: offsetX + lx * cos - ly * sin,
+          y: offsetY + lx * sin + ly * cos,
+        };
+      }
+      let r = '';
+      for (const e of entities) {
+        if (e.type === 'PATH') {
+          // Xform-aware path builder — every point (including arc
+          // endpoints) goes through xform() before projecting to
+          // screen space with tx()/ty().
+          const cmds = [`M${tx(xform(e.verts[0].x,e.verts[0].y).x).toFixed(1)},${ty(xform(e.verts[0].x,e.verts[0].y).y).toFixed(1)}`];
+          const nv = e.verts.length;
+          for (let i2 = 0; i2 < nv; i2++) {
+            const cur2 = e.verts[i2];
+            const nxt2 = e.verts[(i2+1)%nv];
+            if (i2 === nv-1 && !e.closed) break;
+            const b2 = cur2.b || 0;
+            const p1w = xform(cur2.x, cur2.y), p2w = xform(nxt2.x, nxt2.y);
+            if (Math.abs(b2) > 1e-6) {
+              const dx2 = tx(p2w.x)-tx(p1w.x), dy2 = ty(p2w.y)-ty(p1w.y);
+              const d2 = Math.hypot(dx2, dy2);
+              if (d2 > 1e-6) {
+                const rv = Math.abs(d2*(1+b2*b2)/(4*b2));
+                const lg2 = Math.abs(b2)>1?1:0;
+                const sw2 = b2>0?0:1;
+                cmds.push(`A${rv.toFixed(2)},${rv.toFixed(2)} 0 ${lg2},${sw2} ${tx(p2w.x).toFixed(1)},${ty(p2w.y).toFixed(1)}`);
+              }
+            } else {
+              cmds.push(`L${tx(p2w.x).toFixed(1)},${ty(p2w.y).toFixed(1)}`);
+            }
+          }
+          if (e.closed) cmds.push('Z');
+          r += `<path d="${cmds.join(' ')}" fill="${C.furnFill}" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linejoin="round" stroke-linecap="round"/>`;
+        } else if (e.type === 'LWPOLYLINE') {
+          const pts = e.verts.map(v => { const p=xform(v.x,v.y); return `${tx(p.x).toFixed(1)},${ty(p.y).toFixed(1)}`; }).join(' ');
+          if (e.closed)
+            r += `<polygon points="${pts}" fill="${C.furnFill}" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linejoin="round"/>`;
+          else
+            r += `<polyline points="${pts}" fill="none" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linejoin="round" stroke-linecap="round"/>`;
+        }
+      }
+      return r;
+    }
+
+    for (const e of FP.furn) {
+      if (e.kind === 'poly') {
+        out += renderPoly(e, C.furnFill, C.furnStroke, fSSW, fop);
+      } else if (e.kind === 'circle') {
+        out += `<circle cx="${tx(e.x).toFixed(1)}" cy="${ty(e.y).toFixed(1)}" r="${(e.r*s).toFixed(1)}" fill="${C.furnFill}" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}"/>`;
+      } else if (e.kind === 'arc') {
+        const r = e.r*s;
+        const a1 = -e.sa*Math.PI/180, a2 = -e.ea*Math.PI/180;
+        const x1=tx(e.x)+r*Math.cos(a1), y1=ty(e.y)+r*Math.sin(a1);
+        const x2=tx(e.x)+r*Math.cos(a2), y2=ty(e.y)+r*Math.sin(a2);
+        let da=e.ea-e.sa; if(da<0)da+=360;
+        out += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${da>180?1:0},0 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linecap="round"/>`;
+      } else if (e.kind === 'insert') {
+        const blk = FP.blocks[e.block];
+        if (blk) out += renderFurnEntities(blk, e.ix, e.iy, e.sx, e.sy, e.rot);
+      }
+    }
+  }
+
+  // ── 4. WALLS — filled closed polys + open polylines; separate outline stroke
+  if (C.vis.wall) {
+    const wFSW = sw(1.8, C.lw.wall).toFixed(2);
+    const wSSW = C.lw.wallStroke > 0 ? sw(0.8, C.lw.wallStroke).toFixed(2) : '0';
+    for (const p of FP.walls) {
+      if (p.closed)
+        out += renderPoly(p, C.wallFill, C.wallStroke, wSSW, '1');
+      else
+        out += renderPoly(p, 'none', C.wallFill, wFSW, '1');
+    }
+  }
+
+  // ── 5. DOORS — arc swings + lines, stroke only
+  if (C.vis.door) {
+    const dSW = sw(0.9, C.lw.door).toFixed(2);
+    for (const e of FP.doors) {
+      if (e.kind === 'line') {
+        out += `<line x1="${tx(e.x1).toFixed(1)}" y1="${ty(e.y1).toFixed(1)}" x2="${tx(e.x2).toFixed(1)}" y2="${ty(e.y2).toFixed(1)}" stroke="${C.doorStroke}" stroke-width="${dSW}" stroke-linecap="round"/>`;
+      } else if (e.kind === 'arc') {
+        const r=e.r*s;
+        const a1=-e.sa*Math.PI/180, a2=-e.ea*Math.PI/180;
+        const x1=tx(e.x)+r*Math.cos(a1), y1=ty(e.y)+r*Math.sin(a1);
+        const x2=tx(e.x)+r*Math.cos(a2), y2=ty(e.y)+r*Math.sin(a2);
+        let da=e.ea-e.sa; if(da<0)da+=360;
+        out += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${da>180?1:0},0 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="${C.doorStroke}" stroke-width="${dSW}" stroke-linecap="round"/>`;
+      }
+    }
+  }
+
+  // ── 6. DASHED LINES
+  if (C.vis.dash) {
+    const dSW = sw(0.5, C.lw.dash).toFixed(2);
+    for (const e of FP.dashed) {
+      out += `<line x1="${tx(e.x1).toFixed(1)}" y1="${ty(e.y1).toFixed(1)}" x2="${tx(e.x2).toFixed(1)}" y2="${ty(e.y2).toFixed(1)}" stroke="#8a8a80" stroke-width="${dSW}" stroke-dasharray="8,5" opacity="0.6"/>`;
+    }
+  }
+
+  // ── 7. DIMENSIONS — rendered above plan
+  if (C.vis.dim) {
+    const dimSW = sw(0.35, C.lw.dim).toFixed(2);
+    for (const l of FP.dim_lines) {
+      out += `<line x1="${tx(l.x1).toFixed(1)}" y1="${ty(l.y1).toFixed(1)}" x2="${tx(l.x2).toFixed(1)}" y2="${ty(l.y2).toFixed(1)}" stroke="#4a4a42" stroke-width="${dimSW}" opacity="0.75"/>`;
+    }
+    for (const t of FP.dim_texts) {
+      const fh = Math.max(7, t.h*s*C.lw.dim).toFixed(1);
+      out += `<text x="${tx(t.x).toFixed(1)}" y="${ty(t.y).toFixed(1)}" font-size="${fh}" font-family="Space Grotesk,sans-serif" fill="#4a4a42" opacity="0.85" text-anchor="middle">${t.t}</text>`;
+    }
+  }
+
+  // ── 8. ROOM TEXT LABELS — topmost layer
+  if (C.vis.txt) {
+    for (const t of FP.room_texts) {
+      const fh = Math.max(8, t.h * s * C.lw.txt).toFixed(1);
+      // MTEXT attachment points: 1=TL,2=TC,3=TR,4=ML,5=MC,6=MR,7=BL,8=BC,9=BR
+      const anchorMap = {1:'start',2:'middle',3:'end',4:'start',5:'middle',6:'end',7:'start',8:'middle',9:'end'};
+      const anchor = anchorMap[t.attach] || 'start';
+      let lines = t.t.split(/\\n|\n| \\n/g).filter(l=>l.trim());
+      // Clip/wrap to the MTEXT box width (t.w) so labels that land in
+      // the same column don't stack on top of each other.
+      if (t.w > 0) {
+        const maxChars = Math.max(1, Math.floor(t.w * s / parseFloat(fh)));
+        const wrapped = [];
+        lines.forEach(line => {
+          const words = line.trim().split(/\s+/);
+          let cur = '';
+          words.forEach(word => {
+            const candidate = cur ? cur + ' ' + word : word;
+            if (candidate.length > maxChars && cur) { wrapped.push(cur); cur = word; }
+            else cur = candidate;
+          });
+          if (cur) wrapped.push(cur);
+        });
+        if (wrapped.length) lines = wrapped;
+      }
+      const lh = parseFloat(fh) * 1.25;
+      // Vertical offset: top-attach starts at baseline, mid/bot adjust up
+      const vGroupMap = {1:0,2:0,3:0,4:-lines.length*lh/2,5:-lines.length*lh/2,6:-lines.length*lh/2,7:-lines.length*lh,8:-lines.length*lh,9:-lines.length*lh};
+      const yOff = vGroupMap[t.attach] || 0;
+      const x = tx(t.x).toFixed(1), y = ty(t.y).toFixed(1);
+      out += `<text x="${x}" y="${y}" font-size="${fh}" font-family="Space Grotesk,sans-serif" fill="#1c1a18" font-weight="500" text-anchor="${anchor}">`;
+      lines.forEach((ln, i) => {
+        out += `<tspan x="${x}" dy="${i === 0 ? yOff.toFixed(1) : lh.toFixed(1)}">${esc(ln.trim())}</tspan>`;
+      });
+      out += `</text>`;
+    }
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${out}</svg>`;
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+function render() {
+  const vp = document.getElementById('vp');
+  const W = vp.clientWidth, H = vp.clientHeight;
+  const svg = document.getElementById('rsvg');
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  const str = buildSVG(W, H, 52);
+  svg.innerHTML = str.replace(/<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+}
+
+// ══════════════════════════════════════════════════════
+// COLOUR PICKER
+// ══════════════════════════════════════════════════════
+const cpop = document.getElementById('cpop');
+const cpopNative = document.getElementById('cpop-native');
+const cpopLbl = document.getElementById('cpop-lbl');
+
+const SWATCH_TARGETS = {
+  'sw-wall':         { label:'Wall fill',         get:()=>C.wallFill,    set:v=>{C.wallFill=v;   document.getElementById('sw-wall').style.background=v} },
+  'sw-wall-stroke':  { label:'Wall outline',      get:()=>C.wallStroke,  set:v=>{C.wallStroke=v; document.getElementById('sw-wall-stroke').style.background=v} },
+  'sw-floor':        { label:'Floor fill',         get:()=>C.floorFill,   set:v=>{C.floorFill=v;  document.getElementById('sw-floor').style.background=v} },
+  'sw-floor-stroke': { label:'Floor outline',     get:()=>C.floorStroke, set:v=>{C.floorStroke=v;document.getElementById('sw-floor-stroke').style.background=v} },
+  'sw-furn':         { label:'Furniture fill',    get:()=>C.furnFill,    set:v=>{C.furnFill=v;   document.getElementById('sw-furn').style.background=v} },
+  'sw-furn-stroke':  { label:'Furniture outline', get:()=>C.furnStroke,  set:v=>{C.furnStroke=v; document.getElementById('sw-furn-stroke').style.background=v} },
+  'sw-win':          { label:'Window fill',       get:()=>C.winFill,     set:v=>{C.winFill=v;    document.getElementById('sw-win').style.background=v} },
+  'sw-win-stroke':   { label:'Window outline',    get:()=>C.winStroke,   set:v=>{C.winStroke=v;  document.getElementById('sw-win-stroke').style.background=v} },
+  'sw-door':         { label:'Door colour',       get:()=>C.doorStroke,  set:v=>{C.doorStroke=v; document.getElementById('sw-door').style.background=v} },
+};
+
+function openCPick(targetId, anchor) {
+  C.cpickTarget = targetId;
+  const cfg = SWATCH_TARGETS[targetId];
+  cpopLbl.textContent = cfg.label;
+  cpopNative.value = cfg.get();
+  const r = anchor.getBoundingClientRect();
+  cpop.style.left = (r.right + 10) + 'px';
+  cpop.style.top = Math.min(r.top, window.innerHeight - 260) + 'px';
+  cpop.classList.add('on');
+}
+
+cpopNative.addEventListener('input', e => {
+  if (!C.cpickTarget) return;
+  SWATCH_TARGETS[C.cpickTarget].set(e.target.value);
+  render();
+});
+
+// Build swatches
+const cswEl = document.getElementById('csw');
+PALETTE.forEach(col => {
+  const el = document.createElement('div');
+  el.className = 'csw-c'; el.style.background = col;
+  el.addEventListener('click', () => {
+    if (!C.cpickTarget) return;
+    SWATCH_TARGETS[C.cpickTarget].set(col);
+    cpopNative.value = col;
+    render();
+  });
+  cswEl.appendChild(el);
+});
+
+document.getElementById('cpop-close').addEventListener('click', () => cpop.classList.remove('on'));
+document.addEventListener('click', e => {
+  if (!cpop.contains(e.target) && !e.target.classList.contains('lsw') && !e.target.classList.contains('lsw-sm')) cpop.classList.remove('on');
+});
+
+// Wire swatch clicks — both fill swatches (lsw) and outline swatches (lsw-sm)
+Object.keys(SWATCH_TARGETS).forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', function(e) {
+    e.stopPropagation(); openCPick(id, this);
+  });
+});
+
+// ══════════════════════════════════════════════════════
+// VISIBILITY EYES
+// ══════════════════════════════════════════════════════
+const EYE_ICON_ON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_ICON_OFF = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+const EYE_MAP = { 'eye-wall':'wall', 'eye-floor':'floor', 'eye-furn':'furn', 'eye-win':'win', 'eye-door':'door' };
+Object.entries(EYE_MAP).forEach(([id, key]) => {
+  document.getElementById(id).addEventListener('click', function() {
+    C.vis[key] = !C.vis[key];
+    this.classList.toggle('off', !C.vis[key]);
+    this.innerHTML = C.vis[key] ? EYE_ICON_ON : EYE_ICON_OFF;
+    render();
+  });
+});
+
+// Overlay toggles
+['dim','txt','dash'].forEach(key => {
+  document.getElementById('tog-'+key).addEventListener('change', function() {
+    C.vis[key] = this.checked; render();
+  });
+});
+
+// Furniture opacity
+document.getElementById('furn-opacity').addEventListener('input', function() {
+  C.furnOpacity = parseInt(this.value)/100;
+  document.getElementById('furn-op-val').textContent = this.value+'%';
+  render();
+});
+
+// Floor opacity
+document.getElementById('lw-floor').addEventListener('input', function() {
+  C.floorOpacity = parseInt(this.value)/100;
+  document.getElementById('lw-floor-val').textContent = this.value+'%';
+  render();
+});
+
+// Per-layer lineweight sliders
+// weight sliders: value 5–400, map to 0.05–4.0 multiplier
+const LW_SLIDERS = [
+  { id:'lw-wall',          key:'wall',          valId:'lw-wall-val',          fmt:'x' },
+  { id:'lw-wall-stroke',   key:'wallStroke',    valId:'lw-wall-stroke-val',   fmt:'x' },
+  { id:'lw-furn',          key:'furn',          valId:'lw-furn-val',          fmt:'x' },
+  { id:'lw-furn-stroke',   key:'furnStroke',    valId:'lw-furn-stroke-val',   fmt:'x' },
+  { id:'lw-win',           key:'win',           valId:'lw-win-val',           fmt:'x' },
+  { id:'lw-win-stroke',    key:'winStroke',     valId:'lw-win-stroke-val',    fmt:'x' },
+  { id:'lw-floor-stroke',  key:'floorStroke',   valId:'lw-floor-stroke-val',  fmt:'x' },
+  { id:'lw-door',          key:'door',          valId:'lw-door-val',          fmt:'x' },
+  { id:'lw-dim',           key:'dim',           valId:'lw-dim-val',           fmt:'x' },
+  { id:'lw-txt',           key:'txt',           valId:'lw-txt-val',           fmt:'x' },
+  { id:'lw-dash',          key:'dash',          valId:'lw-dash-val',          fmt:'x' },
+];
+LW_SLIDERS.forEach(({ id, key, valId }) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', function() {
+    const v = parseInt(this.value)/100;
+    C.lw[key] = v;
+    document.getElementById(valId).textContent = v.toFixed(1)+'×';
+    render();
+  });
+});
+
+// Background
+document.querySelectorAll('.bgo').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.bgo').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); C.bg = b.dataset.bg; render();
+}));
+
+// Reset colours + weights
+const DEFAULTS = {
+  wallFill:'#1c1a18',   wallStroke:'#1c1a18',
+  floorFill:'#e8e3d8',  floorStroke:'#b8b2a8',
+  furnFill:'#d4ccbf',   furnStroke:'#a8a29a',
+  winFill:'#cce4f0',    winStroke:'#88b8d0',
+  doorStroke:'#3a3530',
+};
+document.getElementById('btn-reset').addEventListener('click', () => {
+  Object.assign(C, DEFAULTS);
+  C.furnOpacity = 0.9; C.floorOpacity = 1.0;
+  C.lw = { wall:1.0, wallStroke:1.0, furn:1.0, furnStroke:1.0, win:1.0, winStroke:1.0, floor:1.0, floorStroke:1.0, door:1.0, dim:1.0, txt:1.0, dash:1.0 };
+  Object.keys(SWATCH_TARGETS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.background = SWATCH_TARGETS[id].get();
+  });
+  LW_SLIDERS.forEach(({ id, valId }) => {
+    const el = document.getElementById(id);
+    if (el) { el.value = 100; document.getElementById(valId).textContent = '1.0×'; }
+  });
+  document.getElementById('furn-opacity').value = 90;
+  document.getElementById('furn-op-val').textContent = '90%';
+  document.getElementById('lw-floor').value = 100;
+  document.getElementById('lw-floor-val').textContent = '100%';
+  render();
+});
+
+// ══════════════════════════════════════════════════════
+// EXPORT RESOLUTION
+// ══════════════════════════════════════════════════════
+document.querySelectorAll('.rb').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.rb').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  C.exportW = parseInt(b.dataset.w); C.exportH = parseInt(b.dataset.h);
+}));
+
+// ══════════════════════════════════════════════════════
+// PNG EXPORT
+// ══════════════════════════════════════════════════════
+document.getElementById('btn-exp').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-exp');
+  btn.textContent='Rendering…'; btn.disabled=true;
+  await new Promise(r => setTimeout(r, 60));
+  let ew=C.exportW, eh=C.exportH;
+  if (ew===0) { const vp=document.getElementById('vp'); ew=vp.clientWidth*2; eh=vp.clientHeight*2; }
+  const svgStr = buildSVG(ew, eh, 80);
+  const blob = new Blob([svgStr], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width=ew; canvas.height=eh;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle=C.bg; ctx.fillRect(0,0,ew,eh);
+    ctx.drawImage(img,0,0);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(pb => {
+      const a = document.createElement('a');
+      a.download='floor-plan.png'; a.href=URL.createObjectURL(pb);
+      a.click(); URL.revokeObjectURL(a.href);
+      btn.textContent='Export PNG'; btn.disabled=false;
+    },'image/png');
+  };
+  img.onerror = () => { btn.textContent='Export PNG'; btn.disabled=false; };
+  img.src = url;
+});
+
+// ══════════════════════════════════════════════════════
+// PAN + ZOOM
+// ══════════════════════════════════════════════════════
+const vp = document.getElementById('vp');
+const ci = document.getElementById('ci');
+function applyT() { ci.style.transform=`translate(${C.panX}px,${C.panY}px) scale(${C.scale})`; }
+
+vp.addEventListener('mousedown', e => { if(e.button!==0)return; C.panning=true; C.lastPan={x:e.clientX,y:e.clientY}; vp.classList.add('pan'); });
+window.addEventListener('mousemove', e => { if(!C.panning)return; C.panX+=e.clientX-C.lastPan.x; C.panY+=e.clientY-C.lastPan.y; C.lastPan={x:e.clientX,y:e.clientY}; applyT(); });
+window.addEventListener('mouseup', () => { C.panning=false; vp.classList.remove('pan'); });
+vp.addEventListener('wheel', e => {
+  e.preventDefault();
+  const d=e.deltaY<0?1.12:0.89;
+  const r=vp.getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  C.panX=mx-(mx-C.panX)*d; C.panY=my-(my-C.panY)*d; C.scale*=d; applyT();
+},{passive:false});
+
+let touches={};
+vp.addEventListener('touchstart',e=>{for(const t of e.touches)touches[t.identifier]={x:t.clientX,y:t.clientY};},{passive:true});
+vp.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0],p=touches[t.identifier];
+    if(p){C.panX+=t.clientX-p.x;C.panY+=t.clientY-p.y;applyT();}
+    touches[t.identifier]={x:t.clientX,y:t.clientY};
+  } else if(e.touches.length===2){
+    const[t1,t2]=[e.touches[0],e.touches[1]];
+    const p1=touches[t1.identifier],p2=touches[t2.identifier];
+    if(p1&&p2){
+      const pd=Math.hypot(p1.x-p2.x,p1.y-p2.y),cd=Math.hypot(t1.clientX-t2.clientX,t1.clientY-t2.clientY),d=cd/pd;
+      const mx=(t1.clientX+t2.clientX)/2,my=(t1.clientY+t2.clientY)/2,rect=vp.getBoundingClientRect();
+      C.panX=(mx-rect.left)-(mx-rect.left-C.panX)*d;C.panY=(my-rect.top)-(my-rect.top-C.panY)*d;C.scale*=d;applyT();
+    }
+    touches[t1.identifier]={x:t1.clientX,y:t1.clientY};touches[t2.identifier]={x:t2.clientX,y:t2.clientY};
+  }
+},{passive:false});
+vp.addEventListener('touchend',e=>{for(const t of e.changedTouches)delete touches[t.identifier];});
+
+function fitView(){C.panX=0;C.panY=0;C.scale=1;applyT();}
+document.getElementById('btn-fit').addEventListener('click',fitView);
+document.getElementById('btn-zi').addEventListener('click',()=>{C.scale*=1.25;applyT();});
+document.getElementById('btn-zo').addEventListener('click',()=>{C.scale*=0.8;applyT();});
+
+// Resize
+if(window.ResizeObserver) new ResizeObserver(render).observe(vp);
+
+// ══════════════════════════════════════════════════════
+// DXF PARSER — parses Designhaus DXF layer convention
+// Produces the same FP data structure as the embedded JSON
+// ══════════════════════════════════════════════════════
+function parseDXFtoFP(text) {
+  // Tokenise
+  const lines = text.split(/\r?\n/);
+  const tok = [];
+  for (let i = 0; i+1 < lines.length; i+=2)
+    tok.push({ code: parseInt(lines[i].trim()), value: lines[i+1].trim() });
+
+  // Parse entities section
+  const rawEnts = [];
+  let i=0, inEnt=false;
+  while (i < tok.length) {
+    const t = tok[i];
+    if (t.code===0 && t.value==='SECTION') { i++; if(i<tok.length && tok[i].code===2 && tok[i].value==='ENTITIES') inEnt=true; i++; continue; }
+    if (t.code===0 && t.value==='ENDSEC') { inEnt=false; i++; continue; }
+    if (!inEnt) { i++; continue; }
+    if (t.code===0) {
+      const type=t.value; const e={type,layer:'0'}; i++;
+      while(i<tok.length && tok[i].code!==0) {
+        const {code,value}=tok[i];
+        if(code===8) e.layer=value.toUpperCase();
+        if(code===10) e.x=e.x??parseFloat(value);
+        if(code===20) e.y=e.y??parseFloat(value);
+        if(code===11) e.x2=parseFloat(value);
+        if(code===21) e.y2=parseFloat(value);
+        if(code===40){
+          if(type==='CIRCLE') e.r=parseFloat(value);
+          else if(type==='ARC') e.r=e.r??parseFloat(value);
+          else if(type==='TEXT'||type==='MTEXT') e.height=parseFloat(value);
+        }
+        if(code===41&&type==='MTEXT') e.width=parseFloat(value);
+        if(code===71&&type==='MTEXT') e.attach=parseInt(value);
+        if(code===2&&type==='INSERT') e.name=value;
+        if(code===41&&type==='INSERT') e.sx=parseFloat(value);
+        if(code===42&&type==='INSERT') e.sy=parseFloat(value);
+        if(code===50&&type==='INSERT') e.rot=parseFloat(value);
+        if(code===50) e.sa=parseFloat(value);
+        if(code===51) e.ea=parseFloat(value);
+        if(code===1) e.text=value;
+        if(code===70&&type==='LWPOLYLINE') e.closed=(parseInt(value)&1)===1;
+        if(type==='LWPOLYLINE'){
+          if(!e.verts)e.verts=[];
+          if(code===10) e._px=parseFloat(value);
+          else if(code===20&&e._px!==undefined){
+            e.verts.push({x:e._px,y:parseFloat(value),b:0});
+            e._px=undefined;
+          }
+          // Bulge (42) trails its own vertex's 10/20 in real DXF output,
+          // so it belongs to the vertex already pushed, not the next one.
+          if(code===42&&e.verts.length) e.verts[e.verts.length-1].b=parseFloat(value);
+        }
+        i++;
+      }
+      // close open polylines where first===last
+      if(type==='LWPOLYLINE'&&e.verts&&e.verts.length>2&&!e.closed){
+        const a=e.verts[0],b=e.verts[e.verts.length-1];
+        if(Math.hypot(a.x-b.x,a.y-b.y)<0.01){e.closed=true;e.verts=e.verts.slice(0,-1);}
+      }
+      // curved polylines (any vertex with a non-zero bulge) render via
+      // the bulge-aware path builder, so tag them as PATH here to match
+      // the embedded reference geometry's convention.
+      if(type==='LWPOLYLINE'&&e.verts&&e.verts.some(v=>Math.abs(v.b||0)>1e-6)){
+        e.type='PATH';
+      }
+      rawEnts.push(e);
+    } else { i++; }
+  }
+
+  // Parse BLOCKS section for INSERT resolution
+  const blocks = {};
+  i=0; let inBlocks=false, curBlock=null;
+  while(i<tok.length){
+    const t=tok[i];
+    if(t.code===0&&t.value==='SECTION'){i++;if(i<tok.length&&tok[i].code===2&&tok[i].value==='BLOCKS')inBlocks=true;i++;continue;}
+    if(t.code===0&&t.value==='ENDSEC'){inBlocks=false;curBlock=null;i++;continue;}
+    if(!inBlocks){i++;continue;}
+    if(t.code===0&&t.value==='BLOCK'){i++;curBlock={name:'',ents:[]};while(i<tok.length&&tok[i].code!==0){if(tok[i].code===2)curBlock.name=tok[i].value;i++;}continue;}
+    if(t.code===0&&t.value==='ENDBLK'){if(curBlock&&!curBlock.name.startsWith('*'))blocks[curBlock.name]=curBlock.ents;curBlock=null;i++;continue;}
+    if(curBlock&&t.code===0){
+      const type=t.value;const e={type};i++;
+      while(i<tok.length&&tok[i].code!==0){
+        const{code,value}=tok[i];
+        if(code===10)e.x=e.x??parseFloat(value);
+        if(code===20)e.y=e.y??parseFloat(value);
+        if(code===11)e.x2=parseFloat(value);
+        if(code===21)e.y2=parseFloat(value);
+        if(code===40)e.r=parseFloat(value);
+        if(code===70&&type==='LWPOLYLINE')e.closed=(parseInt(value)&1)===1;
+        if(type==='LWPOLYLINE'){
+          if(!e.verts)e.verts=[];
+          if(code===10)e._px=parseFloat(value);
+          else if(code===20&&e._px!==undefined){
+            e.verts.push({x:e._px,y:parseFloat(value),b:0});
+            e._px=undefined;
+          }
+          if(code===42&&e.verts.length) e.verts[e.verts.length-1].b=parseFloat(value);
+        }
+        i++;
+      }
+      if(type==='LWPOLYLINE'&&e.verts){
+        const hasBulge=e.verts.some(v=>Math.abs(v.b||0)>1e-6);
+        curBlock.ents.push({type:hasBulge?'PATH':'LWPOLYLINE',closed:!!e.closed,verts:e.verts});
+      }
+      else if(type==='LINE'){curBlock.ents.push({type:'LINE',x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});}
+      else if(type==='ARC'){curBlock.ents.push({type:'ARC',x:e.x,y:e.y,r:e.r,sa:e.sa||0,ea:e.ea||0});}
+      else if(type==='CIRCLE'){curBlock.ents.push({type:'CIRCLE',x:e.x,y:e.y,r:e.r});}
+    } else { i++; }
+  }
+
+  // Parse DIMENSION geometry blocks from *D__ blocks
+  const dimBlocks = {};
+  i=0; inBlocks=false; curBlock=null;
+  const lines2=text.split(/\r?\n/);
+  const tok2=[];
+  for(let j=0;j+1<lines2.length;j+=2)tok2.push({code:parseInt(lines2[j].trim()),value:lines2[j+1].trim()});
+  i=0;inBlocks=false;curBlock=null;
+  while(i<tok2.length){
+    const t=tok2[i];
+    if(t.code===0&&t.value==='SECTION'){i++;if(i<tok2.length&&tok2[i].code===2&&tok2[i].value==='BLOCKS')inBlocks=true;i++;continue;}
+    if(t.code===0&&t.value==='ENDSEC'){inBlocks=false;curBlock=null;i++;continue;}
+    if(!inBlocks){i++;continue;}
+    if(t.code===0&&t.value==='BLOCK'){i++;curBlock={name:'',lines:[],texts:[]};while(i<tok2.length&&tok2[i].code!==0){if(tok2[i].code===2)curBlock.name=tok2[i].value;i++;}continue;}
+    if(t.code===0&&t.value==='ENDBLK'){if(curBlock&&curBlock.name.startsWith('*D'))dimBlocks[curBlock.name]=curBlock;curBlock=null;i++;continue;}
+    if(curBlock&&t.code===0){
+      const type=t.value;const e={};i++;
+      while(i<tok2.length&&tok2[i].code!==0){
+        const{code,value}=tok2[i];
+        if(code===10)e.x=e.x??parseFloat(value);
+        if(code===20)e.y=e.y??parseFloat(value);
+        if(code===11)e.x2=parseFloat(value);
+        if(code===21)e.y2=parseFloat(value);
+        if(code===40)e.h=parseFloat(value);
+        if(code===1)e.text=value;
+        i++;
+      }
+      if(type==='LINE'&&curBlock.name.startsWith('*D'))curBlock.lines.push({x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
+      if(type==='MTEXT'&&curBlock.name.startsWith('*D')){
+        const raw=e.text||'';
+        const clean=raw.replace(/\\[A-Za-z][^;]*;/g,'').replace(/[{}]/g,'').replace(/\\P/g,' ').trim();
+        curBlock.texts.push({x:e.x,y:e.y,h:e.h||80,t:clean});
+      }
+    } else { i++; }
+  }
+
+  // Bucket raw entities into FP structure
+  const fp = { bounds:{x0:Infinity,y0:Infinity,x1:-Infinity,y1:-Infinity}, walls:[], floor:[], furn:[], windows:[], doors:[], dashed:[], dim_lines:[], dim_texts:[], room_texts:[], blocks:{} };
+  fp.blocks = blocks;
+
+  function ex(x,y){if(x<fp.bounds.x0)fp.bounds.x0=x;if(y<fp.bounds.y0)fp.bounds.y0=y;if(x>fp.bounds.x1)fp.bounds.x1=x;if(y>fp.bounds.y1)fp.bounds.y1=y;}
+
+  for(const e of rawEnts){
+    const L=e.layer,T=e.type;
+    if((T==='LWPOLYLINE'||T==='PATH')&&e.verts){
+      for(const v of e.verts)ex(v.x,v.y);
+      const pd={type:T,closed:e.closed,verts:e.verts};
+      if(L==='DC-A-WALL') fp.walls.push(pd);
+      else if(L==='DC-A-FLOOR HATCH') fp.floor.push(pd);
+      else if(L==='DC-A-WINDOW') fp.windows.push(pd);
+      else if(L==='DC-A-FURN') fp.furn.push({kind:'poly',...pd});
+    } else if(T==='LINE'){
+      ex(e.x,e.y);ex(e.x2,e.y2);
+      if(L==='DC-A-DOOR') fp.doors.push({kind:'line',x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
+      else if(L==='DC-A-DASHED') fp.dashed.push({x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
+    } else if(T==='ARC'&&e.r){
+      ex(e.x-e.r,e.y-e.r);ex(e.x+e.r,e.y+e.r);
+      if(L==='DC-A-DOOR') fp.doors.push({kind:'arc',x:e.x,y:e.y,r:e.r,sa:e.sa,ea:e.ea});
+      else if(L==='DC-A-FURN') fp.furn.push({kind:'arc',x:e.x,y:e.y,r:e.r,sa:e.sa,ea:e.ea});
+    } else if(T==='CIRCLE'&&e.r){
+      ex(e.x-e.r,e.y-e.r);ex(e.x+e.r,e.y+e.r);
+      if(L==='DC-A-FURN') fp.furn.push({kind:'circle',x:e.x,y:e.y,r:e.r});
+    } else if(T==='INSERT'){
+      if(L==='DC-A-FURN') fp.furn.push({kind:'insert',block:e.name||'',ix:e.x||0,iy:e.y||0,sx:e.sx||1,sy:e.sy||1,rot:e.rot||0});
+    } else if((T==='TEXT'||T==='MTEXT')&&e.text&&e.x!==undefined){
+      ex(e.x,e.y);
+      if(L==='DC-A-TXT'){
+        const raw=e.text;
+        const clean=raw.replace(/\\[A-Za-z][^;]*;/g,'').replace(/[{}]/g,'').replace(/\\P/g,' ').trim();
+        fp.room_texts.push({x:e.x,y:e.y,h:e.height||150,w:e.width||0,rot:0,attach:e.attach||1,t:clean});
+      }
+    } else if(T==='DIMENSION'){
+      // get geometry block name
+      // scan raw tokens for this dimension's geometry code 2 (block name) after code 0 DIMENSION
+    }
+  }
+
+  // Dimension lines/texts from *D blocks
+  for(const [, blk] of Object.entries(dimBlocks)){
+    for(const l of blk.lines) fp.dim_lines.push(l);
+    for(const t of blk.texts) fp.dim_texts.push(t);
+  }
+
+  // Expand bounds slightly
+  const margin=(fp.bounds.x1-fp.bounds.x0)*0.02;
+  fp.bounds.x0-=margin; fp.bounds.y0-=margin;
+  fp.bounds.x1+=margin; fp.bounds.y1+=margin;
+
+  return fp;
+}
+
+// ══════════════════════════════════════════════════════
+// IMPORT HANDLER
+// ══════════════════════════════════════════════════════
+document.getElementById('btn-import').addEventListener('click', () => {
+  document.getElementById('dxf-input').click();
+});
+
+document.getElementById('dxf-input').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.dxf')) {
+    alert('Please select a .dxf file.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-import');
+  btn.textContent = 'Parsing…';
+  btn.style.pointerEvents = 'none';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = parseDXFtoFP(e.target.result);
+      const totalEnts = parsed.walls.length + parsed.floor.length + parsed.furn.length +
+                        parsed.windows.length + parsed.doors.length + parsed.dim_lines.length + parsed.room_texts.length;
+      if (totalEnts === 0) throw new Error('No Designhaus layers found. Check the file uses DC-A-* layer names.');
+
+      FP = parsed;
+
+      // Reset pan/zoom to fit new file
+      C.panX=0; C.panY=0; C.scale=1; applyT();
+
+      // Update header filename
+      document.getElementById('htag-filename').textContent = file.name.replace(/\.dxf$/i,'');
+
+      render();
+
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Import DXF';
+      btn.style.pointerEvents = '';
+    } catch(err) {
+      alert('Parse error: ' + err.message);
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Import DXF';
+      btn.style.pointerEvents = '';
+    }
+    this.value = ''; // allow re-importing same file
+  };
+  reader.readAsText(file);
+});
+
+// ── Init
+render();
+</script>
+</body>
+</html>
