@@ -63,20 +63,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 
 /* ---------- EDIT PANEL (tabbed) ---------- */
 .sb{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.sb-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.sb-tab{
-  flex:1;padding:13px 0;font-family:var(--font);font-size:13px;font-weight:600;color:var(--tm);
-  background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
-}
-.sb-tab:hover{color:var(--text)}
-.sb-tab.on{color:var(--accent);border-bottom-color:var(--accent)}
-.sb-body{flex:1;min-height:0;overflow-y:auto}
-.sb-body::-webkit-scrollbar{width:5px}
-.sb-body::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:3px}
-.sb-pane[hidden]{display:none}
-
 .ss{padding:16px 18px;border-bottom:1px solid var(--border)}
 .ss:last-child{border-bottom:none}
+.sb>.ss:first-child{flex:1;min-height:0;overflow-y:auto}
+.sb>.ss:first-child::-webkit-scrollbar{width:5px}
+.sb>.ss:first-child::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:3px}
 .sl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ts);margin-bottom:13px}
 
 /* Layer colour rows */
@@ -106,19 +97,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 .sub-row-val{font-size:11.5px;font-weight:600;color:var(--text);font-family:var(--fb);flex-shrink:0;min-width:34px;text-align:right}
 .lsw-sm{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s}
 .lsw-sm:hover{transform:scale(1.1)}
-
-/* Overlay toggles */
-.tog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.tog-row:last-child{margin-bottom:0}
-.tog-label{font-size:13.5px;font-weight:500;color:var(--text);font-family:var(--fb)}
-.tog{position:relative;width:36px;height:20px;flex-shrink:0}
-.tog input{display:none}
-.togtr{position:absolute;inset:0;background:var(--bstrong);border-radius:10px;cursor:pointer;transition:background .2s}
-.tog input:checked+.togtr{background:var(--accent)}
-.togtr::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.tog input:checked+.togtr::after{transform:translateX(16px)}
-.tog-sub{margin:8px 0 14px}
-.tog-sub:last-child{margin-bottom:0}
 
 /* Export — pinned below the tabs, always visible regardless of which
    tab is open. */
@@ -289,202 +267,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 
 <aside class="sb">
 
-  <div class="sb-tabs">
-    <button class="sb-tab on" data-pane="pane-layers">Layers</button>
-    <button class="sb-tab" data-pane="pane-overlays">Overlays</button>
-  </div>
-
-  <div class="sb-body">
-  <div class="sb-pane" id="pane-layers">
   <div class="ss">
-    <!-- WALL -->
-    <div class="lrow">
-      <div class="lrow-head">
-        <div class="lsw" id="sw-wall" style="background:#1c1a18" title="Fill colour"></div>
-        <div class="linfo">
-          <div class="lname">Walls</div>
-          <div class="ldesc">DXF layer: DC-A-WALL</div>
-        </div>
-        <div class="lrow-actions">
-          <button class="leye" id="eye-wall" title="Toggle visibility">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <button class="lchev" id="chev-wall" title="Expand/collapse">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="lrow-details" id="details-wall">
-        <div class="sub-row">
-          <span class="sub-row-name">Fill weight</span>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-wall">
-          <span class="sub-row-val" id="lw-wall-val">1.0×</span>
-        </div>
-        <div class="sub-row">
-          <span class="sub-row-name"><span class="lsw-sm" id="sw-wall-stroke" style="background:#1c1a18" title="Outline colour"></span>Outline</span>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-wall-stroke">
-          <span class="sub-row-val" id="lw-wall-stroke-val">1.0×</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- FLOOR HATCH -->
-    <div class="lrow">
-      <div class="lrow-head">
-        <div class="lsw" id="sw-floor" style="background:#e8e3d8" title="Fill colour"></div>
-        <div class="linfo">
-          <div class="lname">Floor</div>
-          <div class="ldesc">DXF layer: DC-A-FLOOR HATCH</div>
-        </div>
-        <div class="lrow-actions">
-          <button class="leye" id="eye-floor" title="Toggle visibility">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <button class="lchev" id="chev-floor" title="Expand/collapse">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="lrow-details" id="details-floor">
-        <div class="sub-row">
-          <span class="sub-row-name">Opacity</span>
-          <input type="range" min="0" max="100" value="100" step="5" id="lw-floor">
-          <span class="sub-row-val" id="lw-floor-val">100%</span>
-        </div>
-        <div class="sub-row">
-          <span class="sub-row-name"><span class="lsw-sm" id="sw-floor-stroke" style="background:#b8b2a8" title="Outline colour"></span>Outline</span>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-floor-stroke">
-          <span class="sub-row-val" id="lw-floor-stroke-val">1.0×</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- FURNITURE -->
-    <div class="lrow">
-      <div class="lrow-head">
-        <div class="lsw" id="sw-furn" style="background:#d4ccbf" title="Fill colour"></div>
-        <div class="linfo">
-          <div class="lname">Furniture</div>
-          <div class="ldesc">DXF layer: DC-A-FURN</div>
-        </div>
-        <div class="lrow-actions">
-          <button class="leye" id="eye-furn" title="Toggle visibility">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <button class="lchev" id="chev-furn" title="Expand/collapse">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="lrow-details" id="details-furn">
-        <div class="sub-row">
-          <span class="sub-row-name">Fill weight</span>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-furn">
-          <span class="sub-row-val" id="lw-furn-val">1.0×</span>
-        </div>
-        <div class="sub-row">
-          <span class="sub-row-name"><span class="lsw-sm" id="sw-furn-stroke" style="background:#a8a29a" title="Outline colour"></span>Outline</span>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-furn-stroke">
-          <span class="sub-row-val" id="lw-furn-stroke-val">1.0×</span>
-        </div>
-        <div class="sub-row">
-          <span class="sub-row-name">Opacity</span>
-          <input type="range" min="0" max="100" value="90" step="5" id="furn-opacity">
-          <span class="sub-row-val" id="furn-op-val">90%</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- WINDOWS -->
-    <div class="lrow">
-      <div class="lrow-head">
-        <div class="lsw" id="sw-win" style="background:#cce4f0" title="Fill colour"></div>
-        <div class="linfo">
-          <div class="lname">Windows</div>
-          <div class="ldesc">DXF layer: DC-A-WINDOW</div>
-        </div>
-        <div class="lrow-actions">
-          <button class="leye" id="eye-win" title="Toggle visibility">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <button class="lchev" id="chev-win" title="Expand/collapse">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="lrow-details" id="details-win">
-        <div class="sub-row">
-          <span class="sub-row-name">Fill weight</span>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-win">
-          <span class="sub-row-val" id="lw-win-val">1.0×</span>
-        </div>
-        <div class="sub-row">
-          <span class="sub-row-name"><span class="lsw-sm" id="sw-win-stroke" style="background:#88b8d0" title="Outline colour"></span>Outline</span>
-          <input type="range" min="0" max="400" value="100" step="5" id="lw-win-stroke">
-          <span class="sub-row-val" id="lw-win-stroke-val">1.0×</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- DOORS -->
-    <div class="lrow">
-      <div class="lrow-head">
-        <div class="lsw" id="sw-door" style="background:#3a3530" title="Click to change door colour"></div>
-        <div class="linfo">
-          <div class="lname">Doors</div>
-          <div class="ldesc">DXF layer: DC-A-DOOR · stroke only</div>
-        </div>
-        <div class="lrow-actions">
-          <button class="leye" id="eye-door" title="Toggle visibility">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-          <button class="lchev" id="chev-door" title="Expand/collapse">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="lrow-details" id="details-door">
-        <div class="sub-row">
-          <span class="sub-row-name">Weight</span>
-          <input type="range" min="5" max="400" value="100" step="5" id="lw-door">
-          <span class="sub-row-val" id="lw-door-val">1.0×</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  <div class="sb-pane" id="pane-overlays" hidden>
-  <div class="ss">
-    <div class="tog-row">
-      <span class="tog-label">Dimensions</span>
-      <label class="tog"><input type="checkbox" id="tog-dim" checked><span class="togtr"></span></label>
-    </div>
-    <div class="sub-row tog-sub">
-      <span class="sub-row-name">Weight</span>
-      <input type="range" min="5" max="400" value="100" step="5" id="lw-dim">
-      <span class="sub-row-val" id="lw-dim-val">1.0×</span>
-    </div>
-    <div class="tog-row">
-      <span class="tog-label">Room labels</span>
-      <label class="tog"><input type="checkbox" id="tog-txt" checked><span class="togtr"></span></label>
-    </div>
-    <div class="sub-row tog-sub">
-      <span class="sub-row-name">Size</span>
-      <input type="range" min="20" max="300" value="100" step="10" id="lw-txt">
-      <span class="sub-row-val" id="lw-txt-val">1.0×</span>
-    </div>
-    <div class="tog-row">
-      <span class="tog-label">Dashed lines</span>
-      <label class="tog"><input type="checkbox" id="tog-dash" checked><span class="togtr"></span></label>
-    </div>
-    <div class="sub-row tog-sub">
-      <span class="sub-row-name">Weight</span>
-      <input type="range" min="5" max="400" value="100" step="5" id="lw-dash">
-      <span class="sub-row-val" id="lw-dash-val">1.0×</span>
-    </div>
-  </div>
-  </div>
+    <div class="sl">Layers</div>
+    <div id="layersContainer"></div>
   </div>
 
   <!-- EXPORT — pinned below the tabs, always visible -->
@@ -523,17 +308,32 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 
 <!-- DXF prep info -->
 <div class="cpop" id="infoPop">
-  <div class="cpop-lbl">How to prepare your DXF</div>
-  <p>Draw in AutoCAD using the Designhaus layer template. Save as AutoCAD 2010 DXF before uploading. Curved elements use bulge encoding — do not explode polylines. All layers must follow the <code>DC-A-*</code> naming convention.</p>
-  <p><a href="#">Download the Designhaus DXF Template</a></p>
+  <div class="cpop-lbl">How this works</div>
+  <p>Upload any .dxf file — every layer it contains shows up on the right with its own line colour, weight, line type and opacity, plus a fill colour and opacity wherever that layer has closed shapes.</p>
+  <p><strong>Hatching needs a closed loop.</strong> A shape only fills with colour if its outline forms one unbroken loop — a closed polyline, or lines and arcs that connect exactly end to end with no gaps or overlaps. Anything left open renders as an outline only, so if a fill isn't showing up, check that boundary is fully closed before raising its Fill opacity.</p>
   <button class="cpop-close" id="infoPop-close">Close</button>
 </div>
 
 <script>
 // ══════════════════════════════════════════════════════
-// EMBEDDED GEOMETRY — extracted from TRIAL_FLOOR_PLAN_01.dxf
+// EMBEDDED GEOMETRY — extracted from TRIAL_FLOOR_PLAN_01.dxf, in the
+// generic {bounds, layers, blocks} shape produced by parseAnyDXF, so
+// the demo and freshly imported files share one render path.
 // ══════════════════════════════════════════════════════
-let FP ={"bounds":{"x0":2262.445118858302,"y0":10604.371838446998,"x1":11757.07809570866,"y1":16989.260095708658},"walls":[{"type":"LWPOLYLINE","closed":true,"verts":[{"x":3384.489,"y":16286.671},{"x":3384.489,"y":16436.671},{"x":3124.489,"y":16436.671},{"x":3124.489,"y":11791.671},{"x":3464.489,"y":11791.671},{"x":3464.489,"y":11886.671},{"x":3274.489,"y":11886.671},{"x":3274.489,"y":16286.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":5774.489,"y":16436.671},{"x":5774.489,"y":16286.671},{"x":6074.489,"y":16286.671},{"x":6074.489,"y":14566.671},{"x":6124.489,"y":14566.671},{"x":6124.489,"y":14156.671},{"x":6844.489,"y":14156.671},{"x":6844.489,"y":14336.671},{"x":6304.489,"y":14336.671},{"x":6304.489,"y":16656.671},{"x":6754.489,"y":16656.671},{"x":6754.489,"y":16806.671},{"x":6074.489,"y":16806.671},{"x":6074.489,"y":16436.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":11024.489,"y":16656.671},{"x":11454.489,"y":16656.671},{"x":11454.489,"y":13336.671},{"x":10014.489,"y":13336.671},{"x":10014.489,"y":13186.671},{"x":11424.489,"y":13186.671},{"x":11424.489,"y":11941.671},{"x":9294.489,"y":11941.671},{"x":9294.489,"y":12281.671},{"x":9154.489,"y":12281.671},{"x":9154.489,"y":11791.671},{"x":11574.489,"y":11791.671},{"x":11574.489,"y":16806.671},{"x":11024.489,"y":16806.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":5024.489,"y":11936.671},{"x":6124.489,"y":11936.671},{"x":6124.489,"y":13336.671},{"x":6384.489,"y":13336.671},{"x":6384.489,"y":11896.671},{"x":7964.489,"y":11896.671},{"x":7964.489,"y":12241.671},{"x":8114.489,"y":12241.671},{"x":8114.489,"y":11791.671},{"x":4504.489,"y":11791.671},{"x":4504.489,"y":11886.671},{"x":5024.489,"y":11886.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":7124.489,"y":13336.671},{"x":7124.489,"y":13226.671},{"x":7964.489,"y":13226.671},{"x":7964.489,"y":12856.671},{"x":8114.489,"y":12856.671},{"x":8114.489,"y":13226.671},{"x":9154.489,"y":13226.671},{"x":9154.489,"y":12856.671},{"x":9294.489,"y":12856.671},{"x":9294.489,"y":13336.671},{"x":9294.489,"y":13336.671}]},{"type":"LWPOLYLINE","closed":false,"verts":[{"x":7929.489,"y":16657.765},{"x":7929.489,"y":16806.671},{"x":8944.489,"y":16806.671},{"x":8944.489,"y":16656.671},{"x":8504.489,"y":16656.671},{"x":8504.489,"y":14206.671},{"x":8369.489,"y":14206.671},{"x":8369.489,"y":16656.671},{"x":7929.489,"y":16656.671}]}],"floor":[{"type":"LWPOLYLINE","closed":true,"verts":[{"x":3274.489,"y":16286.671},{"x":6074.489,"y":16286.671},{"x":6074.489,"y":14566.671},{"x":6124.489,"y":14566.671},{"x":6124.489,"y":14156.671},{"x":6844.489,"y":14156.671},{"x":6844.489,"y":14336.671},{"x":6304.489,"y":14336.671},{"x":6304.489,"y":16656.671},{"x":8369.489,"y":16656.671},{"x":8369.489,"y":14206.671},{"x":8504.489,"y":14206.671},{"x":8504.489,"y":16656.671},{"x":11454.489,"y":16656.671},{"x":11454.489,"y":13336.671},{"x":10014.489,"y":13336.671},{"x":10014.489,"y":13186.671},{"x":11424.489,"y":13186.671},{"x":11424.489,"y":11941.671},{"x":9294.489,"y":11941.671},{"x":9294.489,"y":13336.671},{"x":7124.489,"y":13336.671},{"x":7124.489,"y":13226.671},{"x":7964.489,"y":13226.671},{"x":7964.489,"y":11896.671},{"x":6384.489,"y":11896.671},{"x":6384.489,"y":13336.671},{"x":6124.489,"y":13336.671},{"x":6124.489,"y":11936.671},{"x":5024.489,"y":11936.671},{"x":5024.489,"y":11886.671},{"x":3274.489,"y":11886.671}]}],"furn":[{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":8804.489,"y":16506.671,"b":0.0},{"x":8504.489,"y":16506.671,"b":0.0},{"x":8504.489,"y":14231.671,"b":0.0},{"x":8804.489,"y":14231.671,"b":0.414214},{"x":8954.489,"y":14381.671,"b":0.0},{"x":8954.489,"y":16356.671,"b":0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":9554.489,"y":16156.671},{"x":11354.489,"y":16156.671},{"x":11354.489,"y":14656.671},{"x":9554.489,"y":14656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":11354.489,"y":14656.671},{"x":11454.489,"y":14656.671},{"x":11454.489,"y":16156.671},{"x":11354.489,"y":16156.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":10014.489,"y":13336.671},{"x":11454.489,"y":13336.671},{"x":11454.489,"y":13936.671},{"x":10014.489,"y":13936.671}]},{"kind":"circle","x":11204.489,"y":16406.671,"r":200.0},{"kind":"circle","x":11204.489,"y":14406.671,"r":200.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6904.489,"y":15156.671},{"x":6304.489,"y":15156.671},{"x":6304.489,"y":16656.671},{"x":6904.489,"y":16656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7769.489,"y":15906.671},{"x":8369.489,"y":15906.671},{"x":8369.489,"y":14346.671},{"x":7769.489,"y":14346.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7769.489,"y":15906.671},{"x":8369.489,"y":15906.671},{"x":8369.489,"y":16656.671},{"x":7769.489,"y":16656.671}]},{"kind":"insert","block":"G$C44963CA8","ix":5298.177,"iy":15897.444,"sx":-1.0,"sy":1.0,"rot":0.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3274.489,"y":16136.671},{"x":3274.489,"y":15586.671},{"x":4024.489,"y":15586.671},{"x":4024.489,"y":16136.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3621.824,"y":13786.671},{"x":3271.824,"y":13786.671},{"x":3274.489,"y":14986.671},{"x":3624.489,"y":14986.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3333.157,"y":14886.671},{"x":3333.157,"y":13886.671},{"x":3273.157,"y":13886.671},{"x":3273.157,"y":14886.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":5674.489,"y":12161.671,"b":1.0},{"x":6124.489,"y":12161.671,"b":0.0},{"x":6124.489,"y":13061.671,"b":1.0},{"x":5674.489,"y":13061.671,"b":0.0}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4924.489,"y":13286.671},{"x":5724.489,"y":13286.671},{"x":5724.489,"y":11986.671},{"x":4924.489,"y":11986.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4724.489,"y":13211.671,"b":0.0},{"x":4874.489,"y":13211.671,"b":-0.414214},{"x":5024.489,"y":13061.671,"b":0.0},{"x":5024.489,"y":12811.671,"b":-0.414214},{"x":4874.489,"y":12661.671,"b":0.0},{"x":4724.489,"y":12661.671,"b":-0.414214},{"x":4574.489,"y":12811.671,"b":0.0},{"x":4574.489,"y":13061.671,"b":-0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4574.489,"y":12911.671},{"x":4549.489,"y":12911.671},{"x":4549.489,"y":12961.671},{"x":4574.489,"y":12961.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4549.489,"y":12732.426,"b":-1.0},{"x":4499.489,"y":12732.426,"b":0.0},{"x":4499.489,"y":13132.426,"b":-1.0},{"x":4549.489,"y":13132.426,"b":0.0}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4724.489,"y":12061.671,"b":0.0},{"x":4874.489,"y":12061.671,"b":0.414214},{"x":5024.489,"y":12211.671,"b":0.0},{"x":5024.489,"y":12461.671,"b":0.414214},{"x":4874.489,"y":12611.671,"b":0.0},{"x":4724.489,"y":12611.671,"b":0.414214},{"x":4574.489,"y":12461.671,"b":0.0},{"x":4574.489,"y":12211.671,"b":0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4574.489,"y":12361.671},{"x":4549.489,"y":12361.671},{"x":4549.489,"y":12311.671},{"x":4574.489,"y":12311.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4549.489,"y":12540.916,"b":1.0},{"x":4499.489,"y":12540.916,"b":0.0},{"x":4499.489,"y":12140.916,"b":1.0},{"x":4549.489,"y":12140.916,"b":0.0}]},{"kind":"circle","x":4553.44,"y":14871.098,"r":300.0},{"kind":"arc","x":4593.196,"y":15168.452,"r":200.0,"sa":332.914,"ea":191.856},{"kind":"arc","x":4593.196,"y":15168.452,"r":200.0,"sa":191.856,"ea":332.914},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6454.489,"y":16156.671},{"x":6454.489,"y":16606.671},{"x":6854.489,"y":16606.671},{"x":6854.489,"y":16156.671}]},{"kind":"circle","x":6404.489,"y":16381.671,"r":25.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":8269.489,"y":15856.671},{"x":8269.489,"y":15076.671},{"x":7819.489,"y":15076.671},{"x":7819.489,"y":15856.671}]}],"windows":[{"type":"LWPOLYLINE","closed":true,"verts":[{"x":3384.489,"y":16436.671},{"x":5774.489,"y":16436.671},{"x":5774.489,"y":16286.671},{"x":3384.489,"y":16286.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":6754.489,"y":16806.671},{"x":7929.489,"y":16806.671},{"x":7929.489,"y":16656.671},{"x":6754.489,"y":16656.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":8944.489,"y":16806.671},{"x":11024.489,"y":16806.671},{"x":11024.489,"y":16656.671},{"x":8944.489,"y":16656.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":7964.489,"y":12856.671},{"x":8114.489,"y":12856.671},{"x":8114.489,"y":12241.671},{"x":7964.489,"y":12241.671}]},{"type":"LWPOLYLINE","closed":true,"verts":[{"x":9154.489,"y":12856.671},{"x":9294.489,"y":12856.671},{"x":9294.489,"y":12281.671},{"x":9154.489,"y":12281.671}]}],"doors":[{"kind":"line","x1":3464.489,"y1":11791.671,"x2":3464.489,"y2":12846.671},{"kind":"arc","x":3474.915,"y":11816.842,"r":1029.881,"sa":358.599,"ea":90.58},{"kind":"arc","x":9308.614,"y":13293.833,"r":707.174,"sa":268.856,"ea":3.473},{"kind":"arc","x":6384.489,"y":13326.671,"r":740.068,"sa":270.774,"ea":0.774},{"kind":"arc","x":8504.489,"y":13336.671,"r":870.0,"sa":0.0,"ea":90.0},{"kind":"line","x1":8504.489,"y1":13336.671,"x2":9374.489,"y2":13336.671},{"kind":"line","x1":6394.489,"y1":12586.671,"x2":6394.489,"y2":13336.671},{"kind":"line","x1":9294.489,"y1":12586.8,"x2":9294.489,"y2":13336.671}],"dashed":[{"x1":3274.489,"y1":16136.671,"x2":6074.489,"y2":16136.671},{"x1":11454.489,"y1":16506.671,"x2":8504.489,"y2":16506.671}],"dim_lines":[{"x1":4924.489,"y1":13286.608,"x2":4924.489,"y2":13115.891},{"x1":5724.489,"y1":13286.608,"x2":5724.489,"y2":13115.891},{"x1":4914.489,"y1":13165.891,"x2":5734.489,"y2":13165.891},{"x1":5273.724,"y1":13286.671,"x2":5128.368,"y2":13286.671},{"x1":5273.724,"y1":11986.671,"x2":5128.368,"y2":11986.671},{"x1":5178.368,"y1":13296.671,"x2":5178.368,"y2":11976.671},{"x1":5724.489,"y1":13286.608,"x2":5724.489,"y2":13115.891},{"x1":6124.489,"y1":13286.608,"x2":6124.489,"y2":13115.891},{"x1":5714.489,"y1":13165.891,"x2":6134.489,"y2":13165.891},{"x1":5087.805,"y1":14211.671,"x2":4923.414,"y2":14211.671},{"x1":5087.805,"y1":16111.671,"x2":4923.414,"y2":16111.671},{"x1":4973.414,"y1":14201.671,"x2":4973.414,"y2":16121.671},{"x1":4024.489,"y1":15586.733,"x2":4024.489,"y2":15787.32},{"x1":3274.489,"y1":15586.733,"x2":3274.489,"y2":15787.32},{"x1":4034.489,"y1":15737.32,"x2":3264.489,"y2":15737.32},{"x1":4024.427,"y1":16136.671,"x2":3903.004,"y2":16136.671},{"x1":4024.427,"y1":15586.671,"x2":3903.004,"y2":15586.671},{"x1":3953.004,"y1":16146.671,"x2":3953.004,"y2":15576.671},{"x1":3274.552,"y1":15586.671,"x2":3408.391,"y2":15586.671},{"x1":3274.552,"y1":14986.671,"x2":3408.391,"y2":14986.671},{"x1":3358.391,"y1":15596.671,"x2":3358.391,"y2":14976.671},{"x1":3624.552,"y1":14986.671,"x2":3755.835,"y2":14986.671},{"x1":3621.886,"y1":13786.671,"x2":3755.835,"y2":13786.671},{"x1":3705.835,"y1":14996.671,"x2":3705.835,"y2":13776.671},{"x1":3621.824,"y1":13786.608,"x2":3621.824,"y2":13625.107},{"x1":3271.824,"y1":13786.608,"x2":3271.824,"y2":13625.107},{"x1":3631.824,"y1":13675.107,"x2":3261.824,"y2":13675.107},{"x1":7819.489,"y1":15856.608,"x2":7819.489,"y2":15733.492},{"x1":8269.489,"y1":15856.608,"x2":8269.489,"y2":15733.492},{"x1":7809.489,"y1":15783.492,"x2":8279.489,"y2":15783.492},{"x1":7819.552,"y1":15856.671,"x2":7943.359,"y2":15856.671},{"x1":7819.552,"y1":15076.671,"x2":7943.359,"y2":15076.671},{"x1":7893.359,"y1":15866.671,"x2":7893.359,"y2":15066.671},{"x1":6904.427,"y1":15156.671,"x2":6755.921,"y2":15156.671},{"x1":6904.427,"y1":16656.671,"x2":6755.921,"y2":16656.671},{"x1":6805.921,"y1":15146.671,"x2":6805.921,"y2":16666.671},{"x1":6304.489,"y1":15156.733,"x2":6304.489,"y2":15313.941},{"x1":6904.489,"y1":15156.733,"x2":6904.489,"y2":15313.941},{"x1":6294.489,"y1":15263.941,"x2":6914.489,"y2":15263.941},{"x1":7769.427,"y1":14346.671,"x2":7541.544,"y2":14346.671},{"x1":7769.427,"y1":15906.671,"x2":7541.544,"y2":15906.671},{"x1":7591.544,"y1":14336.671,"x2":7591.544,"y2":15916.671},{"x1":7769.427,"y1":15906.671,"x2":7541.544,"y2":15906.671},{"x1":7769.427,"y1":16656.671,"x2":7541.544,"y2":16656.671},{"x1":7591.544,"y1":15896.671,"x2":7591.544,"y2":16666.671},{"x1":8369.489,"y1":14346.733,"x2":8369.489,"y2":14492.84},{"x1":7769.489,"y1":14346.733,"x2":7769.489,"y2":14492.84},{"x1":8379.489,"y1":14442.84,"x2":7759.489,"y2":14442.84},{"x1":8672.231,"y1":14231.671,"x2":8571.826,"y2":14231.671},{"x1":8672.231,"y1":16506.671,"x2":8571.826,"y2":16506.671},{"x1":8621.826,"y1":14221.671,"x2":8621.826,"y2":16516.671},{"x1":8954.489,"y1":14790.415,"x2":8954.489,"y2":14840.352},{"x1":9554.489,"y1":14790.415,"x2":9554.489,"y2":14840.352},{"x1":8944.489,"y1":14790.352,"x2":9564.489,"y2":14790.352},{"x1":9554.489,"y1":14790.415,"x2":9554.489,"y2":14840.352},{"x1":11354.489,"y1":14790.415,"x2":11354.489,"y2":14840.352},{"x1":9544.489,"y1":14790.352,"x2":11364.489,"y2":14790.352},{"x1":11354.489,"y1":14790.415,"x2":11354.489,"y2":14840.352},{"x1":11454.489,"y1":14790.415,"x2":11454.489,"y2":14840.352},{"x1":11344.489,"y1":14790.352,"x2":11464.489,"y2":14790.352},{"x1":11354.427,"y1":16156.671,"x2":11237.128,"y2":16156.671},{"x1":11354.427,"y1":16506.671,"x2":11237.128,"y2":16506.671},{"x1":11287.128,"y1":16146.671,"x2":11287.128,"y2":16516.671},{"x1":11377.632,"y1":16506.671,"x2":11237.128,"y2":16506.671},{"x1":11377.632,"y1":16656.671,"x2":11237.128,"y2":16656.671},{"x1":11287.128,"y1":16496.671,"x2":11287.128,"y2":16656.671},{"x1":11287.128,"y1":16656.671,"x2":11287.128,"y2":16935.62},{"x1":11354.427,"y1":14656.671,"x2":11183.122,"y2":14656.671},{"x1":11354.427,"y1":13936.671,"x2":11183.122,"y2":13936.671},{"x1":11233.122,"y1":14666.671,"x2":11233.122,"y2":13926.671},{"x1":11233.185,"y1":13936.671,"x2":11283.122,"y2":13936.671},{"x1":11233.185,"y1":13336.671,"x2":11283.122,"y2":13336.671},{"x1":11233.122,"y1":13946.671,"x2":11233.122,"y2":13326.671},{"x1":10014.489,"y1":13936.608,"x2":10014.489,"y2":13802.573},{"x1":11454.489,"y1":13936.608,"x2":11454.489,"y2":13802.573},{"x1":10004.489,"y1":13852.573,"x2":11464.489,"y2":13852.573},{"x1":6124.552,"y1":14156.671,"x2":6174.489,"y2":14156.671},{"x1":6124.552,"y1":13336.671,"x2":6174.489,"y2":13336.671},{"x1":6124.489,"y1":14166.671,"x2":6124.489,"y2":13326.671}],"dim_texts":[{"x":5324.489,"y":13226.736,"h":80.0,"t":"800","attach":5},{"x":5117.495,"y":12636.671,"h":80.0,"t":"1300","attach":5},{"x":5924.489,"y":13226.736,"h":80.0,"t":"400","attach":5},{"x":4912.568,"y":15161.671,"h":80.0,"t":"1900","attach":5},{"x":3649.489,"y":15798.166,"h":80.0,"t":"750","attach":5},{"x":3892.158,"y":15861.671,"h":80.0,"t":"550","attach":5},{"x":3297.545,"y":15286.671,"h":80.0,"t":"600","attach":5},{"x":3644.989,"y":14386.671,"h":80.0,"t":"1200","attach":5},{"x":3446.824,"y":13735.98,"h":80.0,"t":"350","attach":5},{"x":8044.489,"y":15844.338,"h":80.0,"t":"450","attach":5},{"x":7832.513,"y":15466.671,"h":80.0,"t":"780","attach":5},{"x":6745.075,"y":15906.671,"h":80.0,"t":"1500","attach":5},{"x":6604.489,"y":15324.786,"h":80.0,"t":"600","attach":5},{"x":7530.698,"y":15126.671,"h":80.0,"t":"1560","attach":5},{"x":7530.698,"y":16281.671,"h":80.0,"t":"750","attach":5},{"x":8069.489,"y":14503.686,"h":80.0,"t":"600","attach":5},{"x":8560.98,"y":15369.171,"h":80.0,"t":"2275","attach":5},{"x":9254.489,"y":14851.198,"h":80.0,"t":"600","attach":5},{"x":10454.489,"y":14851.198,"h":80.0,"t":"1800","attach":5},{"x":11404.489,"y":14851.198,"h":80.0,"t":"100","attach":5},{"x":11226.254,"y":16331.671,"h":80.0,"t":"350","attach":5},{"x":11226.282,"y":16831.145,"h":80.0,"t":"150","attach":5},{"x":11172.276,"y":14296.671,"h":80.0,"t":"720","attach":5},{"x":11172.276,"y":13636.671,"h":80.0,"t":"600","attach":5},{"x":10734.489,"y":13913.419,"h":80.0,"t":"1440","attach":5},{"x":6063.643,"y":13746.671,"h":80.0,"t":"820","attach":5}],"room_texts":[{"x":3427.198,"y":16021.03,"h":75.0,"t":"mandir","w":587.22,"rot":0,"attach":1},{"x":5122.64,"y":14503.216,"h":75.0,"t":"3seater sofa","w":587.22,"rot":0,"attach":1},{"x":3181.979,"y":13959.172,"h":75.0,"t":"42\" TV","w":587.22,"rot":0,"attach":1},{"x":5013.143,"y":12145.638,"h":75.0,"t":"dining table","w":587.22,"rot":0,"attach":1},{"x":5606.777,"y":12145.6,"h":75.0,"t":"bench","w":587.22,"rot":0,"attach":1},{"x":7776.474,"y":14639.828,"h":75.0,"t":"main counter","w":587.22,"rot":0,"attach":1},{"x":7670.023,"y":15300.491,"h":75.0,"t":"4 burnerhob","w":587.22,"rot":0,"attach":1},{"x":6043.41,"y":16261.652,"h":75.0,"t":"sink","w":587.22,"rot":0,"attach":1},{"x":7638.343,"y":16377.703,"h":75.0,"t":"washing machine","w":587.22,"rot":0,"attach":1},{"x":6471.675,"y":14713.291,"h":75.0,"t":"fridge","w":587.22,"rot":0,"attach":1},{"x":9587.393,"y":14949.683,"h":75.0,"t":"double bed","w":587.22,"rot":0,"attach":1},{"x":10424.286,"y":13474.382,"h":75.0,"t":"main wardrobe","w":587.22,"rot":0,"attach":1},{"x":8418.763,"y":14424.379,"h":75.0,"t":"wardrobe","w":587.22,"rot":0,"attach":1}],"blocks":{"_ArchTick":[{"type":"LWPOLYLINE","closed":false,"verts":[{"x":-0.5,"y":-0.5},{"x":0.5,"y":0.5}]}],"_Oblique":[{"type":"LINE","x1":-0.5,"y1":-0.5,"x2":0.5,"y2":0.5}],"G$C44963CA8":[{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-1540.774,"b":0.0},{"x":-651.312,"y":-1080.774,"b":-0.414214},{"x":-631.312,"y":-1060.774,"b":0.0},{"x":-496.312,"y":-1060.774,"b":-0.414214},{"x":-476.312,"y":-1080.774,"b":0.0},{"x":-476.312,"y":-1540.774,"b":-0.414214},{"x":-496.312,"y":-1560.774,"b":0.0},{"x":-631.312,"y":-1560.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-1040.774,"b":0.0},{"x":-651.312,"y":-430.774,"b":-0.414214},{"x":-631.312,"y":-410.774,"b":0.0},{"x":-496.312,"y":-410.774,"b":-0.414214},{"x":-476.312,"y":-430.774,"b":0.0},{"x":-476.312,"y":-1040.774,"b":-0.414214},{"x":-496.312,"y":-1060.774,"b":0.0},{"x":-631.312,"y":-1060.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-390.774,"b":0.0},{"x":-651.312,"y":69.226,"b":-0.414214},{"x":-631.312,"y":89.226,"b":0.0},{"x":-496.312,"y":89.226,"b":-0.414214},{"x":-476.312,"y":69.226,"b":0.0},{"x":-476.312,"y":-390.774,"b":-0.414214},{"x":-496.312,"y":-410.774,"b":0.0},{"x":-631.312,"y":-410.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-1540.774,"b":0.0},{"x":-476.312,"y":-1080.774,"b":-0.414214},{"x":-456.312,"y":-1060.774,"b":0.0},{"x":210.309,"y":-1060.774,"b":-0.414214},{"x":230.309,"y":-1080.774,"b":0.0},{"x":230.309,"y":-1540.774,"b":-0.414214},{"x":210.309,"y":-1560.774,"b":0.0},{"x":-456.312,"y":-1560.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-1040.774,"b":0.0},{"x":-476.312,"y":-430.774,"b":-0.414214},{"x":-456.312,"y":-410.774,"b":0.0},{"x":210.309,"y":-410.774,"b":-0.414214},{"x":230.309,"y":-430.774,"b":0.0},{"x":230.309,"y":-1040.774,"b":-0.414214},{"x":210.309,"y":-1060.774,"b":0.0},{"x":-456.312,"y":-1060.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-390.774,"b":0.0},{"x":-476.312,"y":69.226,"b":-0.414214},{"x":-456.312,"y":89.226,"b":0.0},{"x":210.309,"y":89.226,"b":-0.414214},{"x":230.309,"y":69.226,"b":0.0},{"x":230.309,"y":-390.774,"b":-0.414214},{"x":210.309,"y":-410.774,"b":0.0},{"x":-456.312,"y":-410.774,"b":-0.414214}]},{"type":"PATH","closed":false,"verts":[{"x":-456.312,"y":89.226,"b":0.414214},{"x":-476.312,"y":69.226,"b":0.0},{"x":-476.312,"y":-1540.774,"b":0.414214},{"x":-456.312,"y":-1560.774,"b":-0.414214}]},{"type":"PATH","closed":true,"verts":[{"x":210.309,"y":89.226,"b":0.414214},{"x":230.309,"y":109.226,"b":0.0},{"x":230.309,"y":194.226,"b":0.414214},{"x":210.309,"y":214.226,"b":0.0},{"x":-776.312,"y":214.226,"b":0.0},{"x":-776.312,"y":-1685.774,"b":0.0},{"x":210.309,"y":-1685.774,"b":0.414214},{"x":230.309,"y":-1665.774,"b":0.0},{"x":230.309,"y":-1580.774,"b":0.414214},{"x":210.309,"y":-1560.774,"b":0.0},{"x":-631.312,"y":-1560.774,"b":-0.414214},{"x":-651.312,"y":-1540.774,"b":0.0},{"x":-651.312,"y":69.226,"b":-0.414214},{"x":-631.312,"y":89.226,"b":0.0}]}]}};
+let FP = {"bounds":{"x0":2262.445118858302,"y0":10604.371838446998,"x1":11757.07809570866,"y1":16989.260095708658},"layers":{"DC-A-WALL":{"entities":[{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3384.489,"y":16286.671},{"x":3384.489,"y":16436.671},{"x":3124.489,"y":16436.671},{"x":3124.489,"y":11791.671},{"x":3464.489,"y":11791.671},{"x":3464.489,"y":11886.671},{"x":3274.489,"y":11886.671},{"x":3274.489,"y":16286.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":5774.489,"y":16436.671},{"x":5774.489,"y":16286.671},{"x":6074.489,"y":16286.671},{"x":6074.489,"y":14566.671},{"x":6124.489,"y":14566.671},{"x":6124.489,"y":14156.671},{"x":6844.489,"y":14156.671},{"x":6844.489,"y":14336.671},{"x":6304.489,"y":14336.671},{"x":6304.489,"y":16656.671},{"x":6754.489,"y":16656.671},{"x":6754.489,"y":16806.671},{"x":6074.489,"y":16806.671},{"x":6074.489,"y":16436.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":11024.489,"y":16656.671},{"x":11454.489,"y":16656.671},{"x":11454.489,"y":13336.671},{"x":10014.489,"y":13336.671},{"x":10014.489,"y":13186.671},{"x":11424.489,"y":13186.671},{"x":11424.489,"y":11941.671},{"x":9294.489,"y":11941.671},{"x":9294.489,"y":12281.671},{"x":9154.489,"y":12281.671},{"x":9154.489,"y":11791.671},{"x":11574.489,"y":11791.671},{"x":11574.489,"y":16806.671},{"x":11024.489,"y":16806.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":5024.489,"y":11936.671},{"x":6124.489,"y":11936.671},{"x":6124.489,"y":13336.671},{"x":6384.489,"y":13336.671},{"x":6384.489,"y":11896.671},{"x":7964.489,"y":11896.671},{"x":7964.489,"y":12241.671},{"x":8114.489,"y":12241.671},{"x":8114.489,"y":11791.671},{"x":4504.489,"y":11791.671},{"x":4504.489,"y":11886.671},{"x":5024.489,"y":11886.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7124.489,"y":13336.671},{"x":7124.489,"y":13226.671},{"x":7964.489,"y":13226.671},{"x":7964.489,"y":12856.671},{"x":8114.489,"y":12856.671},{"x":8114.489,"y":13226.671},{"x":9154.489,"y":13226.671},{"x":9154.489,"y":12856.671},{"x":9294.489,"y":12856.671},{"x":9294.489,"y":13336.671},{"x":9294.489,"y":13336.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":false,"verts":[{"x":7929.489,"y":16657.765},{"x":7929.489,"y":16806.671},{"x":8944.489,"y":16806.671},{"x":8944.489,"y":16656.671},{"x":8504.489,"y":16656.671},{"x":8504.489,"y":14206.671},{"x":8369.489,"y":14206.671},{"x":8369.489,"y":16656.671},{"x":7929.489,"y":16656.671}]}]},"DC-A-FLOOR HATCH":{"entities":[{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3274.489,"y":16286.671},{"x":6074.489,"y":16286.671},{"x":6074.489,"y":14566.671},{"x":6124.489,"y":14566.671},{"x":6124.489,"y":14156.671},{"x":6844.489,"y":14156.671},{"x":6844.489,"y":14336.671},{"x":6304.489,"y":14336.671},{"x":6304.489,"y":16656.671},{"x":8369.489,"y":16656.671},{"x":8369.489,"y":14206.671},{"x":8504.489,"y":14206.671},{"x":8504.489,"y":16656.671},{"x":11454.489,"y":16656.671},{"x":11454.489,"y":13336.671},{"x":10014.489,"y":13336.671},{"x":10014.489,"y":13186.671},{"x":11424.489,"y":13186.671},{"x":11424.489,"y":11941.671},{"x":9294.489,"y":11941.671},{"x":9294.489,"y":13336.671},{"x":7124.489,"y":13336.671},{"x":7124.489,"y":13226.671},{"x":7964.489,"y":13226.671},{"x":7964.489,"y":11896.671},{"x":6384.489,"y":11896.671},{"x":6384.489,"y":13336.671},{"x":6124.489,"y":13336.671},{"x":6124.489,"y":11936.671},{"x":5024.489,"y":11936.671},{"x":5024.489,"y":11886.671},{"x":3274.489,"y":11886.671}]}]},"DC-A-FURN":{"entities":[{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":8804.489,"y":16506.671,"b":0.0},{"x":8504.489,"y":16506.671,"b":0.0},{"x":8504.489,"y":14231.671,"b":0.0},{"x":8804.489,"y":14231.671,"b":0.414214},{"x":8954.489,"y":14381.671,"b":0.0},{"x":8954.489,"y":16356.671,"b":0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":9554.489,"y":16156.671},{"x":11354.489,"y":16156.671},{"x":11354.489,"y":14656.671},{"x":9554.489,"y":14656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":11354.489,"y":14656.671},{"x":11454.489,"y":14656.671},{"x":11454.489,"y":16156.671},{"x":11354.489,"y":16156.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":10014.489,"y":13336.671},{"x":11454.489,"y":13336.671},{"x":11454.489,"y":13936.671},{"x":10014.489,"y":13936.671}]},{"kind":"circle","x":11204.489,"y":16406.671,"r":200.0},{"kind":"circle","x":11204.489,"y":14406.671,"r":200.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6904.489,"y":15156.671},{"x":6304.489,"y":15156.671},{"x":6304.489,"y":16656.671},{"x":6904.489,"y":16656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7769.489,"y":15906.671},{"x":8369.489,"y":15906.671},{"x":8369.489,"y":14346.671},{"x":7769.489,"y":14346.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7769.489,"y":15906.671},{"x":8369.489,"y":15906.671},{"x":8369.489,"y":16656.671},{"x":7769.489,"y":16656.671}]},{"kind":"insert","block":"G$C44963CA8","layer":"DC-A-FURN","ix":5298.177,"iy":15897.444,"sx":-1.0,"sy":1.0,"rot":0.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3274.489,"y":16136.671},{"x":3274.489,"y":15586.671},{"x":4024.489,"y":15586.671},{"x":4024.489,"y":16136.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3621.824,"y":13786.671},{"x":3271.824,"y":13786.671},{"x":3274.489,"y":14986.671},{"x":3624.489,"y":14986.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3333.157,"y":14886.671},{"x":3333.157,"y":13886.671},{"x":3273.157,"y":13886.671},{"x":3273.157,"y":14886.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":5674.489,"y":12161.671,"b":1.0},{"x":6124.489,"y":12161.671,"b":0.0},{"x":6124.489,"y":13061.671,"b":1.0},{"x":5674.489,"y":13061.671,"b":0.0}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4924.489,"y":13286.671},{"x":5724.489,"y":13286.671},{"x":5724.489,"y":11986.671},{"x":4924.489,"y":11986.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4724.489,"y":13211.671,"b":0.0},{"x":4874.489,"y":13211.671,"b":-0.414214},{"x":5024.489,"y":13061.671,"b":0.0},{"x":5024.489,"y":12811.671,"b":-0.414214},{"x":4874.489,"y":12661.671,"b":0.0},{"x":4724.489,"y":12661.671,"b":-0.414214},{"x":4574.489,"y":12811.671,"b":0.0},{"x":4574.489,"y":13061.671,"b":-0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4574.489,"y":12911.671},{"x":4549.489,"y":12911.671},{"x":4549.489,"y":12961.671},{"x":4574.489,"y":12961.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4549.489,"y":12732.426,"b":-1.0},{"x":4499.489,"y":12732.426,"b":0.0},{"x":4499.489,"y":13132.426,"b":-1.0},{"x":4549.489,"y":13132.426,"b":0.0}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4724.489,"y":12061.671,"b":0.0},{"x":4874.489,"y":12061.671,"b":0.414214},{"x":5024.489,"y":12211.671,"b":0.0},{"x":5024.489,"y":12461.671,"b":0.414214},{"x":4874.489,"y":12611.671,"b":0.0},{"x":4724.489,"y":12611.671,"b":0.414214},{"x":4574.489,"y":12461.671,"b":0.0},{"x":4574.489,"y":12211.671,"b":0.414214}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":4574.489,"y":12361.671},{"x":4549.489,"y":12361.671},{"x":4549.489,"y":12311.671},{"x":4574.489,"y":12311.671}]},{"kind":"poly","type":"PATH","closed":true,"verts":[{"x":4549.489,"y":12540.916,"b":1.0},{"x":4499.489,"y":12540.916,"b":0.0},{"x":4499.489,"y":12140.916,"b":1.0},{"x":4549.489,"y":12140.916,"b":0.0}]},{"kind":"circle","x":4553.44,"y":14871.098,"r":300.0},{"kind":"arc","x":4593.196,"y":15168.452,"r":200.0,"sa":332.914,"ea":191.856},{"kind":"arc","x":4593.196,"y":15168.452,"r":200.0,"sa":191.856,"ea":332.914},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6454.489,"y":16156.671},{"x":6454.489,"y":16606.671},{"x":6854.489,"y":16606.671},{"x":6854.489,"y":16156.671}]},{"kind":"circle","x":6404.489,"y":16381.671,"r":25.0},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":8269.489,"y":15856.671},{"x":8269.489,"y":15076.671},{"x":7819.489,"y":15076.671},{"x":7819.489,"y":15856.671}]}]},"DC-A-WINDOW":{"entities":[{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":3384.489,"y":16436.671},{"x":5774.489,"y":16436.671},{"x":5774.489,"y":16286.671},{"x":3384.489,"y":16286.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":6754.489,"y":16806.671},{"x":7929.489,"y":16806.671},{"x":7929.489,"y":16656.671},{"x":6754.489,"y":16656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":8944.489,"y":16806.671},{"x":11024.489,"y":16806.671},{"x":11024.489,"y":16656.671},{"x":8944.489,"y":16656.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":7964.489,"y":12856.671},{"x":8114.489,"y":12856.671},{"x":8114.489,"y":12241.671},{"x":7964.489,"y":12241.671}]},{"kind":"poly","type":"LWPOLYLINE","closed":true,"verts":[{"x":9154.489,"y":12856.671},{"x":9294.489,"y":12856.671},{"x":9294.489,"y":12281.671},{"x":9154.489,"y":12281.671}]}]},"DC-A-DOOR":{"entities":[{"kind":"line","x1":3464.489,"y1":11791.671,"x2":3464.489,"y2":12846.671},{"kind":"arc","x":3474.915,"y":11816.842,"r":1029.881,"sa":358.599,"ea":90.58},{"kind":"arc","x":9308.614,"y":13293.833,"r":707.174,"sa":268.856,"ea":3.473},{"kind":"arc","x":6384.489,"y":13326.671,"r":740.068,"sa":270.774,"ea":0.774},{"kind":"arc","x":8504.489,"y":13336.671,"r":870.0,"sa":0.0,"ea":90.0},{"kind":"line","x1":8504.489,"y1":13336.671,"x2":9374.489,"y2":13336.671},{"kind":"line","x1":6394.489,"y1":12586.671,"x2":6394.489,"y2":13336.671},{"kind":"line","x1":9294.489,"y1":12586.8,"x2":9294.489,"y2":13336.671}]},"DC-A-DASHED":{"entities":[{"kind":"line","x1":3274.489,"y1":16136.671,"x2":6074.489,"y2":16136.671},{"kind":"line","x1":11454.489,"y1":16506.671,"x2":8504.489,"y2":16506.671}]},"DC-A-DIM":{"entities":[{"kind":"line","x1":4924.489,"y1":13286.608,"x2":4924.489,"y2":13115.891},{"kind":"line","x1":5724.489,"y1":13286.608,"x2":5724.489,"y2":13115.891},{"kind":"line","x1":4914.489,"y1":13165.891,"x2":5734.489,"y2":13165.891},{"kind":"line","x1":5273.724,"y1":13286.671,"x2":5128.368,"y2":13286.671},{"kind":"line","x1":5273.724,"y1":11986.671,"x2":5128.368,"y2":11986.671},{"kind":"line","x1":5178.368,"y1":13296.671,"x2":5178.368,"y2":11976.671},{"kind":"line","x1":5724.489,"y1":13286.608,"x2":5724.489,"y2":13115.891},{"kind":"line","x1":6124.489,"y1":13286.608,"x2":6124.489,"y2":13115.891},{"kind":"line","x1":5714.489,"y1":13165.891,"x2":6134.489,"y2":13165.891},{"kind":"line","x1":5087.805,"y1":14211.671,"x2":4923.414,"y2":14211.671},{"kind":"line","x1":5087.805,"y1":16111.671,"x2":4923.414,"y2":16111.671},{"kind":"line","x1":4973.414,"y1":14201.671,"x2":4973.414,"y2":16121.671},{"kind":"line","x1":4024.489,"y1":15586.733,"x2":4024.489,"y2":15787.32},{"kind":"line","x1":3274.489,"y1":15586.733,"x2":3274.489,"y2":15787.32},{"kind":"line","x1":4034.489,"y1":15737.32,"x2":3264.489,"y2":15737.32},{"kind":"line","x1":4024.427,"y1":16136.671,"x2":3903.004,"y2":16136.671},{"kind":"line","x1":4024.427,"y1":15586.671,"x2":3903.004,"y2":15586.671},{"kind":"line","x1":3953.004,"y1":16146.671,"x2":3953.004,"y2":15576.671},{"kind":"line","x1":3274.552,"y1":15586.671,"x2":3408.391,"y2":15586.671},{"kind":"line","x1":3274.552,"y1":14986.671,"x2":3408.391,"y2":14986.671},{"kind":"line","x1":3358.391,"y1":15596.671,"x2":3358.391,"y2":14976.671},{"kind":"line","x1":3624.552,"y1":14986.671,"x2":3755.835,"y2":14986.671},{"kind":"line","x1":3621.886,"y1":13786.671,"x2":3755.835,"y2":13786.671},{"kind":"line","x1":3705.835,"y1":14996.671,"x2":3705.835,"y2":13776.671},{"kind":"line","x1":3621.824,"y1":13786.608,"x2":3621.824,"y2":13625.107},{"kind":"line","x1":3271.824,"y1":13786.608,"x2":3271.824,"y2":13625.107},{"kind":"line","x1":3631.824,"y1":13675.107,"x2":3261.824,"y2":13675.107},{"kind":"line","x1":7819.489,"y1":15856.608,"x2":7819.489,"y2":15733.492},{"kind":"line","x1":8269.489,"y1":15856.608,"x2":8269.489,"y2":15733.492},{"kind":"line","x1":7809.489,"y1":15783.492,"x2":8279.489,"y2":15783.492},{"kind":"line","x1":7819.552,"y1":15856.671,"x2":7943.359,"y2":15856.671},{"kind":"line","x1":7819.552,"y1":15076.671,"x2":7943.359,"y2":15076.671},{"kind":"line","x1":7893.359,"y1":15866.671,"x2":7893.359,"y2":15066.671},{"kind":"line","x1":6904.427,"y1":15156.671,"x2":6755.921,"y2":15156.671},{"kind":"line","x1":6904.427,"y1":16656.671,"x2":6755.921,"y2":16656.671},{"kind":"line","x1":6805.921,"y1":15146.671,"x2":6805.921,"y2":16666.671},{"kind":"line","x1":6304.489,"y1":15156.733,"x2":6304.489,"y2":15313.941},{"kind":"line","x1":6904.489,"y1":15156.733,"x2":6904.489,"y2":15313.941},{"kind":"line","x1":6294.489,"y1":15263.941,"x2":6914.489,"y2":15263.941},{"kind":"line","x1":7769.427,"y1":14346.671,"x2":7541.544,"y2":14346.671},{"kind":"line","x1":7769.427,"y1":15906.671,"x2":7541.544,"y2":15906.671},{"kind":"line","x1":7591.544,"y1":14336.671,"x2":7591.544,"y2":15916.671},{"kind":"line","x1":7769.427,"y1":15906.671,"x2":7541.544,"y2":15906.671},{"kind":"line","x1":7769.427,"y1":16656.671,"x2":7541.544,"y2":16656.671},{"kind":"line","x1":7591.544,"y1":15896.671,"x2":7591.544,"y2":16666.671},{"kind":"line","x1":8369.489,"y1":14346.733,"x2":8369.489,"y2":14492.84},{"kind":"line","x1":7769.489,"y1":14346.733,"x2":7769.489,"y2":14492.84},{"kind":"line","x1":8379.489,"y1":14442.84,"x2":7759.489,"y2":14442.84},{"kind":"line","x1":8672.231,"y1":14231.671,"x2":8571.826,"y2":14231.671},{"kind":"line","x1":8672.231,"y1":16506.671,"x2":8571.826,"y2":16506.671},{"kind":"line","x1":8621.826,"y1":14221.671,"x2":8621.826,"y2":16516.671},{"kind":"line","x1":8954.489,"y1":14790.415,"x2":8954.489,"y2":14840.352},{"kind":"line","x1":9554.489,"y1":14790.415,"x2":9554.489,"y2":14840.352},{"kind":"line","x1":8944.489,"y1":14790.352,"x2":9564.489,"y2":14790.352},{"kind":"line","x1":9554.489,"y1":14790.415,"x2":9554.489,"y2":14840.352},{"kind":"line","x1":11354.489,"y1":14790.415,"x2":11354.489,"y2":14840.352},{"kind":"line","x1":9544.489,"y1":14790.352,"x2":11364.489,"y2":14790.352},{"kind":"line","x1":11354.489,"y1":14790.415,"x2":11354.489,"y2":14840.352},{"kind":"line","x1":11454.489,"y1":14790.415,"x2":11454.489,"y2":14840.352},{"kind":"line","x1":11344.489,"y1":14790.352,"x2":11464.489,"y2":14790.352},{"kind":"line","x1":11354.427,"y1":16156.671,"x2":11237.128,"y2":16156.671},{"kind":"line","x1":11354.427,"y1":16506.671,"x2":11237.128,"y2":16506.671},{"kind":"line","x1":11287.128,"y1":16146.671,"x2":11287.128,"y2":16516.671},{"kind":"line","x1":11377.632,"y1":16506.671,"x2":11237.128,"y2":16506.671},{"kind":"line","x1":11377.632,"y1":16656.671,"x2":11237.128,"y2":16656.671},{"kind":"line","x1":11287.128,"y1":16496.671,"x2":11287.128,"y2":16656.671},{"kind":"line","x1":11287.128,"y1":16656.671,"x2":11287.128,"y2":16935.62},{"kind":"line","x1":11354.427,"y1":14656.671,"x2":11183.122,"y2":14656.671},{"kind":"line","x1":11354.427,"y1":13936.671,"x2":11183.122,"y2":13936.671},{"kind":"line","x1":11233.122,"y1":14666.671,"x2":11233.122,"y2":13926.671},{"kind":"line","x1":11233.185,"y1":13936.671,"x2":11283.122,"y2":13936.671},{"kind":"line","x1":11233.185,"y1":13336.671,"x2":11283.122,"y2":13336.671},{"kind":"line","x1":11233.122,"y1":13946.671,"x2":11233.122,"y2":13326.671},{"kind":"line","x1":10014.489,"y1":13936.608,"x2":10014.489,"y2":13802.573},{"kind":"line","x1":11454.489,"y1":13936.608,"x2":11454.489,"y2":13802.573},{"kind":"line","x1":10004.489,"y1":13852.573,"x2":11464.489,"y2":13852.573},{"kind":"line","x1":6124.552,"y1":14156.671,"x2":6174.489,"y2":14156.671},{"kind":"line","x1":6124.552,"y1":13336.671,"x2":6174.489,"y2":13336.671},{"kind":"line","x1":6124.489,"y1":14166.671,"x2":6124.489,"y2":13326.671},{"kind":"text","x":5324.489,"y":13226.736,"h":80.0,"w":0,"rot":0,"attach":5,"t":"800","anchorOverride":"middle"},{"kind":"text","x":5117.495,"y":12636.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1300","anchorOverride":"middle"},{"kind":"text","x":5924.489,"y":13226.736,"h":80.0,"w":0,"rot":0,"attach":5,"t":"400","anchorOverride":"middle"},{"kind":"text","x":4912.568,"y":15161.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1900","anchorOverride":"middle"},{"kind":"text","x":3649.489,"y":15798.166,"h":80.0,"w":0,"rot":0,"attach":5,"t":"750","anchorOverride":"middle"},{"kind":"text","x":3892.158,"y":15861.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"550","anchorOverride":"middle"},{"kind":"text","x":3297.545,"y":15286.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"600","anchorOverride":"middle"},{"kind":"text","x":3644.989,"y":14386.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1200","anchorOverride":"middle"},{"kind":"text","x":3446.824,"y":13735.98,"h":80.0,"w":0,"rot":0,"attach":5,"t":"350","anchorOverride":"middle"},{"kind":"text","x":8044.489,"y":15844.338,"h":80.0,"w":0,"rot":0,"attach":5,"t":"450","anchorOverride":"middle"},{"kind":"text","x":7832.513,"y":15466.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"780","anchorOverride":"middle"},{"kind":"text","x":6745.075,"y":15906.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1500","anchorOverride":"middle"},{"kind":"text","x":6604.489,"y":15324.786,"h":80.0,"w":0,"rot":0,"attach":5,"t":"600","anchorOverride":"middle"},{"kind":"text","x":7530.698,"y":15126.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1560","anchorOverride":"middle"},{"kind":"text","x":7530.698,"y":16281.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"750","anchorOverride":"middle"},{"kind":"text","x":8069.489,"y":14503.686,"h":80.0,"w":0,"rot":0,"attach":5,"t":"600","anchorOverride":"middle"},{"kind":"text","x":8560.98,"y":15369.171,"h":80.0,"w":0,"rot":0,"attach":5,"t":"2275","anchorOverride":"middle"},{"kind":"text","x":9254.489,"y":14851.198,"h":80.0,"w":0,"rot":0,"attach":5,"t":"600","anchorOverride":"middle"},{"kind":"text","x":10454.489,"y":14851.198,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1800","anchorOverride":"middle"},{"kind":"text","x":11404.489,"y":14851.198,"h":80.0,"w":0,"rot":0,"attach":5,"t":"100","anchorOverride":"middle"},{"kind":"text","x":11226.254,"y":16331.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"350","anchorOverride":"middle"},{"kind":"text","x":11226.282,"y":16831.145,"h":80.0,"w":0,"rot":0,"attach":5,"t":"150","anchorOverride":"middle"},{"kind":"text","x":11172.276,"y":14296.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"720","anchorOverride":"middle"},{"kind":"text","x":11172.276,"y":13636.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"600","anchorOverride":"middle"},{"kind":"text","x":10734.489,"y":13913.419,"h":80.0,"w":0,"rot":0,"attach":5,"t":"1440","anchorOverride":"middle"},{"kind":"text","x":6063.643,"y":13746.671,"h":80.0,"w":0,"rot":0,"attach":5,"t":"820","anchorOverride":"middle"}]},"DC-A-TXT":{"entities":[{"kind":"text","x":3427.198,"y":16021.03,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"mandir"},{"kind":"text","x":5122.64,"y":14503.216,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"3seater sofa"},{"kind":"text","x":3181.979,"y":13959.172,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"42\" TV"},{"kind":"text","x":5013.143,"y":12145.638,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"dining table"},{"kind":"text","x":5606.777,"y":12145.6,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"bench"},{"kind":"text","x":7776.474,"y":14639.828,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"main counter"},{"kind":"text","x":7670.023,"y":15300.491,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"4 burnerhob"},{"kind":"text","x":6043.41,"y":16261.652,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"sink"},{"kind":"text","x":7638.343,"y":16377.703,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"washing machine"},{"kind":"text","x":6471.675,"y":14713.291,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"fridge"},{"kind":"text","x":9587.393,"y":14949.683,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"double bed"},{"kind":"text","x":10424.286,"y":13474.382,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"main wardrobe"},{"kind":"text","x":8418.763,"y":14424.379,"h":75.0,"w":587.22,"rot":0,"attach":1,"t":"wardrobe"}]}},"blocks":{"_ArchTick":[{"type":"LWPOLYLINE","closed":false,"verts":[{"x":-0.5,"y":-0.5},{"x":0.5,"y":0.5}],"layer":"0"}],"_Oblique":[{"type":"LINE","x1":-0.5,"y1":-0.5,"x2":0.5,"y2":0.5,"layer":"0"}],"G$C44963CA8":[{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-1540.774,"b":0.0},{"x":-651.312,"y":-1080.774,"b":-0.414214},{"x":-631.312,"y":-1060.774,"b":0.0},{"x":-496.312,"y":-1060.774,"b":-0.414214},{"x":-476.312,"y":-1080.774,"b":0.0},{"x":-476.312,"y":-1540.774,"b":-0.414214},{"x":-496.312,"y":-1560.774,"b":0.0},{"x":-631.312,"y":-1560.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-1040.774,"b":0.0},{"x":-651.312,"y":-430.774,"b":-0.414214},{"x":-631.312,"y":-410.774,"b":0.0},{"x":-496.312,"y":-410.774,"b":-0.414214},{"x":-476.312,"y":-430.774,"b":0.0},{"x":-476.312,"y":-1040.774,"b":-0.414214},{"x":-496.312,"y":-1060.774,"b":0.0},{"x":-631.312,"y":-1060.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":true,"verts":[{"x":-651.312,"y":-390.774,"b":0.0},{"x":-651.312,"y":69.226,"b":-0.414214},{"x":-631.312,"y":89.226,"b":0.0},{"x":-496.312,"y":89.226,"b":-0.414214},{"x":-476.312,"y":69.226,"b":0.0},{"x":-476.312,"y":-390.774,"b":-0.414214},{"x":-496.312,"y":-410.774,"b":0.0},{"x":-631.312,"y":-410.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-1540.774,"b":0.0},{"x":-476.312,"y":-1080.774,"b":-0.414214},{"x":-456.312,"y":-1060.774,"b":0.0},{"x":210.309,"y":-1060.774,"b":-0.414214},{"x":230.309,"y":-1080.774,"b":0.0},{"x":230.309,"y":-1540.774,"b":-0.414214},{"x":210.309,"y":-1560.774,"b":0.0},{"x":-456.312,"y":-1560.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-1040.774,"b":0.0},{"x":-476.312,"y":-430.774,"b":-0.414214},{"x":-456.312,"y":-410.774,"b":0.0},{"x":210.309,"y":-410.774,"b":-0.414214},{"x":230.309,"y":-430.774,"b":0.0},{"x":230.309,"y":-1040.774,"b":-0.414214},{"x":210.309,"y":-1060.774,"b":0.0},{"x":-456.312,"y":-1060.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":true,"verts":[{"x":-476.312,"y":-390.774,"b":0.0},{"x":-476.312,"y":69.226,"b":-0.414214},{"x":-456.312,"y":89.226,"b":0.0},{"x":210.309,"y":89.226,"b":-0.414214},{"x":230.309,"y":69.226,"b":0.0},{"x":230.309,"y":-390.774,"b":-0.414214},{"x":210.309,"y":-410.774,"b":0.0},{"x":-456.312,"y":-410.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":false,"verts":[{"x":-456.312,"y":89.226,"b":0.414214},{"x":-476.312,"y":69.226,"b":0.0},{"x":-476.312,"y":-1540.774,"b":0.414214},{"x":-456.312,"y":-1560.774,"b":-0.414214}],"layer":"0"},{"type":"PATH","closed":true,"verts":[{"x":210.309,"y":89.226,"b":0.414214},{"x":230.309,"y":109.226,"b":0.0},{"x":230.309,"y":194.226,"b":0.414214},{"x":210.309,"y":214.226,"b":0.0},{"x":-776.312,"y":214.226,"b":0.0},{"x":-776.312,"y":-1685.774,"b":0.0},{"x":210.309,"y":-1685.774,"b":0.414214},{"x":230.309,"y":-1665.774,"b":0.0},{"x":230.309,"y":-1580.774,"b":0.414214},{"x":210.309,"y":-1560.774,"b":0.0},{"x":-631.312,"y":-1560.774,"b":-0.414214},{"x":-651.312,"y":-1540.774,"b":0.0},{"x":-651.312,"y":69.226,"b":-0.414214},{"x":-631.312,"y":89.226,"b":0.0}],"layer":"0"}]}};
+let layerOrder = ["DC-A-WALL","DC-A-FLOOR HATCH","DC-A-FURN","DC-A-WINDOW","DC-A-DOOR","DC-A-DASHED","DC-A-DIM","DC-A-TXT"];
+let layerStyles = {"DC-A-WALL":{"visible":true,"strokeColor":"#1c1a18","strokeWeight":1.0,"lineType":"solid","opacity":1.0,"fillColor":"#1c1a18","fillOpacity":1.0},"DC-A-FLOOR HATCH":{"visible":true,"strokeColor":"#b8b2a8","strokeWeight":1.0,"lineType":"solid","opacity":1.0,"fillColor":"#e8e3d8","fillOpacity":1.0},"DC-A-FURN":{"visible":true,"strokeColor":"#a8a29a","strokeWeight":1.0,"lineType":"solid","opacity":1.0,"fillColor":"#d4ccbf","fillOpacity":0.9},"DC-A-WINDOW":{"visible":true,"strokeColor":"#88b8d0","strokeWeight":1.0,"lineType":"solid","opacity":1.0,"fillColor":"#cce4f0","fillOpacity":0.85},"DC-A-DOOR":{"visible":true,"strokeColor":"#3a3530","strokeWeight":1.0,"lineType":"solid","opacity":1.0,"fillColor":"#3a3530","fillOpacity":0.0},"DC-A-DASHED":{"visible":true,"strokeColor":"#8a8a80","strokeWeight":1.0,"lineType":"dashed","opacity":0.6,"fillColor":"#8a8a80","fillOpacity":0.0},"DC-A-DIM":{"visible":true,"strokeColor":"#4a4a42","strokeWeight":1.0,"lineType":"solid","opacity":0.75,"fillColor":"#4a4a42","fillOpacity":0.0},"DC-A-TXT":{"visible":true,"strokeColor":"#1c1a18","strokeWeight":1.0,"lineType":"solid","opacity":1.0,"fillColor":"#1c1a18","fillOpacity":0.0}};
+
+// ══════════════════════════════════════════════════════
+// APP STATE (paper/scale/pan-zoom/export — per-layer styling now
+// lives in layerStyles above, not fixed keys here)
+// ══════════════════════════════════════════════════════
+let C = {
+  bg: '#faf8f4',
+  panning:false, lastPan:{x:0,y:0}, panX:0, panY:0, scale:1,
+  paperSize:'A3', orientation:'landscape', scaleMode:'fit', scaleN:50,
+  exportQuality:'print',
+};
 
 // ══════════════════════════════════════════════════════
 // PAPER SIZE + SCALE
@@ -544,44 +344,42 @@ const PAPER_PX_PER_MM = 2.6;          // on-screen page density
 const EXPORT_PX_PER_MM = 150/25.4;    // 150dpi print density
 
 // ══════════════════════════════════════════════════════
-// STYLE PRESETS — 4-5 named colour bundles applied in one click
+// STYLE PRESETS — one-click recolour of every discovered layer
 // ══════════════════════════════════════════════════════
 const STYLE_PRESETS = [
-  { name:'Warm Presentation', bg:'#faf8f4', wallFill:'#1c1a18', wallStroke:'#1c1a18', floorFill:'#e8e3d8', floorStroke:'#b8b2a8', furnFill:'#d4ccbf', furnStroke:'#a8a29a', winFill:'#cce4f0', winStroke:'#88b8d0', doorStroke:'#3a3530', textColor:'#1c1a18', dimColor:'#4a4a42', dimLineColor:'#4a4a42', dashColor:'#8a8a80' },
-  { name:'Minimal Line',      bg:'#ffffff', wallFill:'#1a1a18', wallStroke:'#1a1a18', floorFill:'#ffffff', floorStroke:'#1a1a18', furnFill:'#ffffff', furnStroke:'#1a1a18', winFill:'#ffffff', winStroke:'#1a1a18', doorStroke:'#1a1a18', textColor:'#1a1a18', dimColor:'#6b6b65', dimLineColor:'#6b6b65', dashColor:'#a8a29a' },
-  { name:'Blueprint',         bg:'#1b3a5c', wallFill:'#ffffff', wallStroke:'#ffffff', floorFill:'#2c5580', floorStroke:'#a8c8e0', furnFill:'#3d6690', furnStroke:'#a8c8e0', winFill:'#a8c8e0', winStroke:'#ffffff', doorStroke:'#ffffff', textColor:'#ffffff', dimColor:'#c8ddee', dimLineColor:'#c8ddee', dashColor:'#7fa6c4' },
-  { name:'Charcoal Dark',     bg:'#1a1a18', wallFill:'#f0ece2', wallStroke:'#f0ece2', floorFill:'#3a3530', floorStroke:'#57534c', furnFill:'#57534c', furnStroke:'#8a8680', winFill:'#5f95b0', winStroke:'#88b8d0', doorStroke:'#c7c2b8', textColor:'#f0ece2', dimColor:'#a8a29a', dimLineColor:'#a8a29a', dashColor:'#6b6b65' },
-  { name:'Soft Pastel',       bg:'#faf7f2', wallFill:'#4a4038', wallStroke:'#4a4038', floorFill:'#f0e4d8', floorStroke:'#d9c4b0', furnFill:'#e0c9b8', furnStroke:'#c9ac96', winFill:'#d4e8dc', winStroke:'#a8c9b4', doorStroke:'#6b5d4f', textColor:'#4a4038', dimColor:'#8a7a6a', dimLineColor:'#8a7a6a', dashColor:'#c9b8a8' },
+  { name:'Warm Presentation', bg:'#faf8f4', lineColor:'#1c1a18', fillColor:'#d4ccbf', fillOpacity:0.45 },
+  { name:'Minimal Line',      bg:'#ffffff', lineColor:'#1a1a18', fillColor:'#ffffff', fillOpacity:0.0 },
+  { name:'Blueprint',         bg:'#1b3a5c', lineColor:'#ffffff', fillColor:'#3d6690', fillOpacity:0.5 },
+  { name:'Charcoal Dark',     bg:'#1a1a18', lineColor:'#f0ece2', fillColor:'#57534c', fillOpacity:0.5 },
+  { name:'Soft Pastel',       bg:'#faf7f2', lineColor:'#4a4038', fillColor:'#e0c9b8', fillOpacity:0.4 },
 ];
 
+// Colour swatch grid shown in the colour-picker popover
 const PALETTE = [
   '#1c1a18','#3a3530','#57534c','#6b6b65','#8a8680','#a8a29a','#c7c2b8',
   '#e8e3d8','#f0ece2','#faf8f4','#ffffff','#e9dcc0','#d4ccbf','#cce4f0',
   '#88b8d0','#5f95b0','#b8c9a8','#8fae7a','#c1653e','#a8522f','#e0a978'
 ];
 
-let C = {
-  bg: '#faf8f4',
-  wallFill:'#1c1a18',   wallStroke:'#1c1a18',
-  floorFill:'#e8e3d8',  floorStroke:'#b8b2a8',  floorOpacity:1.0,
-  furnFill:'#d4ccbf',   furnStroke:'#a8a29a',   furnOpacity:0.9,
-  winFill:'#cce4f0',    winStroke:'#88b8d0',
-  doorStroke:'#3a3530',
-  textColor:'#1c1a18', dimColor:'#4a4a42', dimLineColor:'#4a4a42', dashColor:'#8a8a80',
-  vis:{ wall:true, floor:true, furn:true, win:true, door:true, dim:true, txt:true, dash:true },
-  lw:{ wall:1.0, wallStroke:1.0, furn:1.0, furnStroke:1.0, win:1.0, winStroke:1.0, floorStroke:1.0, door:1.0, dim:1.0, txt:1.0, dash:1.0 },
-  cpickTarget:null,
-  panning:false, lastPan:{x:0,y:0}, panX:0, panY:0, scale:1,
-  paperSize:'A3', orientation:'landscape', scaleMode:'fit', scaleN:50,
-  exportQuality:'print',
+// Fallback colours assigned to layers with no usable ACI colour, cycled
+// by discovery order so distinct layers are visually distinguishable
+// even before the user touches anything.
+const DEFAULT_LAYER_PALETTE = ['#c1653e','#3a6ea5','#4a8a5c','#a05ca8','#c48a2e','#5c8aa0','#a04a4a','#6a6a3a','#3a8a8a','#8a5c3a'];
+
+// A practical subset of the AutoCAD Colour Index (1-9 are the named
+// basic colours almost every DXF uses; 250-255 are the common greys),
+// tuned slightly warmer/softer to sit inside the site's palette rather
+// than clash as pure RGB primaries.
+const ACI_COLORS = {
+  1:'#c0392b', 2:'#c9a227', 3:'#3a8a4a', 4:'#2f8a8a', 5:'#3a5aa0', 6:'#a04a90',
+  7:'#2b2724', 8:'#5a5652', 9:'#8b8478',
+  250:'#3a3a3a', 251:'#5a5a5a', 252:'#7a7a7a', 253:'#9a9a9a', 254:'#bababa', 255:'#dadada',
 };
 
 // ══════════════════════════════════════════════════════
 // PAGE TRANSFORM — maps drawing-space mm to a fixed-size page
-// (paper size × orientation × scale), replacing the old
-// "fit whatever bounds to whatever viewport" transform. The live
-// canvas and the PNG export both call this, so what you see is
-// what you get.
+// (paper size × orientation × scale). The live canvas and the PNG
+// export both call this, so what you see is what you get.
 // ══════════════════════════════════════════════════════
 function getPaperDims() {
   let [wmm, hmm] = PAPER_SIZES[C.paperSize];
@@ -629,14 +427,12 @@ function bulgeToPath(verts, closed, tx, ty) {
     if (i === n - 1 && !closed) break;
     const b = cur.b || 0;
     if (Math.abs(b) > 1e-6) {
-      // Convert bulge to SVG arc
       const x1 = tx(cur.x), y1 = ty(cur.y);
       const x2 = tx(nxt.x), y2 = ty(nxt.y);
       const d = Math.hypot(x2 - x1, y2 - y1);
       if (d < 1e-6) { cmds.push(`L${x2.toFixed(1)},${y2.toFixed(1)}`); continue; }
       const r = Math.abs(d * (1 + b * b) / (4 * b));
       const large = Math.abs(b) > 1 ? 1 : 0;
-      // In SVG (Y down): DXF CCW (b>0) → sweep=0; DXF CW (b<0) → sweep=1
       const sweep = b > 0 ? 0 : 1;
       cmds.push(`A${r.toFixed(2)},${r.toFixed(2)} 0 ${large},${sweep} ${x2.toFixed(1)},${y2.toFixed(1)}`);
     } else {
@@ -647,217 +443,188 @@ function bulgeToPath(verts, closed, tx, ty) {
   return cmds.join(' ');
 }
 
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function dashArrayFor(lineType, baseSW) {
+  switch(lineType){
+    case 'dashed': return `${(baseSW*6).toFixed(2)},${(baseSW*4).toFixed(2)}`;
+    case 'dotted': return `${(baseSW*1.4).toFixed(2)},${(baseSW*3).toFixed(2)}`;
+    case 'dashdot': return `${(baseSW*6).toFixed(2)},${(baseSW*3).toFixed(2)},${(baseSW*1.4).toFixed(2)},${(baseSW*3).toFixed(2)}`;
+    default: return '';
+  }
+}
+
 // ══════════════════════════════════════════════════════
-// SVG BUILDER — takes an explicit page transform {s,tx,ty,W,H}
-// so the live view and the PNG export share one code path.
+// SVG BUILDER — walks every discovered layer (in layerOrder) and
+// renders its entities with that layer's own line/fill style. This
+// works identically whether FP came from the embedded demo or a
+// freshly imported arbitrary DXF: there is no more hardcoded
+// wall/floor/furniture logic, just "layer" as a generic concept.
 // ══════════════════════════════════════════════════════
 function buildSVG(t) {
   const { s, tx, ty, W, H } = t;
-
   let out = `<rect width="${W}" height="${H}" fill="${C.bg}"/>`;
 
-  // Helper: polygon from verts array (plain, no bulge)
+  function sw(base, lwMult) {
+    return Math.max(0.2, base * (lwMult||1.0) / Math.max(s*0.012, 0.25));
+  }
   function polyPts(verts) {
     return verts.map(v=>`${tx(v.x).toFixed(1)},${ty(v.y).toFixed(1)}`).join(' ');
   }
 
-  // Helper: render a poly entry as SVG element string (handles plain LWPOLYLINE and PATH with bulge)
-  function renderPoly(p, fill, stroke, sw_, op, extra='') {
-    if (p.type === 'PATH') {
-      const d = bulgeToPath(p.verts, p.closed, tx, ty);
-      return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw_}" opacity="${op}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
-    }
-    const pts = polyPts(p.verts);
-    if (p.closed)
-      return `<polygon points="${pts}" fill="${fill}" stroke="${stroke}" stroke-width="${sw_}" opacity="${op}" stroke-linejoin="round" ${extra}/>`;
-    return `<polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="${sw_}" opacity="${op}" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
-  }
+  function renderEntity(e, style) {
+    const strokeW = sw(0.7, style.strokeWeight).toFixed(2);
+    const dash = dashArrayFor(style.lineType, parseFloat(strokeW));
+    const dashAttr = dash ? ` stroke-dasharray="${dash}"` : '';
+    const op = style.opacity;
 
-  // base = nominal stroke in drawing-space px, lw = per-layer multiplier
-  function sw(base, lwMult) {
-    return Math.max(0.2, base * (lwMult||1.0) / Math.max(s*0.012, 0.25));
-  }
-
-  // ── 1. FLOOR — filled polygon with controllable outline
-  if (C.vis.floor) {
-    const fSW = C.lw.floorStroke > 0 ? sw(0.6, C.lw.floorStroke).toFixed(2) : '0';
-    for (const p of FP.floor)
-      out += renderPoly(p, C.floorFill, C.floorStroke, fSW, C.floorOpacity.toFixed(2));
-  }
-
-  // ── 2. WINDOWS — filled + controllable outline stroke
-  if (C.vis.win) {
-    const wSSW = C.lw.winStroke > 0 ? sw(0.7, C.lw.winStroke).toFixed(2) : '0';
-    for (const p of FP.windows)
-      out += renderPoly(p, C.winFill, C.winStroke, wSSW, '0.85');
-  }
-
-  // ── 3. FURNITURE — fill + separate outline stroke colour
-  if (C.vis.furn) {
-    const fFSW = sw(0.6, C.lw.furn).toFixed(2);
-    const fSSW = C.lw.furnStroke > 0 ? sw(0.5, C.lw.furnStroke).toFixed(2) : '0';
-    const fop = C.furnOpacity.toFixed(2);
-    // Resolve INSERT blocks
-    function renderFurnEntities(entities, offsetX, offsetY, scaleX, scaleY, rotDeg) {
-      const rad = rotDeg * Math.PI / 180;
-      const cos = Math.cos(rad), sin = Math.sin(rad);
-      function xform(bx, by) {
-        const lx = bx * scaleX, ly = by * scaleY;
-        return {
-          x: offsetX + lx * cos - ly * sin,
-          y: offsetY + lx * sin + ly * cos,
-        };
+    if (e.kind === 'poly') {
+      const isClosed = !!e.closed;
+      const fillCol = (isClosed && style.fillOpacity > 0) ? style.fillColor : 'none';
+      const fillOp = isClosed ? style.fillOpacity : 0;
+      if (e.type === 'PATH') {
+        const d = bulgeToPath(e.verts, e.closed, tx, ty);
+        return `<path d="${d}" fill="${fillCol}" fill-opacity="${fillOp}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linejoin="round" stroke-linecap="round"/>`;
       }
-      let r = '';
-      for (const e of entities) {
-        if (e.type === 'PATH') {
-          // Xform-aware path builder — every point (including arc
-          // endpoints) goes through xform() before projecting to
-          // screen space with tx()/ty().
-          const cmds = [`M${tx(xform(e.verts[0].x,e.verts[0].y).x).toFixed(1)},${ty(xform(e.verts[0].x,e.verts[0].y).y).toFixed(1)}`];
-          const nv = e.verts.length;
-          for (let i2 = 0; i2 < nv; i2++) {
-            const cur2 = e.verts[i2];
-            const nxt2 = e.verts[(i2+1)%nv];
-            if (i2 === nv-1 && !e.closed) break;
-            const b2 = cur2.b || 0;
-            const p1w = xform(cur2.x, cur2.y), p2w = xform(nxt2.x, nxt2.y);
-            if (Math.abs(b2) > 1e-6) {
-              const dx2 = tx(p2w.x)-tx(p1w.x), dy2 = ty(p2w.y)-ty(p1w.y);
-              const d2 = Math.hypot(dx2, dy2);
-              if (d2 > 1e-6) {
-                const rv = Math.abs(d2*(1+b2*b2)/(4*b2));
-                const lg2 = Math.abs(b2)>1?1:0;
-                const sw2 = b2>0?0:1;
-                cmds.push(`A${rv.toFixed(2)},${rv.toFixed(2)} 0 ${lg2},${sw2} ${tx(p2w.x).toFixed(1)},${ty(p2w.y).toFixed(1)}`);
-              }
-            } else {
-              cmds.push(`L${tx(p2w.x).toFixed(1)},${ty(p2w.y).toFixed(1)}`);
-            }
-          }
-          if (e.closed) cmds.push('Z');
-          r += `<path d="${cmds.join(' ')}" fill="${C.furnFill}" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linejoin="round" stroke-linecap="round"/>`;
-        } else if (e.type === 'LWPOLYLINE') {
-          const pts = e.verts.map(v => { const p=xform(v.x,v.y); return `${tx(p.x).toFixed(1)},${ty(p.y).toFixed(1)}`; }).join(' ');
-          if (e.closed)
-            r += `<polygon points="${pts}" fill="${C.furnFill}" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linejoin="round"/>`;
-          else
-            r += `<polyline points="${pts}" fill="none" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linejoin="round" stroke-linecap="round"/>`;
-        }
-      }
-      return r;
+      const pts = polyPts(e.verts);
+      if (isClosed)
+        return `<polygon points="${pts}" fill="${fillCol}" fill-opacity="${fillOp}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linejoin="round"/>`;
+      return `<polyline points="${pts}" fill="none" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linejoin="round" stroke-linecap="round"/>`;
     }
-
-    for (const e of FP.furn) {
-      if (e.kind === 'poly') {
-        out += renderPoly(e, C.furnFill, C.furnStroke, fSSW, fop);
-      } else if (e.kind === 'circle') {
-        out += `<circle cx="${tx(e.x).toFixed(1)}" cy="${ty(e.y).toFixed(1)}" r="${(e.r*s).toFixed(1)}" fill="${C.furnFill}" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}"/>`;
-      } else if (e.kind === 'arc') {
-        const r = e.r*s;
-        const a1 = -e.sa*Math.PI/180, a2 = -e.ea*Math.PI/180;
-        const x1=tx(e.x)+r*Math.cos(a1), y1=ty(e.y)+r*Math.sin(a1);
-        const x2=tx(e.x)+r*Math.cos(a2), y2=ty(e.y)+r*Math.sin(a2);
-        let da=e.ea-e.sa; if(da<0)da+=360;
-        out += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${da>180?1:0},0 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="${C.furnStroke}" stroke-width="${fSSW}" opacity="${fop}" stroke-linecap="round"/>`;
-      } else if (e.kind === 'insert') {
-        const blk = FP.blocks[e.block];
-        if (blk) out += renderFurnEntities(blk, e.ix, e.iy, e.sx, e.sy, e.rot);
-      }
+    if (e.kind === 'circle') {
+      const fillCol = style.fillOpacity > 0 ? style.fillColor : 'none';
+      return `<circle cx="${tx(e.x).toFixed(1)}" cy="${ty(e.y).toFixed(1)}" r="${(e.r*s).toFixed(1)}" fill="${fillCol}" fill-opacity="${style.fillOpacity}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr}/>`;
     }
+    if (e.kind === 'arc') {
+      const r = e.r*s;
+      const a1 = -e.sa*Math.PI/180, a2 = -e.ea*Math.PI/180;
+      const x1=tx(e.x)+r*Math.cos(a1), y1=ty(e.y)+r*Math.sin(a1);
+      const x2=tx(e.x)+r*Math.cos(a2), y2=ty(e.y)+r*Math.sin(a2);
+      let da=e.ea-e.sa; if(da<0)da+=360;
+      return `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${da>180?1:0},0 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linecap="round"/>`;
+    }
+    if (e.kind === 'line') {
+      return `<line x1="${tx(e.x1).toFixed(1)}" y1="${ty(e.y1).toFixed(1)}" x2="${tx(e.x2).toFixed(1)}" y2="${ty(e.y2).toFixed(1)}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linecap="round"/>`;
+    }
+    return '';
   }
 
-  // ── 4. WALLS — filled closed polys + open polylines; separate outline stroke
-  if (C.vis.wall) {
-    const wFSW = sw(1.8, C.lw.wall).toFixed(2);
-    const wSSW = C.lw.wallStroke > 0 ? sw(0.8, C.lw.wallStroke).toFixed(2) : '0';
-    for (const p of FP.walls) {
-      if (p.closed)
-        out += renderPoly(p, C.wallFill, C.wallStroke, wSSW, '1');
-      else
-        out += renderPoly(p, 'none', C.wallFill, wFSW, '1');
-    }
-  }
-
-  // ── 5. DOORS — arc swings + lines, stroke only
-  if (C.vis.door) {
-    const dSW = sw(0.9, C.lw.door).toFixed(2);
-    for (const e of FP.doors) {
-      if (e.kind === 'line') {
-        out += `<line x1="${tx(e.x1).toFixed(1)}" y1="${ty(e.y1).toFixed(1)}" x2="${tx(e.x2).toFixed(1)}" y2="${ty(e.y2).toFixed(1)}" stroke="${C.doorStroke}" stroke-width="${dSW}" stroke-linecap="round"/>`;
-      } else if (e.kind === 'arc') {
-        const r=e.r*s;
-        const a1=-e.sa*Math.PI/180, a2=-e.ea*Math.PI/180;
-        const x1=tx(e.x)+r*Math.cos(a1), y1=ty(e.y)+r*Math.sin(a1);
-        const x2=tx(e.x)+r*Math.cos(a2), y2=ty(e.y)+r*Math.sin(a2);
-        let da=e.ea-e.sa; if(da<0)da+=360;
-        out += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${da>180?1:0},0 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="${C.doorStroke}" stroke-width="${dSW}" stroke-linecap="round"/>`;
-      }
-    }
-  }
-
-  // ── 6. DASHED LINES
-  if (C.vis.dash) {
-    const dSW = sw(0.5, C.lw.dash).toFixed(2);
-    for (const e of FP.dashed) {
-      out += `<line x1="${tx(e.x1).toFixed(1)}" y1="${ty(e.y1).toFixed(1)}" x2="${tx(e.x2).toFixed(1)}" y2="${ty(e.y2).toFixed(1)}" stroke="${C.dashColor}" stroke-width="${dSW}" stroke-dasharray="8,5" opacity="0.6"/>`;
-    }
-  }
-
-  // ── 7. DIMENSIONS — rendered above plan
-  if (C.vis.dim) {
-    const dimSW = sw(0.35, C.lw.dim).toFixed(2);
-    for (const l of FP.dim_lines) {
-      out += `<line x1="${tx(l.x1).toFixed(1)}" y1="${ty(l.y1).toFixed(1)}" x2="${tx(l.x2).toFixed(1)}" y2="${ty(l.y2).toFixed(1)}" stroke="${C.dimLineColor}" stroke-width="${dimSW}" opacity="0.75"/>`;
-    }
-    for (const t of FP.dim_texts) {
-      const fh = Math.max(7, t.h*s*C.lw.dim).toFixed(1);
-      out += `<text x="${tx(t.x).toFixed(1)}" y="${ty(t.y).toFixed(1)}" font-size="${fh}" font-family="Space Grotesk,sans-serif" fill="${C.dimColor}" opacity="0.85" text-anchor="middle">${t.t}</text>`;
-    }
-  }
-
-  // ── 8. ROOM TEXT LABELS — topmost layer
-  if (C.vis.txt) {
-    for (const t of FP.room_texts) {
-      const fh = Math.max(8, t.h * s * C.lw.txt).toFixed(1);
-      // MTEXT attachment points: 1=TL,2=TC,3=TR,4=ML,5=MC,6=MR,7=BL,8=BC,9=BR
-      const anchorMap = {1:'start',2:'middle',3:'end',4:'start',5:'middle',6:'end',7:'start',8:'middle',9:'end'};
-      const anchor = anchorMap[t.attach] || 'start';
-      let lines = t.t.split(/\\n|\n| \\n/g).filter(l=>l.trim());
-      // Clip/wrap to the MTEXT box width (t.w) so labels that land in
-      // the same column don't stack on top of each other.
-      if (t.w > 0) {
-        const maxChars = Math.max(1, Math.floor(t.w * s / parseFloat(fh)));
-        const wrapped = [];
-        lines.forEach(line => {
-          const words = line.trim().split(/\s+/);
-          let cur = '';
-          words.forEach(word => {
-            const candidate = cur ? cur + ' ' + word : word;
-            if (candidate.length > maxChars && cur) { wrapped.push(cur); cur = word; }
-            else cur = candidate;
-          });
-          if (cur) wrapped.push(cur);
+  function renderText(t_, style) {
+    const fh = Math.max(8, t_.h * s).toFixed(1);
+    const anchorMap = {1:'start',2:'middle',3:'end',4:'start',5:'middle',6:'end',7:'start',8:'middle',9:'end'};
+    const anchor = t_.anchorOverride || anchorMap[t_.attach] || 'start';
+    let lines = t_.t.split(/\\n|\n| \\n/g).filter(l=>l.trim());
+    if (t_.w > 0) {
+      const maxChars = Math.max(1, Math.floor(t_.w * s / parseFloat(fh)));
+      const wrapped = [];
+      lines.forEach(line => {
+        const words = line.trim().split(/\s+/);
+        let cur = '';
+        words.forEach(word => {
+          const candidate = cur ? cur + ' ' + word : word;
+          if (candidate.length > maxChars && cur) { wrapped.push(cur); cur = word; }
+          else cur = candidate;
         });
-        if (wrapped.length) lines = wrapped;
-      }
-      const lh = parseFloat(fh) * 1.25;
-      // Vertical offset: top-attach starts at baseline, mid/bot adjust up
-      const vGroupMap = {1:0,2:0,3:0,4:-lines.length*lh/2,5:-lines.length*lh/2,6:-lines.length*lh/2,7:-lines.length*lh,8:-lines.length*lh,9:-lines.length*lh};
-      const yOff = vGroupMap[t.attach] || 0;
-      const x = tx(t.x).toFixed(1), y = ty(t.y).toFixed(1);
-      out += `<text x="${x}" y="${y}" font-size="${fh}" font-family="Space Grotesk,sans-serif" fill="${C.textColor}" font-weight="500" text-anchor="${anchor}">`;
-      lines.forEach((ln, i) => {
-        out += `<tspan x="${x}" dy="${i === 0 ? yOff.toFixed(1) : lh.toFixed(1)}">${esc(ln.trim())}</tspan>`;
+        if (cur) wrapped.push(cur);
       });
-      out += `</text>`;
+      if (wrapped.length) lines = wrapped;
+    }
+    const lh = parseFloat(fh) * 1.25;
+    const vGroupMap = {1:0,2:0,3:0,4:-lines.length*lh/2,5:-lines.length*lh/2,6:-lines.length*lh/2,7:-lines.length*lh,8:-lines.length*lh,9:-lines.length*lh};
+    const yOff = vGroupMap[t_.attach] || 0;
+    const x = tx(t_.x).toFixed(1), y = ty(t_.y).toFixed(1);
+    let out_ = `<text x="${x}" y="${y}" font-size="${fh}" font-family="Space Grotesk,sans-serif" fill="${style.strokeColor}" fill-opacity="${style.opacity}" font-weight="500" text-anchor="${anchor}">`;
+    lines.forEach((ln, i) => {
+      out_ += `<tspan x="${x}" dy="${i === 0 ? yOff.toFixed(1) : lh.toFixed(1)}">${esc(ln.trim())}</tspan>`;
+    });
+    out_ += `</text>`;
+    return out_;
+  }
+
+  // INSERT block resolution. Block-internal entities carry their own
+  // `layer` (DXF's BYLOCK convention: layer "0" means "inherit the
+  // INSERT's layer style"; any other explicit layer keeps its own
+  // style regardless of which layer the INSERT itself sits on).
+  function renderInsert(e, insertStyle) {
+    const blk = FP.blocks[e.block];
+    if (!blk) return '';
+    const rad = e.rot * Math.PI / 180;
+    const cos = Math.cos(rad), sin = Math.sin(rad);
+    function xform(bx, by) {
+      const lx = bx * e.sx, ly = by * e.sy;
+      return { x: e.ix + lx*cos - ly*sin, y: e.iy + lx*sin + ly*cos };
+    }
+    let r = '';
+    for (const be of blk) {
+      const beLayer = be.layer && be.layer !== '0' ? be.layer : null;
+      const style = (beLayer && layerStyles[beLayer]) ? layerStyles[beLayer] : insertStyle;
+      if (!style.visible) continue;
+      const strokeW = sw(0.6, style.strokeWeight).toFixed(2);
+      const dash = dashArrayFor(style.lineType, parseFloat(strokeW));
+      const dashAttr = dash ? ` stroke-dasharray="${dash}"` : '';
+      const op = style.opacity;
+
+      if (be.type === 'PATH' || be.type === 'LWPOLYLINE') {
+        const isClosed = !!be.closed;
+        const fillCol = (isClosed && style.fillOpacity > 0) ? style.fillColor : 'none';
+        const fillOp = isClosed ? style.fillOpacity : 0;
+        const cmds = [`M${tx(xform(be.verts[0].x,be.verts[0].y).x).toFixed(1)},${ty(xform(be.verts[0].x,be.verts[0].y).y).toFixed(1)}`];
+        const nv = be.verts.length;
+        for (let i2 = 0; i2 < nv; i2++) {
+          const cur2 = be.verts[i2];
+          const nxt2 = be.verts[(i2+1)%nv];
+          if (i2 === nv-1 && !be.closed) break;
+          const b2 = cur2.b || 0;
+          const p1w = xform(cur2.x, cur2.y), p2w = xform(nxt2.x, nxt2.y);
+          if (Math.abs(b2) > 1e-6) {
+            const dx2 = tx(p2w.x)-tx(p1w.x), dy2 = ty(p2w.y)-ty(p1w.y);
+            const d2 = Math.hypot(dx2, dy2);
+            if (d2 > 1e-6) {
+              const rv = Math.abs(d2*(1+b2*b2)/(4*b2));
+              const lg2 = Math.abs(b2)>1?1:0;
+              const sw2 = b2>0?0:1;
+              cmds.push(`A${rv.toFixed(2)},${rv.toFixed(2)} 0 ${lg2},${sw2} ${tx(p2w.x).toFixed(1)},${ty(p2w.y).toFixed(1)}`);
+            }
+          } else {
+            cmds.push(`L${tx(p2w.x).toFixed(1)},${ty(p2w.y).toFixed(1)}`);
+          }
+        }
+        if (be.closed) cmds.push('Z');
+        r += `<path d="${cmds.join(' ')}" fill="${fillCol}" fill-opacity="${fillOp}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linejoin="round" stroke-linecap="round"/>`;
+      } else if (be.type === 'LINE') {
+        const p1 = xform(be.x1, be.y1), p2 = xform(be.x2, be.y2);
+        r += `<line x1="${tx(p1.x).toFixed(1)}" y1="${ty(p1.y).toFixed(1)}" x2="${tx(p2.x).toFixed(1)}" y2="${ty(p2.y).toFixed(1)}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linecap="round"/>`;
+      } else if (be.type === 'CIRCLE') {
+        const p = xform(be.x, be.y);
+        const rr = be.r * ((Math.abs(e.sx)+Math.abs(e.sy))/2) * s;
+        const fillCol = style.fillOpacity > 0 ? style.fillColor : 'none';
+        r += `<circle cx="${tx(p.x).toFixed(1)}" cy="${ty(p.y).toFixed(1)}" r="${rr.toFixed(1)}" fill="${fillCol}" fill-opacity="${style.fillOpacity}" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr}/>`;
+      } else if (be.type === 'ARC') {
+        const p = xform(be.x, be.y);
+        const rr = be.r * ((Math.abs(e.sx)+Math.abs(e.sy))/2) * s;
+        const a1 = -(be.sa + e.rot)*Math.PI/180, a2 = -(be.ea + e.rot)*Math.PI/180;
+        const x1=tx(p.x)+rr*Math.cos(a1), y1=ty(p.y)+rr*Math.sin(a1);
+        const x2=tx(p.x)+rr*Math.cos(a2), y2=ty(p.y)+rr*Math.sin(a2);
+        let da=be.ea-be.sa; if(da<0)da+=360;
+        r += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${rr.toFixed(1)},${rr.toFixed(1)} 0 ${da>180?1:0},0 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="${style.strokeColor}" stroke-opacity="${op}" stroke-width="${strokeW}"${dashAttr} stroke-linecap="round"/>`;
+      }
+    }
+    return r;
+  }
+
+  for (const layerName of layerOrder) {
+    const style = layerStyles[layerName];
+    const layer = FP.layers[layerName];
+    if (!style || !style.visible || !layer) continue;
+    for (const e of layer.entities) {
+      if (e.kind === 'insert') out += renderInsert(e, style);
+      else if (e.kind === 'text') out += renderText(e, style);
+      else out += renderEntity(e, style);
     }
   }
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${out}</svg>`;
 }
-
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 // ══════════════════════════════════════════════════════
 // RENDER
@@ -878,9 +645,6 @@ function render() {
   updateScaleBar(t);
 }
 
-// Google-Maps-style scale bar: picks a "nice" round metre value whose
-// on-screen width (accounting for the current pan/zoom) lands in a
-// comfortable range, rather than a fixed multi-tick ruler.
 const NICE_METRES = [0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000];
 function updateScaleBar(t) {
   const pxPerMetre = t.s * C.scale * 1000;
@@ -895,71 +659,44 @@ function updateScaleBar(t) {
 }
 
 // ══════════════════════════════════════════════════════
-// COLOUR PICKER
+// COLOUR PICKER — generic: opens against whichever layer/field the
+// caller passes in, rather than a fixed lookup table of named swatches.
 // ══════════════════════════════════════════════════════
 const cpop = document.getElementById('cpop');
 const cpopNative = document.getElementById('cpop-native');
 const cpopLbl = document.getElementById('cpop-lbl');
+let cpickOnChange = null;
 
-const SWATCH_TARGETS = {
-  'sw-wall':         { label:'Wall fill',         get:()=>C.wallFill,    set:v=>{C.wallFill=v;   document.getElementById('sw-wall').style.background=v} },
-  'sw-wall-stroke':  { label:'Wall outline',      get:()=>C.wallStroke,  set:v=>{C.wallStroke=v; document.getElementById('sw-wall-stroke').style.background=v} },
-  'sw-floor':        { label:'Floor fill',         get:()=>C.floorFill,   set:v=>{C.floorFill=v;  document.getElementById('sw-floor').style.background=v} },
-  'sw-floor-stroke': { label:'Floor outline',     get:()=>C.floorStroke, set:v=>{C.floorStroke=v;document.getElementById('sw-floor-stroke').style.background=v} },
-  'sw-furn':         { label:'Furniture fill',    get:()=>C.furnFill,    set:v=>{C.furnFill=v;   document.getElementById('sw-furn').style.background=v} },
-  'sw-furn-stroke':  { label:'Furniture outline', get:()=>C.furnStroke,  set:v=>{C.furnStroke=v; document.getElementById('sw-furn-stroke').style.background=v} },
-  'sw-win':          { label:'Window fill',       get:()=>C.winFill,     set:v=>{C.winFill=v;    document.getElementById('sw-win').style.background=v} },
-  'sw-win-stroke':   { label:'Window outline',    get:()=>C.winStroke,   set:v=>{C.winStroke=v;  document.getElementById('sw-win-stroke').style.background=v} },
-  'sw-door':         { label:'Door colour',       get:()=>C.doorStroke,  set:v=>{C.doorStroke=v; document.getElementById('sw-door').style.background=v} },
-};
-
-function openCPick(targetId, anchor) {
-  C.cpickTarget = targetId;
-  const cfg = SWATCH_TARGETS[targetId];
-  cpopLbl.textContent = cfg.label;
-  cpopNative.value = cfg.get();
+function openColorPicker(currentColor, label, anchor, onChange) {
+  cpopLbl.textContent = label;
+  cpopNative.value = currentColor;
+  cpickOnChange = onChange;
   const r = anchor.getBoundingClientRect();
   cpop.style.left = (r.right + 10) + 'px';
   cpop.style.top = Math.min(r.top, window.innerHeight - 260) + 'px';
   cpop.classList.add('on');
 }
+cpopNative.addEventListener('input', e => { if (cpickOnChange) cpickOnChange(e.target.value); });
 
-cpopNative.addEventListener('input', e => {
-  if (!C.cpickTarget) return;
-  SWATCH_TARGETS[C.cpickTarget].set(e.target.value);
-  render();
-});
-
-// Build swatches
 const cswEl = document.getElementById('csw');
 PALETTE.forEach(col => {
   const el = document.createElement('div');
   el.className = 'csw-c'; el.style.background = col;
   el.addEventListener('click', () => {
-    if (!C.cpickTarget) return;
-    SWATCH_TARGETS[C.cpickTarget].set(col);
+    if (!cpickOnChange) return;
+    cpickOnChange(col);
     cpopNative.value = col;
-    render();
   });
   cswEl.appendChild(el);
 });
-
 document.getElementById('cpop-close').addEventListener('click', () => cpop.classList.remove('on'));
 document.addEventListener('click', e => {
   if (!cpop.contains(e.target) && !e.target.classList.contains('lsw') && !e.target.classList.contains('lsw-sm')) cpop.classList.remove('on');
   if (!infoPop.contains(e.target) && e.target.id !== 'btn-info') infoPop.classList.remove('on');
 });
 
-// Wire swatch clicks — both fill swatches (lsw) and outline swatches (lsw-sm)
-Object.keys(SWATCH_TARGETS).forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('click', function(e) {
-    e.stopPropagation(); openCPick(id, this);
-  });
-});
-
 // ══════════════════════════════════════════════════════
-// INFO POPOVER — "How to prepare your DXF"
+// INFO POPOVER — "How this works"
 // ══════════════════════════════════════════════════════
 const infoPop = document.getElementById('infoPop');
 document.getElementById('btn-info').addEventListener('click', function(e) {
@@ -972,82 +709,152 @@ document.getElementById('btn-info').addEventListener('click', function(e) {
 document.getElementById('infoPop-close').addEventListener('click', () => infoPop.classList.remove('on'));
 
 // ══════════════════════════════════════════════════════
-// VISIBILITY EYES
+// LAYER CARDS — the whole "Layers" panel is generated from
+// layerOrder/layerStyles every time a file is imported, rather than
+// five fixed cards for a fixed set of named layers.
 // ══════════════════════════════════════════════════════
 const EYE_ICON_ON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_ICON_OFF = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+const CHEV_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
 
-const EYE_MAP = { 'eye-wall':'wall', 'eye-floor':'floor', 'eye-furn':'furn', 'eye-win':'win', 'eye-door':'door' };
-Object.entries(EYE_MAP).forEach(([id, key]) => {
-  document.getElementById(id).addEventListener('click', function() {
-    C.vis[key] = !C.vis[key];
-    this.classList.toggle('off', !C.vis[key]);
-    this.innerHTML = C.vis[key] ? EYE_ICON_ON : EYE_ICON_OFF;
-    render();
+function safeLayerId(name) { return name.replace(/[^a-zA-Z0-9_-]/g, '_'); }
+function layerHasClosedLoop(layer) {
+  return layer.entities.some(e => (e.kind === 'poly' && e.closed) || e.kind === 'circle');
+}
+function entityCountLabel(layer) {
+  const n = layer.entities.length;
+  return n + (n === 1 ? ' object' : ' objects');
+}
+
+function renderLayerCards() {
+  const container = document.getElementById('layersContainer');
+  container.innerHTML = '';
+  layerOrder.forEach(name => {
+    const layer = FP.layers[name];
+    const style = layerStyles[name];
+    if (!layer || !style) return;
+    const hasFill = layerHasClosedLoop(layer);
+    const safeId = safeLayerId(name);
+
+    const card = document.createElement('div');
+    card.className = 'lrow';
+    card.innerHTML = `
+      <div class="lrow-head">
+        <div class="lsw" data-layer="${esc(name)}" data-target="stroke" style="background:${style.strokeColor}" title="Line colour"></div>
+        <div class="linfo">
+          <div class="lname">${esc(name)}</div>
+          <div class="ldesc">DXF layer &middot; ${entityCountLabel(layer)}</div>
+        </div>
+        <div class="lrow-actions">
+          <button class="leye${style.visible ? '' : ' off'}" data-layer="${esc(name)}" title="Toggle visibility">${style.visible ? EYE_ICON_ON : EYE_ICON_OFF}</button>
+          <button class="lchev" data-layer="${esc(name)}" title="Expand/collapse">${CHEV_ICON}</button>
+        </div>
+      </div>
+      <div class="lrow-details" id="details-${safeId}">
+        <div class="sub-row">
+          <span class="sub-row-name">Line weight</span>
+          <input type="range" min="5" max="400" step="5" value="${Math.round(style.strokeWeight*100)}" data-layer="${esc(name)}" data-field="strokeWeight">
+          <span class="sub-row-val">${style.strokeWeight.toFixed(1)}&times;</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name">Line opacity</span>
+          <input type="range" min="0" max="100" step="5" value="${Math.round(style.opacity*100)}" data-layer="${esc(name)}" data-field="opacity">
+          <span class="sub-row-val">${Math.round(style.opacity*100)}%</span>
+        </div>
+        <div class="sub-row">
+          <span class="sub-row-name">Line type</span>
+          <select class="ctl-select lt-select" data-layer="${esc(name)}" style="margin-left:auto">
+            <option value="solid"${style.lineType==='solid'?' selected':''}>Solid</option>
+            <option value="dashed"${style.lineType==='dashed'?' selected':''}>Dashed</option>
+            <option value="dotted"${style.lineType==='dotted'?' selected':''}>Dotted</option>
+            <option value="dashdot"${style.lineType==='dashdot'?' selected':''}>Dash-dot</option>
+          </select>
+        </div>
+        ${hasFill ? `
+        <div class="sub-row">
+          <span class="sub-row-name"><span class="lsw-sm" data-layer="${esc(name)}" data-target="fill" style="background:${style.fillColor}" title="Fill colour"></span>Fill</span>
+          <input type="range" min="0" max="100" step="5" value="${Math.round(style.fillOpacity*100)}" data-layer="${esc(name)}" data-field="fillOpacity">
+          <span class="sub-row-val">${Math.round(style.fillOpacity*100)}%</span>
+        </div>` : ''}
+      </div>
+    `;
+    container.appendChild(card);
   });
-});
+  wireLayerCardEvents();
+}
 
-// Overlay toggles
-['dim','txt','dash'].forEach(key => {
-  document.getElementById('tog-'+key).addEventListener('change', function() {
-    C.vis[key] = this.checked; render();
+function wireLayerCardEvents() {
+  const container = document.getElementById('layersContainer');
+
+  container.querySelectorAll('.lsw, .lsw-sm').forEach(swEl => {
+    swEl.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const layerName = this.dataset.layer;
+      const target = this.dataset.target;
+      const style = layerStyles[layerName];
+      const current = target === 'fill' ? style.fillColor : style.strokeColor;
+      openColorPicker(current, `${layerName} — ${target === 'fill' ? 'fill' : 'line'} colour`, this, (val) => {
+        if (target === 'fill') style.fillColor = val; else style.strokeColor = val;
+        this.style.background = val;
+        render();
+      });
+    });
   });
-});
 
-// Furniture opacity
-document.getElementById('furn-opacity').addEventListener('input', function() {
-  C.furnOpacity = parseInt(this.value)/100;
-  document.getElementById('furn-op-val').textContent = this.value+'%';
-  render();
-});
-
-// Floor opacity
-document.getElementById('lw-floor').addEventListener('input', function() {
-  C.floorOpacity = parseInt(this.value)/100;
-  document.getElementById('lw-floor-val').textContent = this.value+'%';
-  render();
-});
-
-// Per-layer lineweight sliders
-// weight sliders: value 5–400, map to 0.05–4.0 multiplier
-const LW_SLIDERS = [
-  { id:'lw-wall',          key:'wall',          valId:'lw-wall-val',          fmt:'x' },
-  { id:'lw-wall-stroke',   key:'wallStroke',    valId:'lw-wall-stroke-val',   fmt:'x' },
-  { id:'lw-furn',          key:'furn',          valId:'lw-furn-val',          fmt:'x' },
-  { id:'lw-furn-stroke',   key:'furnStroke',    valId:'lw-furn-stroke-val',   fmt:'x' },
-  { id:'lw-win',           key:'win',           valId:'lw-win-val',           fmt:'x' },
-  { id:'lw-win-stroke',    key:'winStroke',     valId:'lw-win-stroke-val',    fmt:'x' },
-  { id:'lw-floor-stroke',  key:'floorStroke',   valId:'lw-floor-stroke-val',  fmt:'x' },
-  { id:'lw-door',          key:'door',          valId:'lw-door-val',          fmt:'x' },
-  { id:'lw-dim',           key:'dim',           valId:'lw-dim-val',           fmt:'x' },
-  { id:'lw-txt',           key:'txt',           valId:'lw-txt-val',           fmt:'x' },
-  { id:'lw-dash',          key:'dash',          valId:'lw-dash-val',          fmt:'x' },
-];
-LW_SLIDERS.forEach(({ id, key, valId }) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', function() {
-    const v = parseInt(this.value)/100;
-    C.lw[key] = v;
-    document.getElementById(valId).textContent = v.toFixed(1)+'×';
-    render();
+  container.querySelectorAll('.leye').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const style = layerStyles[this.dataset.layer];
+      style.visible = !style.visible;
+      this.classList.toggle('off', !style.visible);
+      this.innerHTML = style.visible ? EYE_ICON_ON : EYE_ICON_OFF;
+      render();
+    });
   });
-});
+
+  container.querySelectorAll('.lchev').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const safeId = safeLayerId(this.dataset.layer);
+      const details = document.getElementById('details-' + safeId);
+      if (!details) return;
+      const collapsed = this.classList.toggle('collapsed');
+      details.hidden = collapsed;
+    });
+  });
+
+  container.querySelectorAll('input[type=range][data-field]').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const style = layerStyles[this.dataset.layer];
+      const field = this.dataset.field;
+      const v = parseInt(this.value) / 100;
+      style[field] = v;
+      const valEl = this.parentElement.querySelector('.sub-row-val');
+      valEl.textContent = field === 'strokeWeight' ? v.toFixed(1) + '×' : Math.round(v*100) + '%';
+      render();
+    });
+  });
+
+  container.querySelectorAll('.lt-select').forEach(sel => {
+    sel.addEventListener('change', function() {
+      layerStyles[this.dataset.layer].lineType = this.value;
+      render();
+    });
+  });
+}
 
 // ══════════════════════════════════════════════════════
 // STYLE PRESETS
 // ══════════════════════════════════════════════════════
-function syncSwatchUI() {
-  Object.keys(SWATCH_TARGETS).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.background = SWATCH_TARGETS[id].get();
-  });
-}
 function applyStylePreset(preset, btnEl) {
-  Object.assign(C, preset);
-  syncSwatchUI();
+  C.bg = preset.bg;
+  layerOrder.forEach(name => {
+    const style = layerStyles[name];
+    style.strokeColor = preset.lineColor;
+    style.fillColor = preset.fillColor;
+    style.fillOpacity = preset.fillOpacity;
+  });
   document.querySelectorAll('.style-sw').forEach(b => b.classList.remove('on'));
   if (btnEl) btnEl.classList.add('on');
+  renderLayerCards();
   render();
 }
 const stylePresetsEl = document.getElementById('stylePresets');
@@ -1088,34 +895,9 @@ document.querySelectorAll('.rb').forEach(b => b.addEventListener('click', () => 
 }));
 
 // ══════════════════════════════════════════════════════
-// SIDEBAR TABS — Layers / Overlays
-// ══════════════════════════════════════════════════════
-document.querySelectorAll('.sb-tab').forEach(tabBtn => {
-  tabBtn.addEventListener('click', () => {
-    document.querySelectorAll('.sb-tab').forEach(b => b.classList.remove('on'));
-    tabBtn.classList.add('on');
-    const target = tabBtn.dataset.pane;
-    document.querySelectorAll('.sb-pane').forEach(p => { p.hidden = (p.id !== target); });
-  });
-});
-
-// ══════════════════════════════════════════════════════
-// LAYER CARD EXPAND/COLLAPSE
-// ══════════════════════════════════════════════════════
-document.querySelectorAll('.lchev').forEach(chev => {
-  chev.addEventListener('click', () => {
-    const key = chev.id.replace('chev-', '');
-    const details = document.getElementById('details-' + key);
-    if (!details) return;
-    const collapsed = chev.classList.toggle('collapsed');
-    details.hidden = collapsed;
-  });
-});
-
-// ══════════════════════════════════════════════════════
-// PNG EXPORT — uses the same page transform as the live view,
-// just at print (150dpi) or screen (2×) pixel density, so the
-// export matches what's on screen.
+// PNG EXPORT — uses the same page transform as the live view, just
+// at print (150dpi) or screen (2×) pixel density, so the export
+// matches what's on screen.
 // ══════════════════════════════════════════════════════
 document.getElementById('btn-exp').addEventListener('click', async () => {
   const btn = document.getElementById('btn-exp');
@@ -1177,9 +959,9 @@ vp.addEventListener('mousemove', e => {
   const B = FP.bounds;
   const drawX = B.x0 + (pageX - lastTransform.ox) / lastTransform.s;
   const drawY = B.y1 - (pageY - lastTransform.oy) / lastTransform.s;
-  cursorCoordsEl.textContent = `X: ${(drawX/1000).toFixed(1)} m   Y: ${(drawY/1000).toFixed(1)} m`;
+  cursorCoordsEl.textContent = `X: ${(drawX/1000).toFixed(1)} m   Y: ${(drawY/1000).toFixed(1)} m`;
 });
-vp.addEventListener('mouseleave', () => { cursorCoordsEl.textContent = 'X: —   Y: —'; });
+vp.addEventListener('mouseleave', () => { cursorCoordsEl.textContent = 'X: —   Y: —'; });
 
 let touches={};
 vp.addEventListener('touchstart',e=>{for(const t of e.touches)touches[t.identifier]={x:t.clientX,y:t.clientY};},{passive:true});
@@ -1219,205 +1001,222 @@ document.getElementById('btn-zi').addEventListener('click',()=>{C.scale*=1.25;ap
 document.getElementById('btn-zo').addEventListener('click',()=>{C.scale*=0.8;applyT();});
 
 // ══════════════════════════════════════════════════════
-// DXF PARSER — parses Designhaus DXF layer convention
-// Produces the same FP data structure as the embedded JSON
+// DXF PARSER — generic. Reads whatever layers a file actually has
+// (no DC-A-* naming convention required), plus the file's own LAYER
+// table for a colour/linetype hint per layer, and produces the same
+// {bounds, layers, blocks} shape as the embedded demo.
 // ══════════════════════════════════════════════════════
-function parseDXFtoFP(text) {
-  // Tokenise
+function parseAnyDXF(text) {
   const lines = text.split(/\r?\n/);
   const tok = [];
   for (let i = 0; i+1 < lines.length; i+=2)
     tok.push({ code: parseInt(lines[i].trim()), value: lines[i+1].trim() });
 
-  // Parse entities section
-  const rawEnts = [];
-  let i=0, inEnt=false;
-  while (i < tok.length) {
-    const t = tok[i];
-    if (t.code===0 && t.value==='SECTION') { i++; if(i<tok.length && tok[i].code===2 && tok[i].value==='ENTITIES') inEnt=true; i++; continue; }
-    if (t.code===0 && t.value==='ENDSEC') { inEnt=false; i++; continue; }
-    if (!inEnt) { i++; continue; }
-    if (t.code===0) {
-      const type=t.value; const e={type,layer:'0'}; i++;
-      while(i<tok.length && tok[i].code!==0) {
-        const {code,value}=tok[i];
-        if(code===8) e.layer=value.toUpperCase();
-        if(code===10) e.x=e.x??parseFloat(value);
-        if(code===20) e.y=e.y??parseFloat(value);
-        if(code===11) e.x2=parseFloat(value);
-        if(code===21) e.y2=parseFloat(value);
-        if(code===40){
-          if(type==='CIRCLE') e.r=parseFloat(value);
-          else if(type==='ARC') e.r=e.r??parseFloat(value);
-          else if(type==='TEXT'||type==='MTEXT') e.height=parseFloat(value);
+  // ---- TABLES: LAYER definitions (name, ACI colour, linetype) ----
+  const layerDefs = {};
+  const layerDefOrder = [];
+  {
+    let i=0, inTables=false, inLayerTable=false, cur=null;
+    while (i<tok.length) {
+      const t = tok[i];
+      if (t.code===0 && t.value==='SECTION') { i++; if (i<tok.length && tok[i].code===2 && tok[i].value==='TABLES') inTables=true; i++; continue; }
+      if (t.code===0 && t.value==='ENDSEC') { inTables=false; i++; continue; }
+      if (!inTables) { i++; continue; }
+      if (t.code===0 && t.value==='TABLE') { i++; inLayerTable = (i<tok.length && tok[i].code===2 && tok[i].value==='LAYER'); continue; }
+      if (t.code===0 && t.value==='ENDTAB') { inLayerTable=false; i++; continue; }
+      if (inLayerTable && t.code===0 && t.value==='LAYER') {
+        cur = { name:'', aci:null, linetype:'' }; i++;
+        while (i<tok.length && tok[i].code!==0) {
+          const {code,value} = tok[i];
+          if (code===2) cur.name = value;
+          if (code===62) cur.aci = parseInt(value);
+          if (code===6) cur.linetype = value;
+          i++;
         }
-        if(code===41&&type==='MTEXT') e.width=parseFloat(value);
-        if(code===71&&type==='MTEXT') e.attach=parseInt(value);
-        if(code===2&&type==='INSERT') e.name=value;
-        if(code===41&&type==='INSERT') e.sx=parseFloat(value);
-        if(code===42&&type==='INSERT') e.sy=parseFloat(value);
-        if(code===50&&type==='INSERT') e.rot=parseFloat(value);
-        if(code===50) e.sa=parseFloat(value);
-        if(code===51) e.ea=parseFloat(value);
-        if(code===1) e.text=value;
-        if(code===70&&type==='LWPOLYLINE') e.closed=(parseInt(value)&1)===1;
-        if(type==='LWPOLYLINE'){
-          if(!e.verts)e.verts=[];
-          if(code===10) e._px=parseFloat(value);
-          else if(code===20&&e._px!==undefined){
-            e.verts.push({x:e._px,y:parseFloat(value),b:0});
-            e._px=undefined;
-          }
-          // Bulge (42) trails its own vertex's 10/20 in real DXF output,
-          // so it belongs to the vertex already pushed, not the next one.
-          if(code===42&&e.verts.length) e.verts[e.verts.length-1].b=parseFloat(value);
-        }
-        i++;
+        if (cur.name) { layerDefs[cur.name] = cur; layerDefOrder.push(cur.name); }
+        continue;
       }
-      // close open polylines where first===last
-      if(type==='LWPOLYLINE'&&e.verts&&e.verts.length>2&&!e.closed){
-        const a=e.verts[0],b=e.verts[e.verts.length-1];
-        if(Math.hypot(a.x-b.x,a.y-b.y)<0.01){e.closed=true;e.verts=e.verts.slice(0,-1);}
-      }
-      // curved polylines (any vertex with a non-zero bulge) render via
-      // the bulge-aware path builder, so tag them as PATH here to match
-      // the embedded reference geometry's convention.
-      if(type==='LWPOLYLINE'&&e.verts&&e.verts.some(v=>Math.abs(v.b||0)>1e-6)){
-        e.type='PATH';
-      }
-      rawEnts.push(e);
-    } else { i++; }
-  }
-
-  // Parse BLOCKS section for INSERT resolution
-  const blocks = {};
-  i=0; let inBlocks=false, curBlock=null;
-  while(i<tok.length){
-    const t=tok[i];
-    if(t.code===0&&t.value==='SECTION'){i++;if(i<tok.length&&tok[i].code===2&&tok[i].value==='BLOCKS')inBlocks=true;i++;continue;}
-    if(t.code===0&&t.value==='ENDSEC'){inBlocks=false;curBlock=null;i++;continue;}
-    if(!inBlocks){i++;continue;}
-    if(t.code===0&&t.value==='BLOCK'){i++;curBlock={name:'',ents:[]};while(i<tok.length&&tok[i].code!==0){if(tok[i].code===2)curBlock.name=tok[i].value;i++;}continue;}
-    if(t.code===0&&t.value==='ENDBLK'){if(curBlock&&!curBlock.name.startsWith('*'))blocks[curBlock.name]=curBlock.ents;curBlock=null;i++;continue;}
-    if(curBlock&&t.code===0){
-      const type=t.value;const e={type};i++;
-      while(i<tok.length&&tok[i].code!==0){
-        const{code,value}=tok[i];
-        if(code===10)e.x=e.x??parseFloat(value);
-        if(code===20)e.y=e.y??parseFloat(value);
-        if(code===11)e.x2=parseFloat(value);
-        if(code===21)e.y2=parseFloat(value);
-        if(code===40)e.r=parseFloat(value);
-        if(code===70&&type==='LWPOLYLINE')e.closed=(parseInt(value)&1)===1;
-        if(type==='LWPOLYLINE'){
-          if(!e.verts)e.verts=[];
-          if(code===10)e._px=parseFloat(value);
-          else if(code===20&&e._px!==undefined){
-            e.verts.push({x:e._px,y:parseFloat(value),b:0});
-            e._px=undefined;
-          }
-          if(code===42&&e.verts.length) e.verts[e.verts.length-1].b=parseFloat(value);
-        }
-        i++;
-      }
-      if(type==='LWPOLYLINE'&&e.verts){
-        const hasBulge=e.verts.some(v=>Math.abs(v.b||0)>1e-6);
-        curBlock.ents.push({type:hasBulge?'PATH':'LWPOLYLINE',closed:!!e.closed,verts:e.verts});
-      }
-      else if(type==='LINE'){curBlock.ents.push({type:'LINE',x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});}
-      else if(type==='ARC'){curBlock.ents.push({type:'ARC',x:e.x,y:e.y,r:e.r,sa:e.sa||0,ea:e.ea||0});}
-      else if(type==='CIRCLE'){curBlock.ents.push({type:'CIRCLE',x:e.x,y:e.y,r:e.r});}
-    } else { i++; }
-  }
-
-  // Parse DIMENSION geometry blocks from *D__ blocks
-  const dimBlocks = {};
-  i=0; inBlocks=false; curBlock=null;
-  const lines2=text.split(/\r?\n/);
-  const tok2=[];
-  for(let j=0;j+1<lines2.length;j+=2)tok2.push({code:parseInt(lines2[j].trim()),value:lines2[j+1].trim()});
-  i=0;inBlocks=false;curBlock=null;
-  while(i<tok2.length){
-    const t=tok2[i];
-    if(t.code===0&&t.value==='SECTION'){i++;if(i<tok2.length&&tok2[i].code===2&&tok2[i].value==='BLOCKS')inBlocks=true;i++;continue;}
-    if(t.code===0&&t.value==='ENDSEC'){inBlocks=false;curBlock=null;i++;continue;}
-    if(!inBlocks){i++;continue;}
-    if(t.code===0&&t.value==='BLOCK'){i++;curBlock={name:'',lines:[],texts:[]};while(i<tok2.length&&tok2[i].code!==0){if(tok2[i].code===2)curBlock.name=tok2[i].value;i++;}continue;}
-    if(t.code===0&&t.value==='ENDBLK'){if(curBlock&&curBlock.name.startsWith('*D'))dimBlocks[curBlock.name]=curBlock;curBlock=null;i++;continue;}
-    if(curBlock&&t.code===0){
-      const type=t.value;const e={};i++;
-      while(i<tok2.length&&tok2[i].code!==0){
-        const{code,value}=tok2[i];
-        if(code===10)e.x=e.x??parseFloat(value);
-        if(code===20)e.y=e.y??parseFloat(value);
-        if(code===11)e.x2=parseFloat(value);
-        if(code===21)e.y2=parseFloat(value);
-        if(code===40)e.h=parseFloat(value);
-        if(code===1)e.text=value;
-        i++;
-      }
-      if(type==='LINE'&&curBlock.name.startsWith('*D'))curBlock.lines.push({x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
-      if(type==='MTEXT'&&curBlock.name.startsWith('*D')){
-        const raw=e.text||'';
-        const clean=raw.replace(/\\[A-Za-z][^;]*;/g,'').replace(/[{}]/g,'').replace(/\\P/g,' ').trim();
-        curBlock.texts.push({x:e.x,y:e.y,h:e.h||80,t:clean});
-      }
-    } else { i++; }
-  }
-
-  // Bucket raw entities into FP structure
-  const fp = { bounds:{x0:Infinity,y0:Infinity,x1:-Infinity,y1:-Infinity}, walls:[], floor:[], furn:[], windows:[], doors:[], dashed:[], dim_lines:[], dim_texts:[], room_texts:[], blocks:{} };
-  fp.blocks = blocks;
-
-  function ex(x,y){if(x<fp.bounds.x0)fp.bounds.x0=x;if(y<fp.bounds.y0)fp.bounds.y0=y;if(x>fp.bounds.x1)fp.bounds.x1=x;if(y>fp.bounds.y1)fp.bounds.y1=y;}
-
-  for(const e of rawEnts){
-    const L=e.layer,T=e.type;
-    if((T==='LWPOLYLINE'||T==='PATH')&&e.verts){
-      for(const v of e.verts)ex(v.x,v.y);
-      const pd={type:T,closed:e.closed,verts:e.verts};
-      if(L==='DC-A-WALL') fp.walls.push(pd);
-      else if(L==='DC-A-FLOOR HATCH') fp.floor.push(pd);
-      else if(L==='DC-A-WINDOW') fp.windows.push(pd);
-      else if(L==='DC-A-FURN') fp.furn.push({kind:'poly',...pd});
-    } else if(T==='LINE'){
-      ex(e.x,e.y);ex(e.x2,e.y2);
-      if(L==='DC-A-DOOR') fp.doors.push({kind:'line',x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
-      else if(L==='DC-A-DASHED') fp.dashed.push({x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
-    } else if(T==='ARC'&&e.r){
-      ex(e.x-e.r,e.y-e.r);ex(e.x+e.r,e.y+e.r);
-      if(L==='DC-A-DOOR') fp.doors.push({kind:'arc',x:e.x,y:e.y,r:e.r,sa:e.sa,ea:e.ea});
-      else if(L==='DC-A-FURN') fp.furn.push({kind:'arc',x:e.x,y:e.y,r:e.r,sa:e.sa,ea:e.ea});
-    } else if(T==='CIRCLE'&&e.r){
-      ex(e.x-e.r,e.y-e.r);ex(e.x+e.r,e.y+e.r);
-      if(L==='DC-A-FURN') fp.furn.push({kind:'circle',x:e.x,y:e.y,r:e.r});
-    } else if(T==='INSERT'){
-      if(L==='DC-A-FURN') fp.furn.push({kind:'insert',block:e.name||'',ix:e.x||0,iy:e.y||0,sx:e.sx||1,sy:e.sy||1,rot:e.rot||0});
-    } else if((T==='TEXT'||T==='MTEXT')&&e.text&&e.x!==undefined){
-      ex(e.x,e.y);
-      if(L==='DC-A-TXT'){
-        const raw=e.text;
-        const clean=raw.replace(/\\[A-Za-z][^;]*;/g,'').replace(/[{}]/g,'').replace(/\\P/g,' ').trim();
-        fp.room_texts.push({x:e.x,y:e.y,h:e.height||150,w:e.width||0,rot:0,attach:e.attach||1,t:clean});
-      }
-    } else if(T==='DIMENSION'){
-      // get geometry block name
-      // scan raw tokens for this dimension's geometry code 2 (block name) after code 0 DIMENSION
+      i++;
     }
   }
 
-  // Dimension lines/texts from *D blocks
-  for(const [, blk] of Object.entries(dimBlocks)){
-    for(const l of blk.lines) fp.dim_lines.push(l);
-    for(const t of blk.texts) fp.dim_texts.push(t);
+  // ---- ENTITIES ----
+  const rawEnts = [];
+  {
+    let i=0, inEnt=false;
+    while (i < tok.length) {
+      const t = tok[i];
+      if (t.code===0 && t.value==='SECTION') { i++; if(i<tok.length && tok[i].code===2 && tok[i].value==='ENTITIES') inEnt=true; i++; continue; }
+      if (t.code===0 && t.value==='ENDSEC') { inEnt=false; i++; continue; }
+      if (!inEnt) { i++; continue; }
+      if (t.code===0) {
+        const type=t.value; const e={type,layer:'0'}; i++;
+        while(i<tok.length && tok[i].code!==0) {
+          const {code,value}=tok[i];
+          if(code===8) e.layer=value;
+          if(code===10) e.x=e.x??parseFloat(value);
+          if(code===20) e.y=e.y??parseFloat(value);
+          if(code===11) e.x2=parseFloat(value);
+          if(code===21) e.y2=parseFloat(value);
+          if(code===40){
+            if(type==='CIRCLE') e.r=parseFloat(value);
+            else if(type==='ARC') e.r=e.r??parseFloat(value);
+            else if(type==='TEXT'||type==='MTEXT') e.height=parseFloat(value);
+          }
+          if(code===41&&type==='MTEXT') e.width=parseFloat(value);
+          if(code===71&&type==='MTEXT') e.attach=parseInt(value);
+          if(code===2&&type==='INSERT') e.name=value;
+          if(code===41&&type==='INSERT') e.sx=parseFloat(value);
+          if(code===42&&type==='INSERT') e.sy=parseFloat(value);
+          if(code===50&&type==='INSERT') e.rot=parseFloat(value);
+          if(code===50) e.sa=parseFloat(value);
+          if(code===51) e.ea=parseFloat(value);
+          if(code===1) e.text=value;
+          if(code===70&&type==='LWPOLYLINE') e.closed=(parseInt(value)&1)===1;
+          if(type==='LWPOLYLINE'){
+            if(!e.verts)e.verts=[];
+            if(code===10) e._px=parseFloat(value);
+            else if(code===20&&e._px!==undefined){
+              e.verts.push({x:e._px,y:parseFloat(value),b:0});
+              e._px=undefined;
+            }
+            // Bulge (42) trails its own vertex's 10/20 in real DXF
+            // output, so it belongs to the vertex already pushed.
+            if(code===42&&e.verts.length) e.verts[e.verts.length-1].b=parseFloat(value);
+          }
+          i++;
+        }
+        if(type==='LWPOLYLINE'&&e.verts&&e.verts.length>2&&!e.closed){
+          const a=e.verts[0],b=e.verts[e.verts.length-1];
+          if(Math.hypot(a.x-b.x,a.y-b.y)<0.01){e.closed=true;e.verts=e.verts.slice(0,-1);}
+        }
+        if(type==='LWPOLYLINE'&&e.verts&&e.verts.some(v=>Math.abs(v.b||0)>1e-6)){
+          e.type='PATH';
+        }
+        rawEnts.push(e);
+      } else { i++; }
+    }
   }
 
-  // Expand bounds slightly
-  const margin=(fp.bounds.x1-fp.bounds.x0)*0.02;
-  fp.bounds.x0-=margin; fp.bounds.y0-=margin;
-  fp.bounds.x1+=margin; fp.bounds.y1+=margin;
+  // ---- BLOCKS (for INSERT resolution) ----
+  const blocks = {};
+  {
+    let i=0, inBlocks=false, curBlock=null;
+    while(i<tok.length){
+      const t=tok[i];
+      if(t.code===0&&t.value==='SECTION'){i++;if(i<tok.length&&tok[i].code===2&&tok[i].value==='BLOCKS')inBlocks=true;i++;continue;}
+      if(t.code===0&&t.value==='ENDSEC'){inBlocks=false;curBlock=null;i++;continue;}
+      if(!inBlocks){i++;continue;}
+      if(t.code===0&&t.value==='BLOCK'){i++;curBlock={name:'',ents:[]};while(i<tok.length&&tok[i].code!==0){if(tok[i].code===2)curBlock.name=tok[i].value;i++;}continue;}
+      if(t.code===0&&t.value==='ENDBLK'){if(curBlock&&!curBlock.name.startsWith('*'))blocks[curBlock.name]=curBlock.ents;curBlock=null;i++;continue;}
+      if(curBlock&&t.code===0){
+        const type=t.value;const e={type,layer:'0'};i++;
+        while(i<tok.length&&tok[i].code!==0){
+          const{code,value}=tok[i];
+          if(code===8)e.layer=value;
+          if(code===10)e.x=e.x??parseFloat(value);
+          if(code===20)e.y=e.y??parseFloat(value);
+          if(code===11)e.x2=parseFloat(value);
+          if(code===21)e.y2=parseFloat(value);
+          if(code===40)e.r=parseFloat(value);
+          if(code===50)e.sa=parseFloat(value);
+          if(code===51)e.ea=parseFloat(value);
+          if(code===70&&type==='LWPOLYLINE')e.closed=(parseInt(value)&1)===1;
+          if(type==='LWPOLYLINE'){
+            if(!e.verts)e.verts=[];
+            if(code===10)e._px=parseFloat(value);
+            else if(code===20&&e._px!==undefined){
+              e.verts.push({x:e._px,y:parseFloat(value),b:0});
+              e._px=undefined;
+            }
+            if(code===42&&e.verts.length) e.verts[e.verts.length-1].b=parseFloat(value);
+          }
+          i++;
+        }
+        if(type==='LWPOLYLINE'&&e.verts){
+          const hasBulge=e.verts.some(v=>Math.abs(v.b||0)>1e-6);
+          curBlock.ents.push({type:hasBulge?'PATH':'LWPOLYLINE',layer:e.layer,closed:!!e.closed,verts:e.verts});
+        }
+        else if(type==='LINE'){curBlock.ents.push({type:'LINE',layer:e.layer,x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});}
+        else if(type==='ARC'){curBlock.ents.push({type:'ARC',layer:e.layer,x:e.x,y:e.y,r:e.r,sa:e.sa||0,ea:e.ea||0});}
+        else if(type==='CIRCLE'){curBlock.ents.push({type:'CIRCLE',layer:e.layer,x:e.x,y:e.y,r:e.r});}
+      } else { i++; }
+    }
+  }
 
-  return fp;
+  // ---- Bucket entities into generic layers ----
+  const fp = { bounds:{x0:Infinity,y0:Infinity,x1:-Infinity,y1:-Infinity}, layers:{}, blocks };
+  const newLayerOrder = [];
+  function ensureLayer(name) {
+    if (!fp.layers[name]) { fp.layers[name] = {entities:[]}; newLayerOrder.push(name); }
+    return fp.layers[name];
+  }
+  layerDefOrder.forEach(ensureLayer);
+
+  function ex(x,y){if(x<fp.bounds.x0)fp.bounds.x0=x;if(y<fp.bounds.y0)fp.bounds.y0=y;if(x>fp.bounds.x1)fp.bounds.x1=x;if(y>fp.bounds.y1)fp.bounds.y1=y;}
+
+  for (const e of rawEnts) {
+    const L = e.layer || '0';
+    const T = e.type;
+    if ((T==='LWPOLYLINE'||T==='PATH') && e.verts) {
+      for (const v of e.verts) ex(v.x,v.y);
+      ensureLayer(L).entities.push({kind:'poly', type:T, closed:!!e.closed, verts:e.verts});
+    } else if (T==='LINE') {
+      ex(e.x,e.y); ex(e.x2,e.y2);
+      ensureLayer(L).entities.push({kind:'line', x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
+    } else if (T==='ARC' && e.r) {
+      ex(e.x-e.r,e.y-e.r); ex(e.x+e.r,e.y+e.r);
+      ensureLayer(L).entities.push({kind:'arc', x:e.x,y:e.y,r:e.r,sa:e.sa||0,ea:e.ea||0});
+    } else if (T==='CIRCLE' && e.r) {
+      ex(e.x-e.r,e.y-e.r); ex(e.x+e.r,e.y+e.r);
+      ensureLayer(L).entities.push({kind:'circle', x:e.x,y:e.y,r:e.r});
+    } else if (T==='INSERT') {
+      ex(e.x||0, e.y||0);
+      ensureLayer(L).entities.push({kind:'insert', block:e.name||'', layer:L, ix:e.x||0, iy:e.y||0, sx:e.sx||1, sy:e.sy||1, rot:e.rot||0});
+    } else if ((T==='TEXT'||T==='MTEXT') && e.text!==undefined && e.x!==undefined) {
+      ex(e.x,e.y);
+      const raw = e.text;
+      const clean = raw.replace(/\\[A-Za-z][^;]*;/g,'').replace(/[{}]/g,'').replace(/\\P/g,' ').trim();
+      if (clean) ensureLayer(L).entities.push({kind:'text', x:e.x, y:e.y, h:e.height||150, w:e.width||0, rot:0, attach:e.attach||1, t:clean});
+    }
+    // DIMENSION entities are intentionally skipped: their geometry is
+    // normally generated into an anonymous *D block by whichever CAD
+    // program authored the file, and correctly resolving every
+    // DIMSTYLE variant is out of scope for a general-purpose importer.
+    // Files with dimensions already exploded to plain lines/text will
+    // still show them, since those come through as LINE/TEXT above.
+  }
+
+  const finalOrder = newLayerOrder.filter(name => fp.layers[name].entities.length > 0);
+  Object.keys(fp.layers).forEach(name => { if (fp.layers[name].entities.length === 0) delete fp.layers[name]; });
+
+  if (!isFinite(fp.bounds.x0)) {
+    fp.bounds = {x0:0,y0:0,x1:1000,y1:1000};
+  } else {
+    const margin = (fp.bounds.x1-fp.bounds.x0)*0.02 || 10;
+    fp.bounds.x0-=margin; fp.bounds.y0-=margin; fp.bounds.x1+=margin; fp.bounds.y1+=margin;
+  }
+
+  const styles = {};
+  finalOrder.forEach((name, i) => {
+    const def = layerDefs[name];
+    let color = null;
+    if (def && def.aci) { const c = ACI_COLORS[Math.abs(def.aci)]; if (c) color = c; }
+    if (!color) color = DEFAULT_LAYER_PALETTE[i % DEFAULT_LAYER_PALETTE.length];
+    let lineType = 'solid';
+    if (def && def.linetype) {
+      const lt = def.linetype.toUpperCase();
+      if (lt.includes('DASHDOT') || lt.includes('DIVIDE')) lineType = 'dashdot';
+      else if (lt.includes('DASH') || lt.includes('HIDDEN') || lt.includes('PHANTOM')) lineType = 'dashed';
+      else if (lt.includes('DOT') || lt.includes('CENTER')) lineType = 'dotted';
+    }
+    styles[name] = {
+      visible: true, strokeColor: color, strokeWeight: 1.0, lineType, opacity: 1.0,
+      fillColor: color, fillOpacity: 0,
+    };
+  });
+
+  return { fp, layerOrder: finalOrder, layerStyles: styles };
 }
 
 // ══════════════════════════════════════════════════════
@@ -1436,35 +1235,33 @@ document.getElementById('dxf-input').addEventListener('change', function() {
   }
 
   const btn = document.getElementById('btn-import');
+  const importBtnHTML = btn.innerHTML;
   btn.textContent = 'Parsing…';
   btn.style.pointerEvents = 'none';
 
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const parsed = parseDXFtoFP(e.target.result);
-      const totalEnts = parsed.walls.length + parsed.floor.length + parsed.furn.length +
-                        parsed.windows.length + parsed.doors.length + parsed.dim_lines.length + parsed.room_texts.length;
-      if (totalEnts === 0) throw new Error('No Designhaus layers found. Check the file uses DC-A-* layer names.');
+      const result = parseAnyDXF(e.target.result);
+      if (result.layerOrder.length === 0) throw new Error('No drawable geometry found in this file.');
 
-      FP = parsed;
+      FP = result.fp;
+      layerOrder = result.layerOrder;
+      layerStyles = result.layerStyles;
 
-      // Reset pan/zoom to fit new file
-      fitView();
-
-      // Update header filename
+      renderLayerCards();
       document.getElementById('htag-filename').textContent = file.name.replace(/\.dxf$/i,'');
-
       render();
+      requestAnimationFrame(() => requestAnimationFrame(fitView));
 
-      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Import DXF';
+      btn.innerHTML = importBtnHTML;
       btn.style.pointerEvents = '';
     } catch(err) {
       alert('Parse error: ' + err.message);
-      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Import DXF';
+      btn.innerHTML = importBtnHTML;
       btn.style.pointerEvents = '';
     }
-    this.value = ''; // allow re-importing same file
+    this.value = '';
   };
   reader.readAsText(file);
 });
@@ -1473,8 +1270,10 @@ document.getElementById('dxf-input').addEventListener('change', function() {
 if(window.ResizeObserver) new ResizeObserver(render).observe(vp);
 
 // ── Init
+renderLayerCards();
 render();
 requestAnimationFrame(() => requestAnimationFrame(fitView));
+
 </script>
 </body>
 </html>
