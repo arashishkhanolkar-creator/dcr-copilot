@@ -170,13 +170,37 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 /* Colour picker / info popup */
 .cpop{position:fixed;z-index:999;background:var(--surface);border:1px solid var(--bstrong);border-radius:9px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.14);display:none;width:200px}
 .cpop.on{display:block}
-.cpop input[type=color]{width:100%;height:34px;border:none;border-radius:5px;cursor:pointer;margin-bottom:7px}
-.csw{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:7px}
+.csw{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:9px 0 7px}
 .csw-c{width:22px;height:22px;border-radius:3px;cursor:pointer;border:1px solid rgba(0,0,0,.1);transition:transform .1s}
 .csw-c:hover{transform:scale(1.15)}
 .cpop-close{width:100%;padding:4px;font-family:var(--fb);font-size:10px;border:1px solid var(--border);border-radius:4px;background:none;cursor:pointer;color:var(--ts)}
 .cpop-lbl{font-size:9px;color:var(--tm);font-family:var(--fb);margin-bottom:5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
 #infoPop{width:290px;}
+
+/* Colour wheel */
+.cwheel-wrap{position:relative;width:170px;height:170px;margin:0 auto 8px;cursor:crosshair}
+.cwheel-wrap canvas{display:block;border-radius:50%}
+.cwheel-dot{
+  position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid #fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+  transform:translate(-50%,-50%);pointer-events:none;
+}
+.cwheel-value{width:100%;height:14px;border-radius:7px;-webkit-appearance:none;appearance:none;margin-bottom:9px;cursor:pointer;outline:none}
+.cwheel-value::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--bstrong);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer}
+.cwheel-value::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--bstrong);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer}
+.cpop-hex-row{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.cpop-hex-row span{font-family:var(--fb);font-size:12px;color:var(--tm);font-weight:600}
+.cpop-hex-row input{flex:1;min-width:0;font-family:var(--fb);font-size:12px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;text-transform:uppercase}
+.cpop-rgb-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:2px}
+.cpop-rgb-row input{width:100%;font-family:var(--fb);font-size:11px;border:1px solid var(--border);border-radius:5px;padding:5px 4px;text-align:center}
+.cpop-rgb-row label{display:block;font-size:8.5px;color:var(--tm);text-align:center;margin-top:2px;letter-spacing:.06em}
+
+/* Drag-to-reorder layer cards */
+.ldrag{color:var(--tm);cursor:grab;flex-shrink:0;display:flex;align-items:center;padding:2px 0;margin-top:1px;touch-action:none}
+.ldrag:active{cursor:grabbing}
+.lrow.dragging{opacity:.4}
+.lrow.drag-over-top{box-shadow:inset 0 2px 0 var(--accent)}
+.lrow.drag-over-bottom{box-shadow:inset 0 -2px 0 var(--accent)}
 #infoPop p{font-family:var(--fb);font-size:11.5px;color:var(--ts);line-height:1.65;margin-bottom:10px}
 #infoPop code{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:11px}
 #infoPop a{color:var(--accent);font-weight:600}
@@ -301,7 +325,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 <!-- Colour picker -->
 <div class="cpop" id="cpop">
   <div class="cpop-lbl" id="cpop-lbl">Wall colour</div>
-  <input type="color" id="cpop-native">
+  <div class="cwheel-wrap" id="cwheelWrap">
+    <canvas id="cwheelCanvas" width="170" height="170"></canvas>
+    <div class="cwheel-dot" id="cwheelDot"></div>
+  </div>
+  <input type="range" class="cwheel-value" id="cwheelValue" min="0" max="100" value="100">
+  <div class="cpop-hex-row">
+    <span>#</span>
+    <input type="text" id="cpop-hex" maxlength="7" placeholder="C1653E">
+  </div>
+  <div class="cpop-rgb-row">
+    <div><input type="number" id="cpop-r" min="0" max="255"><label>R</label></div>
+    <div><input type="number" id="cpop-g" min="0" max="255"><label>G</label></div>
+    <div><input type="number" id="cpop-b" min="0" max="255"><label>B</label></div>
+  </div>
   <div class="csw" id="csw"></div>
   <button class="cpop-close" id="cpop-close">Done</button>
 </div>
@@ -612,7 +649,11 @@ function buildSVG(t) {
     return r;
   }
 
-  for (const layerName of layerOrder) {
+  // Rendered back-to-front: the layer at the TOP of the sidebar list
+  // (layerOrder[0]) is drawn LAST, so it visually sits on top of the
+  // canvas — the same convention as a Photoshop/Illustrator layers panel.
+  for (let li = layerOrder.length - 1; li >= 0; li--) {
+    const layerName = layerOrder[li];
     const style = layerStyles[layerName];
     const layer = FP.layers[layerName];
     if (!style || !style.visible || !layer) continue;
@@ -659,34 +700,173 @@ function updateScaleBar(t) {
 }
 
 // ══════════════════════════════════════════════════════
-// COLOUR PICKER — generic: opens against whichever layer/field the
-// caller passes in, rather than a fixed lookup table of named swatches.
+// COLOUR PICKER — a hue/saturation wheel + brightness slider, with
+// hex and RGB fields that stay in sync with it. Opens against
+// whichever layer/field the caller passes in, rather than a fixed
+// lookup table of named swatches.
 // ══════════════════════════════════════════════════════
+function hsvToRgb(h, s, v) {
+  h = ((h % 360) + 360) % 360 / 60;
+  const i = Math.floor(h), f = h - i;
+  const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+  let r, g, b;
+  switch (i % 6) {
+    case 0: r=v; g=t; b=p; break;
+    case 1: r=q; g=v; b=p; break;
+    case 2: r=p; g=v; b=t; break;
+    case 3: r=p; g=q; b=v; break;
+    case 4: r=t; g=p; b=v; break;
+    default: r=v; g=p; b=q; break;
+  }
+  return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+}
+function rgbToHsv(r, g, b) {
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0;
+  if (d!==0) {
+    if (max===r) h=((g-b)/d)%6;
+    else if (max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h*=60; if (h<0) h+=360;
+  }
+  return [h, max===0?0:d/max, max];
+}
+function clamp255(n) { return Math.max(0, Math.min(255, Math.round(n||0))); }
+function rgbToHex(r,g,b) { return '#'+[r,g,b].map(x=>clamp255(x).toString(16).padStart(2,'0')).join(''); }
+function hexToRgb(hex) {
+  hex = hex.replace('#','').trim();
+  if (hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+  const num = parseInt(hex,16);
+  return [(num>>16)&255, (num>>8)&255, num&255];
+}
+
 const cpop = document.getElementById('cpop');
-const cpopNative = document.getElementById('cpop-native');
 const cpopLbl = document.getElementById('cpop-lbl');
+const cwheelCanvas = document.getElementById('cwheelCanvas');
+const cwheelCtx = cwheelCanvas.getContext('2d');
+const cwheelDot = document.getElementById('cwheelDot');
+const cwheelValue = document.getElementById('cwheelValue');
+const cpopHex = document.getElementById('cpop-hex');
+const cpopR = document.getElementById('cpop-r'), cpopG = document.getElementById('cpop-g'), cpopB = document.getElementById('cpop-b');
+const WHEEL_SIZE = cwheelCanvas.width, WHEEL_R = WHEEL_SIZE/2;
 let cpickOnChange = null;
+let wheelHSV = {h:0, s:0, v:1};
+
+function drawWheel() {
+  const img = cwheelCtx.createImageData(WHEEL_SIZE, WHEEL_SIZE);
+  for (let y=0; y<WHEEL_SIZE; y++) {
+    for (let x=0; x<WHEEL_SIZE; x++) {
+      const dx=x-WHEEL_R, dy=y-WHEEL_R;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const idx=(y*WHEEL_SIZE+x)*4;
+      if (dist<=WHEEL_R) {
+        let angle=Math.atan2(dy,dx)*180/Math.PI; if(angle<0)angle+=360;
+        const sat=Math.min(1,dist/WHEEL_R);
+        const [r,g,b]=hsvToRgb(angle,sat,wheelHSV.v);
+        img.data[idx]=r; img.data[idx+1]=g; img.data[idx+2]=b; img.data[idx+3]=255;
+      } else {
+        img.data[idx+3]=0;
+      }
+    }
+  }
+  cwheelCtx.putImageData(img,0,0);
+}
+
+function updateWheelChrome() {
+  const angleRad = wheelHSV.h*Math.PI/180;
+  const dist = wheelHSV.s*WHEEL_R;
+  cwheelDot.style.left = (WHEEL_R + dist*Math.cos(angleRad)) + 'px';
+  cwheelDot.style.top = (WHEEL_R + dist*Math.sin(angleRad)) + 'px';
+  const [r,g,b] = hsvToRgb(wheelHSV.h, wheelHSV.s, wheelHSV.v);
+  cwheelDot.style.background = rgbToHex(r,g,b);
+  const pureHue = hsvToRgb(wheelHSV.h, wheelHSV.s, 1);
+  cwheelValue.style.background = `linear-gradient(to right, #000, ${rgbToHex(...pureHue)})`;
+}
+
+// Pushes the current wheelHSV state out to the hex/RGB fields and,
+// unless suppressed (used only while the user is actively typing in
+// one of those fields), notifies the caller of the new colour.
+function pushColor(fireChange) {
+  const [r,g,b] = hsvToRgb(wheelHSV.h, wheelHSV.s, wheelHSV.v);
+  const hex = rgbToHex(r,g,b);
+  cpopHex.value = hex.slice(1).toUpperCase();
+  cpopR.value = r; cpopG.value = g; cpopB.value = b;
+  updateWheelChrome();
+  if (fireChange && cpickOnChange) cpickOnChange(hex);
+}
+
+function setColorFromHex(hex, fireChange) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return;
+  const [h,s,v] = rgbToHsv(rgb[0], rgb[1], rgb[2]);
+  wheelHSV = {h,s,v};
+  drawWheel();
+  cwheelValue.value = Math.round(v*100);
+  pushColor(fireChange);
+}
 
 function openColorPicker(currentColor, label, anchor, onChange) {
   cpopLbl.textContent = label;
-  cpopNative.value = currentColor;
   cpickOnChange = onChange;
+  setColorFromHex(currentColor, false);
   const r = anchor.getBoundingClientRect();
   cpop.style.left = (r.right + 10) + 'px';
-  cpop.style.top = Math.min(r.top, window.innerHeight - 260) + 'px';
+  cpop.style.top = Math.min(r.top, window.innerHeight - 380) + 'px';
   cpop.classList.add('on');
 }
-cpopNative.addEventListener('input', e => { if (cpickOnChange) cpickOnChange(e.target.value); });
+
+function pickFromWheelEvent(evt) {
+  const rect = cwheelCanvas.getBoundingClientRect();
+  const x = evt.clientX - rect.left, y = evt.clientY - rect.top;
+  const dx = x-WHEEL_R, dy = y-WHEEL_R;
+  let angle = Math.atan2(dy,dx)*180/Math.PI; if(angle<0)angle+=360;
+  wheelHSV.h = angle;
+  wheelHSV.s = Math.min(1, Math.sqrt(dx*dx+dy*dy)/WHEEL_R);
+  pushColor(true);
+}
+let wheelDragging = false;
+document.getElementById('cwheelWrap').addEventListener('mousedown', e => { wheelDragging=true; pickFromWheelEvent(e); });
+window.addEventListener('mousemove', e => { if (wheelDragging) pickFromWheelEvent(e); });
+window.addEventListener('mouseup', () => { wheelDragging=false; });
+
+cwheelValue.addEventListener('input', function() {
+  wheelHSV.v = parseInt(this.value)/100;
+  drawWheel();
+  pushColor(true);
+});
+
+cpopHex.addEventListener('input', function() {
+  const rgb = hexToRgb(this.value);
+  if (!rgb) return; // let them keep typing until it's a valid 3/6-digit hex
+  const [h,s,v] = rgbToHsv(rgb[0], rgb[1], rgb[2]);
+  wheelHSV = {h,s,v};
+  drawWheel();
+  cwheelValue.value = Math.round(v*100);
+  cpopR.value = rgb[0]; cpopG.value = rgb[1]; cpopB.value = rgb[2];
+  updateWheelChrome();
+  if (cpickOnChange) cpickOnChange(rgbToHex(...rgb));
+});
+
+[cpopR, cpopG, cpopB].forEach(inp => {
+  inp.addEventListener('input', () => {
+    const r=clamp255(cpopR.value), g=clamp255(cpopG.value), b=clamp255(cpopB.value);
+    const [h,s,v] = rgbToHsv(r,g,b);
+    wheelHSV = {h,s,v};
+    drawWheel();
+    cwheelValue.value = Math.round(v*100);
+    cpopHex.value = rgbToHex(r,g,b).slice(1).toUpperCase();
+    updateWheelChrome();
+    if (cpickOnChange) cpickOnChange(rgbToHex(r,g,b));
+  });
+});
 
 const cswEl = document.getElementById('csw');
 PALETTE.forEach(col => {
   const el = document.createElement('div');
   el.className = 'csw-c'; el.style.background = col;
-  el.addEventListener('click', () => {
-    if (!cpickOnChange) return;
-    cpickOnChange(col);
-    cpopNative.value = col;
-  });
+  el.addEventListener('click', () => setColorFromHex(col, true));
   cswEl.appendChild(el);
 });
 document.getElementById('cpop-close').addEventListener('click', () => cpop.classList.remove('on'));
@@ -718,6 +898,11 @@ const EYE_ICON_OFF = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none
 const CHEV_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>';
 
 function safeLayerId(name) { return name.replace(/[^a-zA-Z0-9_-]/g, '_'); }
+
+// Cards start collapsed; this tracks which ones the user has opened so
+// that reordering, style presets, etc. (which all re-render the list)
+// don't silently close a card they're in the middle of editing.
+let expandedLayers = new Set();
 function layerHasClosedLoop(layer) {
   return layer.entities.some(e => (e.kind === 'poly' && e.closed) || e.kind === 'circle');
 }
@@ -735,11 +920,16 @@ function renderLayerCards() {
     if (!layer || !style) return;
     const hasFill = layerHasClosedLoop(layer);
     const safeId = safeLayerId(name);
+    const isExpanded = expandedLayers.has(name);
 
     const card = document.createElement('div');
     card.className = 'lrow';
+    card.dataset.layer = name;
     card.innerHTML = `
-      <div class="lrow-head">
+      <div class="lrow-head" draggable="true">
+        <span class="ldrag" title="Drag to reorder">
+          <svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="2" r="1.4"/><circle cx="8" cy="2" r="1.4"/><circle cx="2" cy="8" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="2" cy="14" r="1.4"/><circle cx="8" cy="14" r="1.4"/></svg>
+        </span>
         <div class="lsw" data-layer="${esc(name)}" data-target="stroke" style="background:${style.strokeColor}" title="Line colour"></div>
         <div class="linfo">
           <div class="lname">${esc(name)}</div>
@@ -747,10 +937,10 @@ function renderLayerCards() {
         </div>
         <div class="lrow-actions">
           <button class="leye${style.visible ? '' : ' off'}" data-layer="${esc(name)}" title="Toggle visibility">${style.visible ? EYE_ICON_ON : EYE_ICON_OFF}</button>
-          <button class="lchev" data-layer="${esc(name)}" title="Expand/collapse">${CHEV_ICON}</button>
+          <button class="lchev${isExpanded ? '' : ' collapsed'}" data-layer="${esc(name)}" title="Expand/collapse">${CHEV_ICON}</button>
         </div>
       </div>
-      <div class="lrow-details" id="details-${safeId}">
+      <div class="lrow-details" id="details-${safeId}"${isExpanded ? '' : ' hidden'}>
         <div class="sub-row">
           <span class="sub-row-name">Line weight</span>
           <input type="range" min="5" max="400" step="5" value="${Math.round(style.strokeWeight*100)}" data-layer="${esc(name)}" data-field="strokeWeight">
@@ -813,11 +1003,13 @@ function wireLayerCardEvents() {
 
   container.querySelectorAll('.lchev').forEach(btn => {
     btn.addEventListener('click', function() {
-      const safeId = safeLayerId(this.dataset.layer);
+      const layerName = this.dataset.layer;
+      const safeId = safeLayerId(layerName);
       const details = document.getElementById('details-' + safeId);
       if (!details) return;
       const collapsed = this.classList.toggle('collapsed');
       details.hidden = collapsed;
+      if (collapsed) expandedLayers.delete(layerName); else expandedLayers.add(layerName);
     });
   });
 
@@ -836,6 +1028,50 @@ function wireLayerCardEvents() {
   container.querySelectorAll('.lt-select').forEach(sel => {
     sel.addEventListener('change', function() {
       layerStyles[this.dataset.layer].lineType = this.value;
+      render();
+    });
+  });
+
+  // Drag-to-reorder: dragging a card's header changes its position in
+  // layerOrder, which also controls draw order — the card at the top
+  // of this list renders on top of the canvas, matching how a
+  // Photoshop/Illustrator-style layers panel behaves.
+  container.querySelectorAll('.lrow').forEach(card => {
+    const head = card.querySelector('.lrow-head');
+    head.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', card.dataset.layer);
+      card.classList.add('dragging');
+    });
+    head.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      container.querySelectorAll('.lrow').forEach(c => c.classList.remove('drag-over-top','drag-over-bottom'));
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      const rect = card.getBoundingClientRect();
+      const before = e.clientY < rect.top + rect.height/2;
+      card.classList.toggle('drag-over-top', before);
+      card.classList.toggle('drag-over-bottom', !before);
+    });
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      const draggedName = e.dataTransfer.getData('text/plain');
+      const targetName = card.dataset.layer;
+      card.classList.remove('drag-over-top','drag-over-bottom');
+      if (draggedName === targetName) return;
+      const rect = card.getBoundingClientRect();
+      const before = e.clientY < rect.top + rect.height/2;
+      const fromIdx = layerOrder.indexOf(draggedName);
+      if (fromIdx === -1) return;
+      layerOrder.splice(fromIdx, 1);
+      let toIdx = layerOrder.indexOf(targetName);
+      if (!before) toIdx += 1;
+      layerOrder.splice(toIdx, 0, draggedName);
+      renderLayerCards();
       render();
     });
   });
@@ -1248,6 +1484,7 @@ document.getElementById('dxf-input').addEventListener('change', function() {
       FP = result.fp;
       layerOrder = result.layerOrder;
       layerStyles = result.layerStyles;
+      expandedLayers = new Set();
 
       renderLayerCards();
       document.getElementById('htag-filename').textContent = file.name.replace(/\.dxf$/i,'');
