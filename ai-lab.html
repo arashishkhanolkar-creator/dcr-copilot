@@ -179,6 +179,96 @@
   .footer-links a{color:#c9c2b0;}
   .foot-copy{font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase;}
 
+  /* ---------- ACCOUNT / DC COINS ---------- */
+  .nav-account{display:flex; align-items:center; gap:18px;}
+  .coin-badge{
+    display:flex; align-items:center; gap:7px; font-family:'Space Grotesk',sans-serif; font-weight:600;
+    font-size:12px; letter-spacing:0.02em; cursor:pointer; background:none; border:none; color:var(--charcoal);
+    padding:0;
+  }
+  .coin-badge .dot{width:7px; height:7px; border-radius:50%; background:#c1653e; flex-shrink:0;}
+  .account-name{
+    font-family:'Manrope',sans-serif; font-weight:500; font-size:11px; color:var(--concrete);
+    max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .nav-signin-btn{
+    font-family:'Manrope',sans-serif; font-weight:600; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    background:none; border:1px solid var(--charcoal); border-radius:2px; padding:10px 18px; cursor:pointer;
+    color:var(--charcoal); transition:background .2s ease, color .2s ease;
+  }
+  .nav-signin-btn:hover{background:var(--charcoal); color:var(--ivory);}
+  @media(max-width:860px){ .nav-account{display:none;} }
+
+  /* Modal shell (shared by sign-in + buy-coins) */
+  .dc-modal-overlay{
+    position:fixed; inset:0; z-index:500; background:rgba(43,39,36,0.55);
+    display:none; align-items:center; justify-content:center; padding:24px;
+  }
+  .dc-modal-overlay.on{display:flex;}
+  .dc-modal{
+    background:var(--ivory); color:var(--charcoal); width:100%; max-width:380px;
+    padding:44px 36px 36px; position:relative; max-height:88vh; overflow-y:auto;
+  }
+  .dc-modal-close{
+    position:absolute; top:18px; right:18px; background:none; border:none; cursor:pointer;
+    color:var(--concrete); font-size:20px; line-height:1; padding:4px;
+  }
+  .dc-modal h3{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:22px; margin-bottom:8px; letter-spacing:-0.01em;
+  }
+  .dc-modal .dc-sub{font-size:12.5px; color:var(--concrete); margin-bottom:28px; line-height:1.6;}
+  .dc-provider-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px; width:100%;
+    font-family:'Manrope',sans-serif; font-weight:600; font-size:12.5px; letter-spacing:0.02em;
+    padding:13px; margin-bottom:11px; border:1px solid var(--line); border-radius:2px; background:#fff;
+    color:var(--charcoal); cursor:pointer; transition:border-color .2s ease;
+  }
+  .dc-provider-btn:hover{border-color:var(--charcoal);}
+  .dc-provider-btn svg{flex-shrink:0;}
+  .dc-divider{
+    display:flex; align-items:center; gap:12px; margin:20px 0; font-size:10px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--concrete);
+  }
+  .dc-divider::before, .dc-divider::after{content:''; flex:1; height:1px; background:var(--line);}
+  .dc-field{
+    width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:12px 14px; margin-bottom:10px;
+    border:1px solid var(--line); border-radius:2px; background:#fff; color:var(--charcoal);
+  }
+  .dc-primary-btn{
+    width:100%; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; letter-spacing:0.02em;
+    padding:13px; background:var(--charcoal); color:var(--ivory); border:none; border-radius:2px; cursor:pointer;
+    transition:opacity .2s ease;
+  }
+  .dc-primary-btn:hover{opacity:0.85;}
+  .dc-primary-btn:disabled{opacity:0.4; cursor:default;}
+  .dc-status{font-size:11.5px; color:var(--concrete); margin-top:12px; min-height:16px; line-height:1.6;}
+  .dc-status.err{color:#a8442a;}
+  .dc-back-link{
+    display:inline-block; margin-top:16px; font-size:11px; color:var(--concrete); text-decoration:underline;
+    cursor:pointer; background:none; border:none;
+  }
+  .dc-step{display:none;}
+  .dc-step.on{display:block;}
+
+  /* Buy-coins packages */
+  .coin-packages{display:flex; flex-direction:column; gap:10px; margin-bottom:24px;}
+  .coin-pkg{
+    display:flex; align-items:center; justify-content:space-between; padding:16px 18px;
+    border:1px solid var(--line); border-radius:2px; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+    background:#fff;
+  }
+  .coin-pkg:hover{border-color:var(--charcoal);}
+  .coin-pkg.sel{border-color:#c1653e; background:#f8ede6;}
+  .coin-pkg-coins{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;}
+  .coin-pkg-tag{font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:#c1653e; font-weight:600; margin-left:8px;}
+  .coin-pkg-price{font-family:'Manrope',sans-serif; font-weight:600; font-size:14px; color:var(--concrete);}
+  .coin-balance-line{
+    display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:600;
+    font-size:15px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--line);
+  }
+  .coin-balance-line .dot{width:8px; height:8px; border-radius:50%; background:#c1653e;}
+  #dcRecaptchaContainer{display:none;}
+
 </style>
 </head>
 <body>
@@ -208,6 +298,9 @@
     </div>
     <a href="index.html#contact" class="link-u">Contact</a>
   </nav>
+  <div class="nav-account" id="navAccount">
+    <button class="nav-signin-btn" id="btnSignIn">Sign in</button>
+  </div>
 </header>
 
 <section class="hero-work">
@@ -273,6 +366,248 @@
     <span class="foot-copy">© Designhaus Collective</span>
   </div>
 </footer>
+
+<!-- Sign-in modal -->
+<div class="dc-modal-overlay" id="signInOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="signInOverlay">&times;</button>
+
+    <div class="dc-step on" id="stepProviders">
+      <h3>Sign in to AI Lab</h3>
+      <p class="dc-sub">Get a DC Coins balance you can top up. Everything in AI Lab is still free to use — this doesn't change that yet.</p>
+      <button class="dc-provider-btn" id="btnGoogle">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.86-.08-1.68-.22-2.47H12v4.68h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.84z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.88-3a7.4 7.4 0 0 1-11-3.9H1.05v3.09A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.05 14.2a7.2 7.2 0 0 1 0-4.4V6.71H1.05a12 12 0 0 0 0 10.58z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44A11.6 11.6 0 0 0 12 0 12 12 0 0 0 1.05 6.71l4 3.1A7.16 7.16 0 0 1 12 4.75z"/></svg>
+        Continue with Google
+      </button>
+      <button class="dc-provider-btn" id="btnUsePhone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Continue with Phone
+      </button>
+      <button class="dc-provider-btn" id="btnUseEmail">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        Continue with Email
+      </button>
+      <p class="dc-status" id="providerStatus"></p>
+    </div>
+
+    <div class="dc-step" id="stepPhoneNumber">
+      <h3>Enter your phone number</h3>
+      <p class="dc-sub">We'll text you a one-time code. Include your country code.</p>
+      <input class="dc-field" type="tel" id="phoneInput" placeholder="+91 98765 43210">
+      <button class="dc-primary-btn" id="btnSendCode">Send code</button>
+      <p class="dc-status" id="phoneStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+
+    <div class="dc-step" id="stepPhoneCode">
+      <h3>Enter the code</h3>
+      <p class="dc-sub">Sent by SMS just now.</p>
+      <input class="dc-field" type="text" inputmode="numeric" id="codeInput" placeholder="123456" maxlength="6">
+      <button class="dc-primary-btn" id="btnConfirmCode">Confirm</button>
+      <p class="dc-status" id="codeStatus"></p>
+      <button class="dc-back-link" data-back="stepPhoneNumber">&larr; Back</button>
+    </div>
+
+    <div class="dc-step" id="stepEmail">
+      <h3>Enter your email</h3>
+      <p class="dc-sub">We'll send you a sign-in link — no password to remember.</p>
+      <input class="dc-field" type="email" id="emailInput" placeholder="you@example.com">
+      <button class="dc-primary-btn" id="btnSendEmailLink">Send link</button>
+      <p class="dc-status" id="emailStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+
+    <div class="dc-step" id="stepEmailSent">
+      <h3>Check your inbox</h3>
+      <p class="dc-sub">Click the link we just sent — it'll bring you straight back here, signed in.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Buy DC Coins modal -->
+<div class="dc-modal-overlay" id="buyCoinsOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="buyCoinsOverlay">&times;</button>
+    <h3>DC Coins</h3>
+    <p class="dc-sub">Top up your balance. Nothing in AI Lab spends coins yet — this just gets your account ready for when tools start using them.</p>
+    <div class="coin-balance-line"><span class="dot"></span> <span id="buyModalBalance">0</span> DC</div>
+    <div class="coin-packages" id="coinPackagesList"></div>
+    <button class="dc-primary-btn" id="btnBuySelected" disabled>Select a package</button>
+    <p class="dc-status" id="buyStatus"></p>
+  </div>
+</div>
+
+<div id="dcRecaptchaContainer"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script type="module">
+  import {
+    DC_FIREBASE_CONFIGURED, COIN_PACKAGES, onDCAuthChange,
+    dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
+    dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent, dcBuyCoinPackage,
+  } from './assets/js/dc-auth.js';
+
+  const $ = id => document.getElementById(id);
+  const navAccount = $('navAccount');
+  const signInOverlay = $('signInOverlay');
+  const buyCoinsOverlay = $('buyCoinsOverlay');
+  let selectedPackage = null;
+
+  function showStep(id) {
+    document.querySelectorAll('.dc-step').forEach(s => s.classList.toggle('on', s.id === id));
+  }
+  function openModal(overlay) { overlay.classList.add('on'); }
+  function closeModal(overlay) { overlay.classList.remove('on'); }
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal($(btn.dataset.close)));
+  });
+  document.querySelectorAll('[data-back]').forEach(btn => {
+    btn.addEventListener('click', () => showStep(btn.dataset.back));
+  });
+  [signInOverlay, buyCoinsOverlay].forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay); });
+  });
+
+  function notConfiguredMessage(el) {
+    el.textContent = "Sign-in isn't switched on yet — check back soon.";
+    el.className = 'dc-status err';
+  }
+
+  // ---- Nav: signed-out vs signed-in state ----
+  onDCAuthChange(user => {
+    if (user) {
+      navAccount.innerHTML = `
+        <button class="coin-badge" id="coinBadgeBtn"><span class="dot"></span>${user.coins} DC</button>
+        <span class="account-name">${user.displayName || user.email || user.phoneNumber || 'Account'}</span>
+        <button class="nav-signin-btn" id="btnSignOut">Sign out</button>
+      `;
+      $('coinBadgeBtn').addEventListener('click', () => { renderCoinPackages(); openModal(buyCoinsOverlay); });
+      $('btnSignOut').addEventListener('click', () => dcSignOut());
+      $('buyModalBalance').textContent = user.coins;
+    } else {
+      navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
+      $('btnSignIn').addEventListener('click', () => { showStep('stepProviders'); openModal(signInOverlay); });
+    }
+  });
+
+  // ---- Google ----
+  $('btnGoogle').addEventListener('click', async () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    $('providerStatus').textContent = 'Opening Google sign-in…';
+    $('providerStatus').className = 'dc-status';
+    try {
+      await dcSignInWithGoogle();
+      closeModal(signInOverlay);
+    } catch (err) {
+      $('providerStatus').textContent = err.message;
+      $('providerStatus').className = 'dc-status err';
+    }
+  });
+
+  // ---- Phone ----
+  $('btnUsePhone').addEventListener('click', () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    showStep('stepPhoneNumber');
+  });
+  $('btnSendCode').addEventListener('click', async () => {
+    const phone = $('phoneInput').value.trim();
+    if (!phone.startsWith('+')) {
+      $('phoneStatus').textContent = 'Include the country code, e.g. +91…';
+      $('phoneStatus').className = 'dc-status err';
+      return;
+    }
+    $('btnSendCode').disabled = true;
+    $('phoneStatus').textContent = 'Sending…';
+    $('phoneStatus').className = 'dc-status';
+    try {
+      await dcStartPhoneSignIn(phone, 'dcRecaptchaContainer');
+      showStep('stepPhoneCode');
+    } catch (err) {
+      $('phoneStatus').textContent = err.message;
+      $('phoneStatus').className = 'dc-status err';
+    }
+    $('btnSendCode').disabled = false;
+  });
+  $('btnConfirmCode').addEventListener('click', async () => {
+    const code = $('codeInput').value.trim();
+    $('codeStatus').textContent = 'Checking…';
+    $('codeStatus').className = 'dc-status';
+    try {
+      await dcConfirmPhoneCode(code);
+      closeModal(signInOverlay);
+    } catch (err) {
+      $('codeStatus').textContent = err.message;
+      $('codeStatus').className = 'dc-status err';
+    }
+  });
+
+  // ---- Email link ----
+  $('btnUseEmail').addEventListener('click', () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    showStep('stepEmail');
+  });
+  $('btnSendEmailLink').addEventListener('click', async () => {
+    const email = $('emailInput').value.trim();
+    if (!email.includes('@')) {
+      $('emailStatus').textContent = 'That doesn\'t look like an email address.';
+      $('emailStatus').className = 'dc-status err';
+      return;
+    }
+    $('emailStatus').textContent = 'Sending…';
+    $('emailStatus').className = 'dc-status';
+    try {
+      await dcSendEmailLink(email);
+      showStep('stepEmailSent');
+    } catch (err) {
+      $('emailStatus').textContent = err.message;
+      $('emailStatus').className = 'dc-status err';
+    }
+  });
+  if (DC_FIREBASE_CONFIGURED) {
+    dcCompleteEmailLinkSignInIfPresent().catch(() => {});
+  }
+
+  // ---- Buy DC Coins ----
+  function renderCoinPackages() {
+    const list = $('coinPackagesList');
+    list.innerHTML = '';
+    selectedPackage = null;
+    $('btnBuySelected').disabled = true;
+    $('btnBuySelected').textContent = 'Select a package';
+    COIN_PACKAGES.forEach(pkg => {
+      const el = document.createElement('div');
+      el.className = 'coin-pkg';
+      el.innerHTML = `
+        <span class="coin-pkg-coins">${pkg.coins} DC${pkg.best ? '<span class="coin-pkg-tag">Best value</span>' : ''}</span>
+        <span class="coin-pkg-price">₹${pkg.priceINR}</span>
+      `;
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.coin-pkg').forEach(p => p.classList.remove('sel'));
+        el.classList.add('sel');
+        selectedPackage = pkg;
+        $('btnBuySelected').disabled = false;
+        $('btnBuySelected').textContent = `Buy ${pkg.coins} DC — ₹${pkg.priceINR}`;
+      });
+      list.appendChild(el);
+    });
+  }
+  $('btnBuySelected').addEventListener('click', async () => {
+    if (!selectedPackage) return;
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('buyStatus'));
+    $('btnBuySelected').disabled = true;
+    $('buyStatus').textContent = 'Opening payment…';
+    $('buyStatus').className = 'dc-status';
+    try {
+      const result = await dcBuyCoinPackage(selectedPackage.id);
+      $('buyStatus').textContent = `Added ${result.coins} DC to your balance.`;
+      $('buyModalBalance').textContent = parseInt($('buyModalBalance').textContent, 10) + (result.alreadyCredited ? 0 : result.coins);
+    } catch (err) {
+      $('buyStatus').textContent = err.message;
+      $('buyStatus').className = 'dc-status err';
+    }
+    $('btnBuySelected').disabled = false;
+  });
+</script>
 
 <script>
   const nav = document.getElementById('siteNav');
