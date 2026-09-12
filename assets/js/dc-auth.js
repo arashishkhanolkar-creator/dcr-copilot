@@ -59,6 +59,9 @@ export const COIN_PACKAGES = [
   { id: "pack_1300", coins: 1300, priceINR: 250 },
 ];
 
+// Keep in sync with DCR_CHAT_COST in firebase/functions/index.js.
+export const DCR_CHAT_COST = 10;
+
 let currentUser = null;
 let unsubscribeCoins = null;
 const listeners = new Set();
@@ -186,4 +189,14 @@ export async function dcBuyCoinPackage(packageId) {
     });
     rzp.open();
   });
+}
+
+// ---- DCR Copilot chat — each call sends the running conversation and
+// gets back one assistant reply, at a cost of DCR_CHAT_COST DC Coins per
+// call (deducted server-side; refunded automatically if the call fails). ----
+export async function dcSendChatMessage(messages) {
+  if (!currentUser) throw new Error("Sign in first.");
+  const send = httpsCallable(functions, "sendDcrChatMessage");
+  const { data } = await send({ messages });
+  return data;
 }

@@ -56,6 +56,30 @@ share) and a **Key Secret** (never share this with me or paste it in
 chat — it goes straight into Firebase's secret manager in step 8, from
 your own machine).
 
+## 6b. Get an Anthropic API key (for DCR Copilot's chat)
+Go to [console.anthropic.com](https://console.anthropic.com) → **API
+Keys** → **Create Key**. This is a separate account/billing relationship
+from your Claude Code or claude.ai subscription — it's billed per token
+for the DCR Copilot chat's actual usage. Same rule as the Razorpay
+secret: never paste this key in chat, it goes straight into Firebase's
+secret manager in step 8.
+
+## 6c. Upload the DCR Copilot skill
+The DCR Copilot chat answers using the same Agent Skill sold as a
+download today (`downloads/dcr-copilot.zip`), uploaded once to
+Anthropic's Skills API so the chat backend can reference it. From the
+repo root, in PowerShell:
+```powershell
+Expand-Archive downloads\dcr-copilot.zip downloads\_skill-extracted -Force
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+node firebase\scripts\upload-skill.js downloads\_skill-extracted\dcr-copilot
+```
+It prints a `skill_id` (like `skill_01Abc...`) — paste that back so
+`DCR_SKILL_ID` in `firebase/functions/index.js` can be set, then
+redeploy functions (step 8). This only needs doing once, unless the
+skill's own content changes later (in which case, re-run it and update
+`DCR_SKILL_ID` to the new id it prints).
+
 ## 7. Install the Firebase CLI and log in
 On your machine (needs [Node.js](https://nodejs.org) installed):
 ```bash
@@ -72,23 +96,35 @@ cd firebase
 firebase use --add          # pick the project you created in step 1
 firebase functions:secrets:set RAZORPAY_KEY_ID
 firebase functions:secrets:set RAZORPAY_KEY_SECRET
+firebase functions:secrets:set ANTHROPIC_API_KEY
 firebase deploy --only functions,firestore:rules
 ```
 Each `secrets:set` command prompts you to paste the value — it's stored
-encrypted in Google Secret Manager, never in this repo.
+encrypted in Google Secret Manager, never in this repo. Remember to set
+`DCR_SKILL_ID` in `firebase/functions/index.js` (step 6c) before this
+deploy, or DCR Copilot's chat will refuse to answer with a clear
+"not set up yet" error.
 
-## 9. Adjust coin pricing (optional)
-Package prices/coin amounts live in two places that need to match:
+## 9. Adjust pricing (optional)
+Coin package prices/amounts live in two places that need to match:
 - `firebase/functions/index.js` → the `PACKAGES` object
 - `assets/js/dc-auth.js` → the `COIN_PACKAGES` array
 
 Current pricing: ₹50 → 200 DC, ₹150 → 700 DC (best value), ₹250 → 1300 DC.
 
+DCR Copilot's chat cost lives in two places that need to match:
+- `firebase/functions/index.js` → `DCR_CHAT_COST`
+- `assets/js/dc-auth.js` → `DCR_CHAT_COST`
+
+Current cost: 10 DC per question.
+
 ## 10. Test it
 Once steps 5–8 are done and the config is pasted in, reload the AI Lab
-page, sign in, and try a purchase with a
+page, sign in, and try a coin purchase with a
 [Razorpay test card](https://razorpay.com/docs/payments/payments/test-card-upi-details/)
-before going live with real payments.
+before going live with real payments. Then open the DCR Copilot page,
+sign in, and ask a real UDCPR/DCPR-2034 question to confirm the chat,
+skill, and coin deduction all work end to end.
 
 ---
 

@@ -9,11 +9,11 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta name="color-scheme" content="light">
 <title>DCR Copilot — Stop searching. Start asking.</title>
-<meta name="description" content="DCR Copilot brings UDCPR and DCPR-2034 into Claude — ask your question, get the clause, table, and page reference. Built by Designhaus Collective.">
+<meta name="description" content="DCR Copilot answers UDCPR and DCPR-2034 questions in a chat right on this site — ask, get the clause, table, and page reference. Built by Designhaus Collective.">
 <link rel="canonical" href="https://designhauscollective.in">
 <meta property="og:type" content="website">
 <meta property="og:title" content="DCR Copilot — Stop searching. Start asking.">
-<meta property="og:description" content="UDCPR and DCPR-2034, inside Claude. Ask your question, get the clause, table, and reference.">
+<meta property="og:description" content="UDCPR and DCPR-2034, in a chat on this site. Ask your question, get the clause, table, and reference.">
 <meta property="og:url" content="https://designhauscollective.in">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -376,6 +376,124 @@
     display:flex;align-items:center;justify-content:center;
   }
   .modal-close:hover{background:var(--line);color:var(--ink);}
+
+  /* ---------- account / DC coins (nav sits over the hero photo) ---------- */
+  .nav-account{display:flex;align-items:center;gap:16px;}
+  .coin-badge{
+    display:flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:13px;cursor:pointer;background:none;border:none;color:var(--hero-text);padding:0;
+  }
+  .coin-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+  .account-name{
+    font-size:12.5px;color:var(--hero-text-dim);max-width:110px;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;
+  }
+  .nav-signin-btn{
+    font-family:'Manrope',sans-serif;font-weight:600;font-size:12.5px;
+    background:transparent;border:1px solid rgba(255,255,255,0.4);border-radius:var(--radius);
+    padding:9px 16px;cursor:pointer;color:var(--hero-text);transition:border-color .2s ease,background .2s ease;
+  }
+  .nav-signin-btn:hover{border-color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.06);}
+  @media(max-width:600px){ .nav-account{display:none;} }
+
+  /* Modal shell (shared by sign-in + buy-coins) */
+  .dc-modal-overlay{
+    position:fixed;inset:0;z-index:500;background:rgba(10,8,4,0.6);
+    display:none;align-items:center;justify-content:center;padding:24px;
+  }
+  .dc-modal-overlay.on{display:flex;}
+  .dc-modal{
+    background:var(--paper);color:var(--ink);width:100%;max-width:380px;
+    padding:44px 36px 36px;position:relative;max-height:88vh;overflow-y:auto;border-radius:var(--radius);
+  }
+  .dc-modal-close{
+    position:absolute;top:18px;right:18px;background:none;border:none;cursor:pointer;
+    color:var(--ink-faint);font-size:20px;line-height:1;padding:4px;
+  }
+  .dc-modal h3{font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:22px;margin-bottom:8px;}
+  .dc-modal .dc-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:28px;line-height:1.6;}
+  .dc-provider-btn{
+    display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+    font-family:'Manrope',sans-serif;font-weight:600;font-size:12.5px;
+    padding:13px;margin-bottom:11px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;
+    color:var(--ink);cursor:pointer;transition:border-color .2s ease;
+  }
+  .dc-provider-btn:hover{border-color:var(--ink);}
+  .dc-provider-btn svg{flex-shrink:0;}
+  .dc-field{
+    width:100%;font-family:'Manrope',sans-serif;font-size:13px;padding:12px 14px;margin-bottom:10px;
+    border:1px solid var(--line);border-radius:var(--radius);background:#fff;color:var(--ink);
+  }
+  .dc-primary-btn{
+    width:100%;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;
+    padding:13px;background:var(--ink);color:var(--paper);border:none;border-radius:var(--radius);cursor:pointer;
+    transition:opacity .2s ease;
+  }
+  .dc-primary-btn:hover{opacity:0.85;}
+  .dc-primary-btn:disabled{opacity:0.4;cursor:default;}
+  .dc-status{font-size:11.5px;color:var(--ink-soft);margin-top:12px;min-height:16px;line-height:1.6;}
+  .dc-status.err{color:#B23A2E;}
+  .dc-back-link{
+    display:inline-block;margin-top:16px;font-size:11px;color:var(--ink-soft);text-decoration:underline;
+    cursor:pointer;background:none;border:none;
+  }
+  .dc-step{display:none;}
+  .dc-step.on{display:block;}
+  .coin-packages{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+  .coin-pkg{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 18px;
+    border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;
+    transition:border-color .2s ease,background .2s ease;background:#fff;
+  }
+  .coin-pkg:hover{border-color:var(--ink);}
+  .coin-pkg.sel{border-color:var(--amber);background:#f8ede6;}
+  .coin-pkg-coins{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;}
+  .coin-pkg-tag{font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber-deep);font-weight:700;margin-left:8px;}
+  .coin-pkg-price{font-family:'Manrope',sans-serif;font-weight:600;font-size:14px;color:var(--ink-soft);}
+  .coin-balance-line{
+    display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:15px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line);
+  }
+  .coin-balance-line .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);}
+  #dcRecaptchaContainer{display:none;}
+
+  /* ---------- chat panel (replaces the buy section) ---------- */
+  .chat-section{background:#F5F2EA;}
+  .chat-shell{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    max-width:760px;margin:44px auto 0;overflow:hidden;
+  }
+  .chat-top{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    padding:20px 26px;border-bottom:1px solid var(--line);
+  }
+  .chat-top-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--ink);}
+  .chat-top-cost{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);}
+  .chat-log{
+    height:420px;overflow-y:auto;padding:26px;display:flex;flex-direction:column;gap:18px;
+  }
+  .chat-msg{max-width:86%;font-size:14.5px;line-height:1.65;}
+  .chat-msg.user{align-self:flex-end;background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:var(--radius);}
+  .chat-msg.assistant{align-self:flex-start;color:var(--ink);}
+  .chat-msg.assistant :is(h1,h2,h3,h4){font-family:'Space Grotesk',sans-serif;font-size:14.5px;margin:14px 0 6px;}
+  .chat-msg.assistant p{margin:0 0 10px;}
+  .chat-msg.assistant table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0;}
+  .chat-msg.assistant th{text-align:left;font-weight:600;color:var(--ink-soft);padding:6px 8px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;}
+  .chat-msg.assistant td{padding:7px 8px;border-bottom:1px solid var(--line);}
+  .chat-msg.assistant code{background:var(--line);padding:1px 5px;border-radius:2px;font-size:12.5px;}
+  .chat-msg.pending{color:var(--ink-faint);font-style:italic;}
+  .chat-msg.error{color:#B23A2E;}
+  .chat-empty{color:var(--ink-faint);font-size:14px;padding:8px 0;}
+  .chat-gate{padding:60px 26px;text-align:center;}
+  .chat-gate p{color:var(--ink-soft);font-size:14.5px;margin:10px auto 22px;max-width:400px;}
+  .chat-input-row{display:flex;gap:10px;padding:18px 20px;border-top:1px solid var(--line);}
+  .chat-input-row textarea{
+    flex:1;resize:none;font-family:'Manrope',sans-serif;font-size:14px;padding:12px 14px;
+    border:1px solid var(--line);border-radius:var(--radius);background:#fff;color:var(--ink);
+    max-height:120px;
+  }
+  .chat-input-row button{flex-shrink:0;}
+  .chat-low-balance{padding:14px 26px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -391,6 +509,9 @@
       <a href="#how">How it works</a>
       <a href="#faq">FAQ</a>
     </nav>
+    <div class="nav-account" id="navAccount">
+      <button class="nav-signin-btn" id="btnSignIn">Sign in</button>
+    </div>
   </div>
 </header>
 
@@ -398,14 +519,14 @@
   <div class="wrap hero-inner">
     <div class="eyebrow">For architects · planners · designers</div>
     <h1>Stop searching.<br><span class="accent">Start asking.</span></h1>
-    <p class="sub">DCR Copilot brings UDCPR and DCPR-2034 into Claude — ask your question, get the clause, table, and page reference and much more. No more digging through 500-page PDFs.</p>
+    <p class="sub">DCR Copilot answers UDCPR and DCPR-2034 questions in a chat, right on this page — ask your question, get the clause, table, and page reference. No more digging through 500-page PDFs.</p>
     <div class="cta-row">
-      <a class="btn" href="#" id="pay-link-hero">Get DCR Copilot — ₹79 →</a>
+      <a class="btn" href="#chat" id="start-chat-link">Ask DCR Copilot — 10 DC/question →</a>
       <a class="btn btn-ghost" href="#how">See how it works</a>
     </div>
     <div class="badges">
-      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>One-time purchase</div>
-      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Instant download</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat right here, no install</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>Pay per question</div>
       <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>No subscription</div>
     </div>
   </div>
@@ -479,7 +600,7 @@
       <div class="feature-cell">
         <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v13m0 0l-4-4m4 4l4-4M5 21h14"/></svg></div>
         <h4>Instant access</h4>
-        <p>Download once. Install in Claude. Use whenever you need it.</p>
+        <p>No download, no Claude account. Sign in and start chatting right here.</p>
       </div>
     </div>
   </div>
@@ -522,42 +643,58 @@
 <section class="how" id="how">
   <div class="wrap">
     <div class="eyebrow">How it works</div>
-    <h2>Three steps. No terminal, no setup beyond a toggle.</h2>
-    <p class="how-lede">From purchase to your first answered question, this takes about two minutes — most of it is waiting for a download.</p>
+    <h2>Three steps. No download, no Claude account.</h2>
+    <p class="how-lede">From signing in to your first answered question takes under a minute, right here on this page.</p>
     <div class="step-row">
       <div class="step">
         <span class="num">01</span>
-        <h3>Download</h3>
-        <p>Purchase and download the DCR Copilot skill file instantly — one zip, delivered right away.</p>
+        <h3>Sign in</h3>
+        <p>Google, phone, or email — takes a few seconds. You'll get a DC Coins balance to spend on questions.</p>
       </div>
       <div class="step">
         <span class="num">02</span>
-        <h3>Install in Claude</h3>
-        <p>Open Claude, go to Settings → Capabilities, enable Code execution, then Skills → Add skill → upload the zip. Works the same on a free or paid Claude account.</p>
+        <h3>Ask your question</h3>
+        <p>Type it into the chat below, in plain language. Each question costs 10 DC — top up with a card or UPI whenever you're low.</p>
       </div>
       <div class="step">
         <span class="num">03</span>
-        <h3>Start asking</h3>
-        <p>Ask any UDCPR or DCPR-2034 question in a normal Claude chat. You'll get a direct answer, the table it came from, and the exact clause to cite.</p>
+        <h3>Get your answer</h3>
+        <p>A direct answer, the table it came from, and the exact clause to cite — same as before, just without leaving this page.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="pricing" id="buy">
+<section class="chat-section" id="chat">
   <div class="wrap">
-    <div class="price-block">
-      <div class="price-left">
-        <h2>Why keep searching?</h2>
-        <p>Get the answer you need for less than the cost of a coffee. No subscription, no recurring payment — download once, use whenever you need it.</p>
+    <div class="section-head">
+      <div class="eyebrow">Ask DCR Copilot</div>
+      <h2>Ask your question below.</h2>
+      <p>10 DC per question, less than the cost of a coffee. Sign in to get a DC Coins balance — no subscription, top up whenever you need to.</p>
+    </div>
+    <div class="chat-shell">
+      <div class="chat-top">
+        <span class="chat-top-title">DCR Copilot</span>
+        <span class="chat-top-cost">10 DC / question</span>
       </div>
-      <div class="price-right">
-        <div class="price-amount-row">
-          <span class="price-original">₹299</span>
-          <span class="price-amount">₹79</span>
+
+      <div id="chatSignedOut" class="chat-gate">
+        <p>Sign in to start asking UDCPR and DCPR-2034 questions — Google, phone, or email.</p>
+        <button class="btn" id="btnChatSignIn">Sign in to chat →</button>
+      </div>
+
+      <div id="chatSignedIn" style="display:none;">
+        <div class="chat-log" id="chatLog">
+          <p class="chat-empty">Ask about FSI, setbacks, parking, TDR, premiums — anything UDCPR or DCPR-2034.</p>
         </div>
-        <p class="price-note">One-time purchase · Instant download · Secure payment</p>
-        <a class="btn" href="#" id="pay-link">Get DCR Copilot — ₹79 →</a>
+        <div class="chat-low-balance">
+          <span id="chatBalanceText">0 DC available</span>
+          <button class="btn" style="background:transparent;border:1px solid var(--line);color:var(--ink);padding:9px 16px;font-size:12.5px;" id="btnChatTopUp">Top up →</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chatInput" rows="1" placeholder="e.g. What's the parking requirement for a hospital in Pune?"></textarea>
+          <button class="btn" id="btnChatSend">Ask — 10 DC</button>
+        </div>
       </div>
     </div>
   </div>
@@ -579,8 +716,12 @@
       <p>DCR Copilot flags when a height question may be affected by AAI (Airports Authority of India) restrictions, but the exact limit for a specific plot needs checking separately via AAI's NOCAS portal — this is a plot-by-plot, coordinate-based system that's completely separate from UDCPR and DCPR-2034, and no regulation lookup can determine it for you.</p>
     </details>
     <details>
-      <summary>Do I need a paid Claude plan?</summary>
-      <p>No. It works on a free Claude account — just enable Code execution in Settings → Capabilities. Heavy back-to-back usage in one sitting may hit Claude's own free-tier daily limit, which is a Claude account limit, not something this tool controls.</p>
+      <summary>Do I need a Claude account?</summary>
+      <p>No. The chat runs directly on this page — no Claude account, no download, no install. Just sign in with Google, phone, or email and you're ready to ask.</p>
+    </details>
+    <details>
+      <summary>How much does each question cost?</summary>
+      <p>10 DC per question. ₹50 gets you 200 DC (20 questions) — larger top-up packs work out to less per question. If a question fails to answer for any reason, you're not charged.</p>
     </details>
     <details>
       <summary>What happens when UDCPR or DCPR-2034 gets amended?</summary>
@@ -607,6 +748,7 @@
       <div class="footer-cols">
         <div class="footer-col">
           <h5>Product</h5>
+          <a href="#chat">Ask a question</a>
           <a href="#how">How it works</a>
           <a href="#faq">FAQ</a>
         </div>
@@ -629,16 +771,358 @@
   </div>
 </footer>
 
+<!-- Sign-in modal -->
+<div class="dc-modal-overlay" id="signInOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="signInOverlay">&times;</button>
+
+    <div class="dc-step on" id="stepProviders">
+      <h3>Sign in to DCR Copilot</h3>
+      <p class="dc-sub">Get a DC Coins balance to ask questions with — 10 DC per question.</p>
+      <button class="dc-provider-btn" id="btnGoogle">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.86-.08-1.68-.22-2.47H12v4.68h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.84z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.88-3a7.4 7.4 0 0 1-11-3.9H1.05v3.09A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.05 14.2a7.2 7.2 0 0 1 0-4.4V6.71H1.05a12 12 0 0 0 0 10.58z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44A11.6 11.6 0 0 0 12 0 12 12 0 0 0 1.05 6.71l4 3.1A7.16 7.16 0 0 1 12 4.75z"/></svg>
+        Continue with Google
+      </button>
+      <button class="dc-provider-btn" id="btnUsePhone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Continue with Phone
+      </button>
+      <button class="dc-provider-btn" id="btnUseEmail">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        Continue with Email
+      </button>
+      <p class="dc-status" id="providerStatus"></p>
+    </div>
+
+    <div class="dc-step" id="stepPhoneNumber">
+      <h3>Enter your phone number</h3>
+      <p class="dc-sub">We'll text you a one-time code. Include your country code.</p>
+      <input class="dc-field" type="tel" id="phoneInput" placeholder="+91 98765 43210">
+      <button class="dc-primary-btn" id="btnSendCode">Send code</button>
+      <p class="dc-status" id="phoneStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+
+    <div class="dc-step" id="stepPhoneCode">
+      <h3>Enter the code</h3>
+      <p class="dc-sub">Sent by SMS just now.</p>
+      <input class="dc-field" type="text" inputmode="numeric" id="codeInput" placeholder="123456" maxlength="6">
+      <button class="dc-primary-btn" id="btnConfirmCode">Confirm</button>
+      <p class="dc-status" id="codeStatus"></p>
+      <button class="dc-back-link" data-back="stepPhoneNumber">&larr; Back</button>
+    </div>
+
+    <div class="dc-step" id="stepEmail">
+      <h3>Enter your email</h3>
+      <p class="dc-sub">We'll send you a sign-in link — no password to remember.</p>
+      <input class="dc-field" type="email" id="emailInput" placeholder="you@example.com">
+      <button class="dc-primary-btn" id="btnSendEmailLink">Send link</button>
+      <p class="dc-status" id="emailStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+
+    <div class="dc-step" id="stepEmailSent">
+      <h3>Check your inbox</h3>
+      <p class="dc-sub">Click the link we just sent — it'll bring you straight back here, signed in.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Buy DC Coins modal -->
+<div class="dc-modal-overlay" id="buyCoinsOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="buyCoinsOverlay">&times;</button>
+    <h3>DC Coins</h3>
+    <p class="dc-sub">Top up your balance. Each question in DCR Copilot costs 10 DC.</p>
+    <div class="coin-balance-line"><span class="dot"></span> <span id="buyModalBalance">0</span> DC</div>
+    <div class="coin-packages" id="coinPackagesList"></div>
+    <button class="dc-primary-btn" id="btnBuySelected" disabled>Select a package</button>
+    <p class="dc-status" id="buyStatus"></p>
+  </div>
+</div>
+
+<div id="dcRecaptchaContainer"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script type="module">
+  import {
+    DC_FIREBASE_CONFIGURED, COIN_PACKAGES, DCR_CHAT_COST, onDCAuthChange,
+    dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
+    dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent, dcBuyCoinPackage,
+    dcSendChatMessage,
+  } from './assets/js/dc-auth.js';
+
+  const $ = id => document.getElementById(id);
+  const navAccount = $('navAccount');
+  const signInOverlay = $('signInOverlay');
+  const buyCoinsOverlay = $('buyCoinsOverlay');
+  let selectedPackage = null;
+  let currentCoins = 0;
+  let chatHistory = [];
+  let sending = false;
+
+  function showStep(id) {
+    document.querySelectorAll('.dc-step').forEach(s => s.classList.toggle('on', s.id === id));
+  }
+  function openModal(overlay) { overlay.classList.add('on'); }
+  function closeModal(overlay) { overlay.classList.remove('on'); }
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal($(btn.dataset.close)));
+  });
+  document.querySelectorAll('[data-back]').forEach(btn => {
+    btn.addEventListener('click', () => showStep(btn.dataset.back));
+  });
+  [signInOverlay, buyCoinsOverlay].forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay); });
+  });
+
+  function notConfiguredMessage(el) {
+    el.textContent = "Sign-in isn't switched on yet — check back soon.";
+    el.className = 'dc-status err';
+  }
+  function openSignIn() { showStep('stepProviders'); openModal(signInOverlay); }
+
+  // ---- Nav + chat gate: signed-out vs signed-in state ----
+  onDCAuthChange(user => {
+    if (user) {
+      currentCoins = user.coins;
+      navAccount.innerHTML = `
+        <button class="coin-badge" id="coinBadgeBtn"><span class="dot"></span>${user.coins} DC</button>
+        <span class="account-name">${user.displayName || user.email || user.phoneNumber || 'Account'}</span>
+        <button class="nav-signin-btn" id="btnSignOut">Sign out</button>
+      `;
+      $('coinBadgeBtn').addEventListener('click', () => { renderCoinPackages(); openModal(buyCoinsOverlay); });
+      $('btnSignOut').addEventListener('click', () => dcSignOut());
+      $('buyModalBalance').textContent = user.coins;
+      $('chatSignedOut').style.display = 'none';
+      $('chatSignedIn').style.display = '';
+      $('chatBalanceText').textContent = `${user.coins} DC available`;
+    } else {
+      currentCoins = 0;
+      navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
+      $('btnSignIn').addEventListener('click', openSignIn);
+      $('chatSignedOut').style.display = '';
+      $('chatSignedIn').style.display = 'none';
+    }
+  });
+
+  // ---- Google ----
+  $('btnGoogle').addEventListener('click', async () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    $('providerStatus').textContent = 'Opening Google sign-in…';
+    $('providerStatus').className = 'dc-status';
+    try {
+      await dcSignInWithGoogle();
+      closeModal(signInOverlay);
+    } catch (err) {
+      $('providerStatus').textContent = err.message;
+      $('providerStatus').className = 'dc-status err';
+    }
+  });
+
+  // ---- Phone ----
+  $('btnUsePhone').addEventListener('click', () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    showStep('stepPhoneNumber');
+  });
+  $('btnSendCode').addEventListener('click', async () => {
+    const phone = $('phoneInput').value.trim();
+    if (!phone.startsWith('+')) {
+      $('phoneStatus').textContent = 'Include the country code, e.g. +91…';
+      $('phoneStatus').className = 'dc-status err';
+      return;
+    }
+    $('btnSendCode').disabled = true;
+    $('phoneStatus').textContent = 'Sending…';
+    $('phoneStatus').className = 'dc-status';
+    try {
+      await dcStartPhoneSignIn(phone, 'dcRecaptchaContainer');
+      showStep('stepPhoneCode');
+    } catch (err) {
+      $('phoneStatus').textContent = err.message;
+      $('phoneStatus').className = 'dc-status err';
+    }
+    $('btnSendCode').disabled = false;
+  });
+  $('btnConfirmCode').addEventListener('click', async () => {
+    const code = $('codeInput').value.trim();
+    $('codeStatus').textContent = 'Checking…';
+    $('codeStatus').className = 'dc-status';
+    try {
+      await dcConfirmPhoneCode(code);
+      closeModal(signInOverlay);
+    } catch (err) {
+      $('codeStatus').textContent = err.message;
+      $('codeStatus').className = 'dc-status err';
+    }
+  });
+
+  // ---- Email link ----
+  $('btnUseEmail').addEventListener('click', () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    showStep('stepEmail');
+  });
+  $('btnSendEmailLink').addEventListener('click', async () => {
+    const email = $('emailInput').value.trim();
+    if (!email.includes('@')) {
+      $('emailStatus').textContent = 'That doesn\'t look like an email address.';
+      $('emailStatus').className = 'dc-status err';
+      return;
+    }
+    $('emailStatus').textContent = 'Sending…';
+    $('emailStatus').className = 'dc-status';
+    try {
+      await dcSendEmailLink(email);
+      showStep('stepEmailSent');
+    } catch (err) {
+      $('emailStatus').textContent = err.message;
+      $('emailStatus').className = 'dc-status err';
+    }
+  });
+  if (DC_FIREBASE_CONFIGURED) {
+    dcCompleteEmailLinkSignInIfPresent().catch(() => {});
+  }
+
+  // ---- Buy DC Coins ----
+  function renderCoinPackages() {
+    const list = $('coinPackagesList');
+    list.innerHTML = '';
+    selectedPackage = null;
+    $('btnBuySelected').disabled = true;
+    $('btnBuySelected').textContent = 'Select a package';
+    COIN_PACKAGES.forEach(pkg => {
+      const el = document.createElement('div');
+      el.className = 'coin-pkg';
+      el.innerHTML = `
+        <span class="coin-pkg-coins">${pkg.coins} DC${pkg.best ? '<span class="coin-pkg-tag">Best value</span>' : ''}</span>
+        <span class="coin-pkg-price">₹${pkg.priceINR}</span>
+      `;
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.coin-pkg').forEach(p => p.classList.remove('sel'));
+        el.classList.add('sel');
+        selectedPackage = pkg;
+        $('btnBuySelected').disabled = false;
+        $('btnBuySelected').textContent = `Buy ${pkg.coins} DC — ₹${pkg.priceINR}`;
+      });
+      list.appendChild(el);
+    });
+  }
+  $('btnBuySelected').addEventListener('click', async () => {
+    if (!selectedPackage) return;
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('buyStatus'));
+    $('btnBuySelected').disabled = true;
+    $('buyStatus').textContent = 'Opening payment…';
+    $('buyStatus').className = 'dc-status';
+    try {
+      const result = await dcBuyCoinPackage(selectedPackage.id);
+      $('buyStatus').textContent = `Added ${result.coins} DC to your balance.`;
+      const newBalance = parseInt($('buyModalBalance').textContent, 10) + (result.alreadyCredited ? 0 : result.coins);
+      $('buyModalBalance').textContent = newBalance;
+      currentCoins = newBalance;
+      $('chatBalanceText').textContent = `${newBalance} DC available`;
+      const badge = $('coinBadgeBtn');
+      if (badge) badge.innerHTML = `<span class="dot"></span>${newBalance} DC`;
+    } catch (err) {
+      $('buyStatus').textContent = err.message;
+      $('buyStatus').className = 'dc-status err';
+    }
+    $('btnBuySelected').disabled = false;
+  });
+
+  // ---- Chat ----
+  $('btnChatSignIn').addEventListener('click', openSignIn);
+  $('btnChatTopUp').addEventListener('click', () => { renderCoinPackages(); openModal(buyCoinsOverlay); });
+
+  // Minimal, safe markdown-ish rendering: escape HTML, then render just
+  // paragraphs, tables (from a leading |, GFM-style) and **bold**.
+  function renderAssistantText(text) {
+    const escape = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const lines = text.split('\n');
+    let html = '';
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      if (/^\s*\|.*\|\s*$/.test(line) && lines[i + 1] && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+        const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+        const headers = cells(line);
+        i += 2;
+        let rows = [];
+        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(cells(lines[i])); i++; }
+        html += '<table><thead><tr>' + headers.map(h => `<th>${escape(h)}</th>`).join('') + '</tr></thead><tbody>' +
+          rows.map(r => '<tr>' + r.map(c => `<td>${escape(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+      } else if (line.trim() === '') {
+        i++;
+      } else {
+        let para = line;
+        i++;
+        while (i < lines.length && lines[i].trim() !== '' && !/^\s*\|.*\|\s*$/.test(lines[i])) { para += '\n' + lines[i]; i++; }
+        html += `<p>${escape(para).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>`;
+      }
+    }
+    return html;
+  }
+
+  function appendMessage(role, text) {
+    const log = $('chatLog');
+    const empty = log.querySelector('.chat-empty');
+    if (empty) empty.remove();
+    const el = document.createElement('div');
+    el.className = `chat-msg ${role}`;
+    if (role === 'assistant') el.innerHTML = renderAssistantText(text);
+    else el.textContent = text;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+
+  async function sendChat() {
+    if (sending) return;
+    const input = $('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    if (currentCoins < DCR_CHAT_COST) {
+      appendMessage('error', `You need at least ${DCR_CHAT_COST} DC to ask a question — top up to keep going.`);
+      return;
+    }
+    sending = true;
+    $('btnChatSend').disabled = true;
+    input.value = '';
+    appendMessage('user', text);
+    chatHistory.push({ role: 'user', content: text });
+    const pending = appendMessage('pending assistant', 'Reading the relevant chapters…');
+    try {
+      const result = await dcSendChatMessage(chatHistory);
+      pending.remove();
+      appendMessage('assistant', result.reply);
+      chatHistory.push({ role: 'assistant', content: result.reply });
+      currentCoins = result.coins;
+      $('chatBalanceText').textContent = `${result.coins} DC available`;
+      const badge = $('coinBadgeBtn');
+      if (badge) badge.innerHTML = `<span class="dot"></span>${result.coins} DC`;
+    } catch (err) {
+      pending.remove();
+      chatHistory.pop();
+      appendMessage('error', err.message || 'Something went wrong — try again.');
+    }
+    sending = false;
+    $('btnChatSend').disabled = false;
+  }
+  $('btnChatSend').addEventListener('click', sendChat);
+  $('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+  });
+</script>
+
 <div class="modal" id="modal-terms">
   <div class="modal-backdrop"></div>
   <div class="modal-panel">
     <button class="modal-close" data-close-modal="modal-terms" aria-label="Close">✕</button>
     <h3>Terms of use</h3>
     <div class="modal-body">
-      <p>DCR Copilot is a digital reference tool ("Skill") for Claude, covering UDCPR and DCPR-2034, sold by Designhaus Collective.</p>
-      <p><strong>What you're buying.</strong> A one-time purchase grants you a personal license to download, install, and use the DCR Copilot skill file. It's for your own use — not for resale, redistribution, or sharing with others outside your own practice.</p>
+      <p>DCR Copilot is a chat tool covering UDCPR and DCPR-2034, run by Designhaus Collective directly on this website.</p>
+      <p><strong>How it works.</strong> Sign in to get a DC Coins balance, topped up in advance via card or UPI. Each question you ask deducts a fixed number of DC Coins from your balance; DC Coins have no cash value, aren't transferable between accounts, and aren't redeemable for cash. If a question fails to get an answer, you're not charged for it.</p>
       <p><strong>What it is, and isn't.</strong> This is a reference and verification aid, built from the publicly published UDCPR and DCPR-2034 regulation text. It is not legal or professional advice, and it does not replace confirming with the relevant Planning Authority (or MCGM, for Mumbai) before acting on any answer it gives.</p>
-      <p><strong>Accuracy.</strong> Regulations get amended over time. While the skill checks a live source for amendment-prone figures where possible, we don't guarantee it reflects every amendment the moment it's notified.</p>
+      <p><strong>Accuracy.</strong> Regulations get amended over time. We don't guarantee every answer reflects the latest amendment the moment it's notified.</p>
       <p><strong>Changes.</strong> We may update these terms from time to time; continued use after an update means you accept the revised terms.</p>
       <p>Questions: <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a></p>
     </div>
@@ -651,9 +1135,9 @@
     <button class="modal-close" data-close-modal="modal-refund" aria-label="Close">✕</button>
     <h3>Refund policy</h3>
     <div class="modal-body">
-      <p>DCR Copilot is delivered instantly as a digital download, so refunds work a little differently than a physical product.</p>
-      <p><strong>General policy.</strong> Because the product is delivered immediately upon payment, we're generally not able to offer refunds once your download link has been issued.</p>
-      <p><strong>When we will refund you.</strong> If the product genuinely doesn't work as described and we can't resolve it, contact us within 7 days of purchase and we'll sort it out, including a refund if the issue can't be fixed.</p>
+      <p>DC Coins are a prepaid balance used to pay for questions in DCR Copilot's chat.</p>
+      <p><strong>Failed questions.</strong> If a question doesn't get answered because of an error on our end, you're automatically not charged for it — no refund request needed.</p>
+      <p><strong>Unused DC Coins.</strong> Because coins are delivered instantly to your balance on payment, we're generally not able to refund a top-up once it's been credited. If you believe a charge was made in error, contact us within 7 days of the purchase and we'll look into it.</p>
       <p><strong>How to request one.</strong> Email <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a> with your Razorpay payment ID and a description of the problem.</p>
     </div>
   </div>
@@ -665,10 +1149,10 @@
     <button class="modal-close" data-close-modal="modal-privacy" aria-label="Close">✕</button>
     <h3>Privacy policy</h3>
     <div class="modal-body">
-      <p><strong>What we collect.</strong> Your email address on the payment page, used to send your download link and a confirmation email. Razorpay's payment page also asks for a phone number as part of their own payment verification — that number goes to Razorpay, not to us, and we never use it for anything on our end.</p>
-      <p><strong>Why we collect it.</strong> Your email is used to send your download link and confirm your purchase. Nothing more.</p>
+      <p><strong>What we collect.</strong> Whatever your sign-in method shares (your name/email for Google, your phone number for phone sign-in, or just your email for email-link sign-in), plus your DC Coins balance and chat questions, stored against your account so we can answer and bill correctly.</p>
+      <p><strong>Why we collect it.</strong> To identify your account, maintain your coin balance, and answer your questions.</p>
       <p><strong>Payment details.</strong> Payment itself is processed entirely by Razorpay — we never see or store your card, UPI, or bank details ourselves.</p>
-      <p><strong>Sharing.</strong> We don't sell or share your data with third parties, beyond what's needed to process payment (Razorpay) and deliver email (Resend).</p>
+      <p><strong>Sharing.</strong> We don't sell or share your data with third parties, beyond what's needed to authenticate you (Firebase), process payment (Razorpay), and generate answers (Anthropic).</p>
       <p>Questions: <a href="mailto:connect@designhauscollective.in">connect@designhauscollective.in</a></p>
     </div>
   </div>
@@ -788,19 +1272,6 @@
       runDemoLoop();
     }
   }
-
-  // ---- Payment link ----
-  const PAYMENT_URL = "https://rzp.io/rzp/DCRCOPILOT";
-  function handlePayClick(e){
-    e.preventDefault();
-    if (!PAYMENT_URL){
-      alert('Add your Razorpay Payment Page URL to PAYMENT_URL in this script once your account is verified.');
-      return;
-    }
-    window.location.href = PAYMENT_URL;
-  }
-  document.getElementById('pay-link').addEventListener('click', handlePayClick);
-  document.getElementById('pay-link-hero').addEventListener('click', handlePayClick);
 
   // ---- Policy modals ----
   function openModal(id){ document.getElementById(id).classList.add('open'); }
