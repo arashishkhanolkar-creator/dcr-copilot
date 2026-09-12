@@ -18,7 +18,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const RAZORPAY_KEY_ID = defineSecret("RAZORPAY_KEY_ID");
-const RAZORPAY_KEY_SECRET = defineSecret("RAZORPAY_KEY_SECRET");
+const RAZORPAY_KEY_SECRET = defineSecret("RAZORPAY_KEY_SECRET"); // force redeploy to pick up latest secret version
 
 // Keep this in sync with COIN_PACKAGES in assets/js/dc-auth.js.
 // Amounts are in paise (INR × 100) — Razorpay's order amount unit.
