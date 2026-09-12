@@ -82,7 +82,7 @@ Package prices/coin amounts live in two places that need to match:
 - `firebase/functions/index.js` → the `PACKAGES` object
 - `assets/js/dc-auth.js` → the `COIN_PACKAGES` array
 
-Defaults right now: ₹99 → 100 DC, ₹299 → 350 DC, ₹499 → 650 DC.
+Current pricing: ₹50 → 200 DC, ₹150 → 700 DC (best value), ₹250 → 1300 DC.
 
 ## 10. Test it
 Once steps 5–8 are done and the config is pasted in, reload the AI Lab

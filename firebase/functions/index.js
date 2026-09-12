@@ -23,9 +23,9 @@ const RAZORPAY_KEY_SECRET = defineSecret("RAZORPAY_KEY_SECRET");
 // Keep this in sync with COIN_PACKAGES in assets/js/dc-auth.js.
 // Amounts are in paise (INR × 100) — Razorpay's order amount unit.
 const PACKAGES = {
-  pack_100: { coins: 100, amountPaise: 9900 },
-  pack_350: { coins: 350, amountPaise: 29900 },
-  pack_650: { coins: 650, amountPaise: 49900 },
+  pack_200: { coins: 200, amountPaise: 5000 },
+  pack_700: { coins: 700, amountPaise: 15000 },
+  pack_1300: { coins: 1300, amountPaise: 25000 },
 };
 
 exports.createRazorpayOrder = onCall(

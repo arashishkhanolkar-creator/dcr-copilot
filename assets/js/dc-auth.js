@@ -54,9 +54,9 @@ const functions = getFunctions(app);
 
 // Keep these in sync with firebase/functions/index.js's PACKAGES map.
 export const COIN_PACKAGES = [
-  { id: "pack_100", coins: 100, priceINR: 99 },
-  { id: "pack_350", coins: 350, priceINR: 299, best: true },
-  { id: "pack_650", coins: 650, priceINR: 499 },
+  { id: "pack_200", coins: 200, priceINR: 50 },
+  { id: "pack_700", coins: 700, priceINR: 150, best: true },
+  { id: "pack_1300", coins: 1300, priceINR: 250 },
 ];
 
 let currentUser = null;
