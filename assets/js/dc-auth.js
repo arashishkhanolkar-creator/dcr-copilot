@@ -60,7 +60,7 @@ export const COIN_PACKAGES = [
 ];
 
 // Keep in sync with DCR_CHAT_COST in firebase/functions/index.js.
-export const DCR_CHAT_COST = 10;
+export const DCR_CHAT_COST = 0; // TEMP: free while testing — set back to 10 before going live
 
 let currentUser = null;
 let unsubscribeCoins = null;
