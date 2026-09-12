@@ -37,14 +37,13 @@ import {
   getFunctions, httpsCallable,
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
 
-// TODO(Ashish): replace with your Firebase project's own web config.
 const FIREBASE_CONFIG = {
-  apiKey: "REPLACE_ME",
-  authDomain: "REPLACE_ME.firebaseapp.com",
-  projectId: "REPLACE_ME",
-  storageBucket: "REPLACE_ME.appspot.com",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME",
+  apiKey: "AIzaSyAKStYBUCvHs_iSDBXuFSe1lapfewdICsc",
+  authDomain: "designhaus-ai-lab.firebaseapp.com",
+  projectId: "designhaus-ai-lab",
+  storageBucket: "designhaus-ai-lab.firebasestorage.app",
+  messagingSenderId: "320801112110",
+  appId: "1:320801112110:web:5beb9a21b285e9002adfbf",
 };
 export const DC_FIREBASE_CONFIGURED = FIREBASE_CONFIG.apiKey !== "REPLACE_ME";
 
