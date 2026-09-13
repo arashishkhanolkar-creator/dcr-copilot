@@ -377,13 +377,8 @@
   }
   .modal-close:hover{background:var(--line);color:var(--ink);}
 
-  /* ---------- account / DC coins (nav sits over the hero photo) ---------- */
+  /* ---------- account (nav sits over the hero photo) ---------- */
   .nav-account{display:flex;align-items:center;gap:16px;}
-  .coin-badge{
-    display:flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-weight:700;
-    font-size:13px;cursor:pointer;background:none;border:none;color:var(--hero-text);padding:0;
-  }
-  .coin-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;}
   .account-name{
     font-size:12.5px;color:var(--hero-text-dim);max-width:110px;overflow:hidden;
     text-overflow:ellipsis;white-space:nowrap;
@@ -439,22 +434,6 @@
   }
   .dc-step{display:none;}
   .dc-step.on{display:block;}
-  .coin-packages{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
-  .coin-pkg{
-    display:flex;align-items:center;justify-content:space-between;padding:16px 18px;
-    border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;
-    transition:border-color .2s ease,background .2s ease;background:#fff;
-  }
-  .coin-pkg:hover{border-color:var(--ink);}
-  .coin-pkg.sel{border-color:var(--amber);background:#f8ede6;}
-  .coin-pkg-coins{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;}
-  .coin-pkg-tag{font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--amber-deep);font-weight:700;margin-left:8px;}
-  .coin-pkg-price{font-family:'Manrope',sans-serif;font-weight:600;font-size:14px;color:var(--ink-soft);}
-  .coin-balance-line{
-    display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;
-    font-size:15px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line);
-  }
-  .coin-balance-line .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);}
   #dcRecaptchaContainer{display:none;}
 
   /* ---------- chat panel (replaces the buy section) ---------- */
@@ -812,35 +791,18 @@
   </div>
 </div>
 
-<!-- Buy DC Coins modal -->
-<div class="dc-modal-overlay" id="buyCoinsOverlay">
-  <div class="dc-modal">
-    <button class="dc-modal-close" data-close="buyCoinsOverlay">&times;</button>
-    <h3>DC Coins</h3>
-    <p class="dc-sub">Top up your balance. Each question in DCR Copilot costs 10 DC.</p>
-    <div class="coin-balance-line"><span class="dot"></span> <span id="buyModalBalance">0</span> DC</div>
-    <div class="coin-packages" id="coinPackagesList"></div>
-    <button class="dc-primary-btn" id="btnBuySelected" disabled>Select a package</button>
-    <p class="dc-status" id="buyStatus"></p>
-  </div>
-</div>
-
 <div id="dcRecaptchaContainer"></div>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script type="module">
   import {
-    DC_FIREBASE_CONFIGURED, COIN_PACKAGES, onDCAuthChange,
+    DC_FIREBASE_CONFIGURED, onDCAuthChange,
     dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
-    dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent, dcBuyCoinPackage,
+    dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent,
   } from './assets/js/dc-auth.js';
 
   const $ = id => document.getElementById(id);
   const navAccount = $('navAccount');
   const signInOverlay = $('signInOverlay');
-  const buyCoinsOverlay = $('buyCoinsOverlay');
-  let selectedPackage = null;
-  let currentCoins = 0;
 
   function showStep(id) {
     document.querySelectorAll('.dc-step').forEach(s => s.classList.toggle('on', s.id === id));
@@ -853,9 +815,7 @@
   document.querySelectorAll('[data-back]').forEach(btn => {
     btn.addEventListener('click', () => showStep(btn.dataset.back));
   });
-  [signInOverlay, buyCoinsOverlay].forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay); });
-  });
+  signInOverlay.addEventListener('click', e => { if (e.target === signInOverlay) closeModal(signInOverlay); });
 
   function notConfiguredMessage(el) {
     el.textContent = "Sign-in isn't switched on yet — check back soon.";
@@ -863,20 +823,15 @@
   }
   function openSignIn() { showStep('stepProviders'); openModal(signInOverlay); }
 
-  // ---- Nav + chat gate: signed-out vs signed-in state ----
+  // ---- Nav: signed-out vs signed-in state ----
   onDCAuthChange(user => {
     if (user) {
-      currentCoins = user.coins;
       navAccount.innerHTML = `
-        <button class="coin-badge" id="coinBadgeBtn"><span class="dot"></span>${user.coins} DC</button>
         <span class="account-name">${user.displayName || user.email || user.phoneNumber || 'Account'}</span>
         <button class="nav-signin-btn" id="btnSignOut">Sign out</button>
       `;
-      $('coinBadgeBtn').addEventListener('click', () => { renderCoinPackages(); openModal(buyCoinsOverlay); });
       $('btnSignOut').addEventListener('click', () => dcSignOut());
-      $('buyModalBalance').textContent = user.coins;
     } else {
-      currentCoins = 0;
       navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
       $('btnSignIn').addEventListener('click', openSignIn);
     }
@@ -958,51 +913,6 @@
   if (DC_FIREBASE_CONFIGURED) {
     dcCompleteEmailLinkSignInIfPresent().catch(() => {});
   }
-
-  // ---- Buy DC Coins ----
-  function renderCoinPackages() {
-    const list = $('coinPackagesList');
-    list.innerHTML = '';
-    selectedPackage = null;
-    $('btnBuySelected').disabled = true;
-    $('btnBuySelected').textContent = 'Select a package';
-    COIN_PACKAGES.forEach(pkg => {
-      const el = document.createElement('div');
-      el.className = 'coin-pkg';
-      el.innerHTML = `
-        <span class="coin-pkg-coins">${pkg.coins} DC${pkg.best ? '<span class="coin-pkg-tag">Best value</span>' : ''}</span>
-        <span class="coin-pkg-price">₹${pkg.priceINR}</span>
-      `;
-      el.addEventListener('click', () => {
-        document.querySelectorAll('.coin-pkg').forEach(p => p.classList.remove('sel'));
-        el.classList.add('sel');
-        selectedPackage = pkg;
-        $('btnBuySelected').disabled = false;
-        $('btnBuySelected').textContent = `Buy ${pkg.coins} DC — ₹${pkg.priceINR}`;
-      });
-      list.appendChild(el);
-    });
-  }
-  $('btnBuySelected').addEventListener('click', async () => {
-    if (!selectedPackage) return;
-    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('buyStatus'));
-    $('btnBuySelected').disabled = true;
-    $('buyStatus').textContent = 'Opening payment…';
-    $('buyStatus').className = 'dc-status';
-    try {
-      const result = await dcBuyCoinPackage(selectedPackage.id);
-      $('buyStatus').textContent = `Added ${result.coins} DC to your balance.`;
-      const newBalance = parseInt($('buyModalBalance').textContent, 10) + (result.alreadyCredited ? 0 : result.coins);
-      $('buyModalBalance').textContent = newBalance;
-      currentCoins = newBalance;
-      const badge = $('coinBadgeBtn');
-      if (badge) badge.innerHTML = `<span class="dot"></span>${newBalance} DC`;
-    } catch (err) {
-      $('buyStatus').textContent = err.message;
-      $('buyStatus').className = 'dc-status err';
-    }
-    $('btnBuySelected').disabled = false;
-  });
 </script>
 
 <div class="modal" id="modal-terms">
