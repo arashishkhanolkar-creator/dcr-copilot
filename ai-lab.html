@@ -101,13 +101,13 @@
   /* ---------- AI LAB HERO: big title + about (right, below nav) + bottom product strip ---------- */
   .lab-hero{
     min-height:100vh; display:flex; flex-direction:column; justify-content:space-between;
-    padding-top:150px; padding-bottom:64px; background:var(--stone);
+    padding-top:180px; padding-bottom:64px; background:var(--stone);
   }
   .lab-hero-top{
     flex:1; display:flex; align-items:center; justify-content:space-between; gap:48px; flex-wrap:wrap;
   }
   .lab-title{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(56px,9vw,150px);
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(42px,6.75vw,112.5px);
     text-transform:uppercase; letter-spacing:-0.02em; line-height:0.95; color:var(--charcoal); margin:0;
   }
   .lab-about{max-width:420px;}
@@ -115,7 +115,6 @@
   .lab-about p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300; margin:0;}
   .lab-about p strong{color:var(--charcoal); font-weight:600;}
   @media(max-width:900px){
-    .lab-hero{padding-top:120px;}
     .lab-hero-top{flex-direction:column; align-items:flex-start; gap:32px;}
     .lab-about{max-width:100%;}
   }
@@ -262,7 +261,6 @@
   <div class="nav-mark">
     <a href="index.html" aria-label="Designhaus Collective — Home" class="nav-mark-link">
       <img src="assets/icons/logo-mark.png" alt="">
-      <span class="nav-wordmark">AI Lab</span>
     </a>
   </div>
   <nav class="links">
