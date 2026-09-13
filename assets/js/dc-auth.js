@@ -101,10 +101,19 @@ onAuthStateChanged(auth, async (user) => {
     unsubscribeCoins = onSnapshot(doc(db, "users", user.uid), snap => {
       if (snap.exists()) {
         const d = snap.data();
+        const ms = ts => (ts && typeof ts.toMillis === "function") ? ts.toMillis() : null;
         currentUser = {
           ...currentUser, coins: d.coins || 0,
           tier: d.tier || null, status: d.status || null,
-          trialEnd: d.trialEnd ? d.trialEnd.toMillis() : null,
+          trialStart: ms(d.trialStart), trialEnd: ms(d.trialEnd),
+          subscriptionId: d.subscriptionId || null,
+          razorpaySubscriptionStatus: d.razorpaySubscriptionStatus || null,
+          billingPeriod: d.billingPeriod || null,
+          currentPeriodEnd: ms(d.currentPeriodEnd),
+          launchPricing: !!d.launchPricing,
+          launchPricingExpiry: ms(d.launchPricingExpiry),
+          gracePeriodEnd: ms(d.gracePeriodEnd),
+          createdAt: ms(d.createdAt),
         };
         notify();
       }

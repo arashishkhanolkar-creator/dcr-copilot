@@ -827,7 +827,7 @@
   onDCAuthChange(user => {
     if (user) {
       navAccount.innerHTML = `
-        <span class="account-name">${user.displayName || user.email || user.phoneNumber || 'Account'}</span>
+        <a href="account.html" class="account-name">${user.displayName || user.email || user.phoneNumber || 'Account'}</a>
         <button class="nav-signin-btn" id="btnSignOut">Sign out</button>
       `;
       $('btnSignOut').addEventListener('click', () => dcSignOut());
