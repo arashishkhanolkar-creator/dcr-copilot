@@ -22,13 +22,9 @@ actually need your sign-off before I write any code:
    share token itself — e.g. `presentations/{shareToken}`. This is so an
    anonymous client (no login, per the brief) can fetch *that one document*
    by ID, without Firestore rules having to expose anything else.
-3. **Feasibility Studio's report is modeled as fields on the project
-   document itself (one report per project, regenerated in place)**, not a
-   separate historical `feasibility_reports` table. The brief lists it as
-   its own table with `created_at`, which reads like it *might* want
-   version history (keep every past report per project, not just the
-   latest). **Which do you want** — latest-only (simpler), or keep every
-   regenerated version?
+3. **Confirmed:** Feasibility Studio's report is modeled as fields on the
+   project document itself (one report per project, regenerated in
+   place) — not a separate historical `feasibility_reports` table.
 4. **Trial expiry and grace-period expiry need a scheduled (cron) function**
    — these are time-based transitions ("7 days have passed," "3 days of
    grace have passed"), not triggered by a Razorpay webhook event. This
@@ -133,11 +129,8 @@ doc, or `tier` is null").
 
 ---
 
-## 4. What still needs your input
+## 4. Status
 
-- §1.3 above (report history: latest-only vs versioned) — the one real
-  open question in this doc.
-- Everything else here I'm treating as confirmed unless you flag it —
-  reply with changes or a go-ahead and Phase 1 build order (per the brief)
-  starts with Razorpay plans (done) → auth/tier-selection signup flow →
-  trial logic → webhook handler → access-control middleware.
+All open questions resolved — this doc is confirmed. Build order (per the
+brief): Razorpay plans (done) → auth/tier-selection signup flow + trial
+logic (in progress) → webhook handler → access-control middleware.

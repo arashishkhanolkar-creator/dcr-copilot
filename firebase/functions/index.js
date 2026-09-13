@@ -215,3 +215,61 @@ exports.sendDcrChatMessage = onCall(
     }
   }
 );
+
+// ══════════════════════════════════════════════════════
+// AI Lab subscription — trial activation + expiry.
+//
+// tier/status/trial* fields are only ever written here (Admin SDK,
+// bypasses Firestore rules) or by the Razorpay webhook handler once
+// that's built — never by the client directly. See
+// firebase/PHASE1-DATA-MODEL.md for the full state machine.
+// ══════════════════════════════════════════════════════
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+
+const TRIAL_DAYS = 7;
+
+exports.startTrial = onCall(
+  {},
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
+    const tier = request.data && request.data.tier;
+    if (tier !== "designer" && tier !== "practice") {
+      throw new HttpsError("invalid-argument", "tier must be 'designer' or 'practice'.");
+    }
+
+    const userRef = db.collection("users").doc(request.auth.uid);
+    return db.runTransaction(async (tx) => {
+      const snap = await tx.get(userRef);
+      const data = snap.exists ? snap.data() : {};
+      if (data.tier || data.status) {
+        throw new HttpsError("failed-precondition", "You've already started a trial or subscription.");
+      }
+      const now = admin.firestore.Timestamp.now();
+      const trialEnd = admin.firestore.Timestamp.fromMillis(now.toMillis() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
+      tx.set(userRef, {
+        tier,
+        status: "trial_active",
+        trialStart: now,
+        trialEnd,
+      }, { merge: true });
+      return { status: "trial_active", tier, trialEndMillis: trialEnd.toMillis() };
+    });
+  }
+);
+
+// Runs hourly: flips any trial past its trialEnd to trial_expired, unless
+// they've since subscribed (subscriptionId would be set by the webhook
+// handler, which also updates status away from trial_active — this query
+// only ever matches users still sitting at trial_active).
+exports.expireTrials = onSchedule("every 1 hours", async () => {
+  const now = admin.firestore.Timestamp.now();
+  const snap = await db.collection("users")
+    .where("status", "==", "trial_active")
+    .where("trialEnd", "<=", now)
+    .get();
+  if (snap.empty) return;
+  const batch = db.batch();
+  snap.forEach(doc => batch.update(doc.ref, { status: "trial_expired" }));
+  await batch.commit();
+  console.log(`expireTrials: transitioned ${snap.size} user(s) to trial_expired`);
+});

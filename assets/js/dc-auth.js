@@ -100,7 +100,12 @@ onAuthStateChanged(auth, async (user) => {
     notify();
     unsubscribeCoins = onSnapshot(doc(db, "users", user.uid), snap => {
       if (snap.exists()) {
-        currentUser = { ...currentUser, coins: snap.data().coins || 0 };
+        const d = snap.data();
+        currentUser = {
+          ...currentUser, coins: d.coins || 0,
+          tier: d.tier || null, status: d.status || null,
+          trialEnd: d.trialEnd ? d.trialEnd.toMillis() : null,
+        };
         notify();
       }
     });
@@ -189,6 +194,14 @@ export async function dcBuyCoinPackage(packageId) {
     });
     rzp.open();
   });
+}
+
+// ---- AI Lab subscription trial ----
+export async function dcStartTrial(tier) {
+  if (!currentUser) throw new Error("Sign in first.");
+  const start = httpsCallable(functions, "startTrial");
+  const { data } = await start({ tier });
+  return data;
 }
 
 // ---- DCR Copilot chat — each call sends the running conversation and
