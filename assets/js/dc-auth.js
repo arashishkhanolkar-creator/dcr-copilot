@@ -169,6 +169,75 @@ export function dcCompleteEmailLinkSignInIfPresent() {
   });
 }
 
+// ---- Shared account/subscription status summary — used by the nav's
+// Profile dropdown and the account page, so the copy for each state
+// only lives in one place. See firebase/PHASE1-DATA-MODEL.md for the
+// full state machine this mirrors. ----
+const TIER_LABEL = { designer: "Designer", practice: "Practice" };
+function fmtDate(ms) {
+  return ms ? new Date(ms).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null;
+}
+function daysLeft(ms) {
+  return ms ? Math.max(0, Math.ceil((ms - Date.now()) / 86400000)) : null;
+}
+export function dcAccountSummary(user) {
+  const tierLabel = TIER_LABEL[user.tier] || null;
+  switch (user.status) {
+    case "trial_active": {
+      const dl = daysLeft(user.trialEnd);
+      return {
+        pillClass: "ok", pillLabel: "Trial active",
+        planLabel: tierLabel ? `${tierLabel} plan` : "Trial",
+        detail: `${dl} day${dl === 1 ? "" : "s"} left — ends ${fmtDate(user.trialEnd)}`,
+        actionLabel: "Subscribe now", actionHref: "pricing.html",
+      };
+    }
+    case "trial_expired":
+      return {
+        pillClass: "neutral", pillLabel: "Trial expired",
+        planLabel: tierLabel ? `${tierLabel} plan` : "Trial",
+        detail: `Ended ${fmtDate(user.trialEnd)}`,
+        actionLabel: "Subscribe to continue", actionHref: "pricing.html",
+      };
+    case "subscribed_designer":
+    case "subscribed_practice":
+      return {
+        pillClass: "ok", pillLabel: "Active",
+        planLabel: `${tierLabel} plan`,
+        detail: user.currentPeriodEnd ? `Renews ${fmtDate(user.currentPeriodEnd)}` : "",
+        actionLabel: null, actionHref: null,
+      };
+    case "subscription_lapsed":
+      return {
+        pillClass: "warn", pillLabel: "Payment issue",
+        planLabel: tierLabel ? `${tierLabel} plan` : "",
+        detail: user.gracePeriodEnd ? `Update payment by ${fmtDate(user.gracePeriodEnd)}` : "",
+        actionLabel: "Contact support", actionHref: "mailto:connect@designhauscollective.in",
+      };
+    case "subscription_cancelled":
+      return {
+        pillClass: "neutral", pillLabel: "Cancelled",
+        planLabel: tierLabel ? `${tierLabel} plan` : "",
+        detail: user.currentPeriodEnd ? `Access until ${fmtDate(user.currentPeriodEnd)}` : "",
+        actionLabel: "Resubscribe", actionHref: "pricing.html",
+      };
+    case "subscription_expired":
+      return {
+        pillClass: "err", pillLabel: "Expired",
+        planLabel: tierLabel ? `${tierLabel} plan` : "",
+        detail: "",
+        actionLabel: "Subscribe again", actionHref: "pricing.html",
+      };
+    default:
+      return {
+        pillClass: "neutral", pillLabel: "No plan",
+        planLabel: "",
+        detail: "Start a 7-day free trial",
+        actionLabel: "Choose a plan", actionHref: "pricing.html",
+      };
+  }
+}
+
 // ---- DC Coin purchase — Razorpay Checkout, verified server-side
 // before any coins are credited (see firebase/functions/index.js). ----
 export async function dcBuyCoinPackage(packageId) {

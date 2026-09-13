@@ -72,7 +72,7 @@
   }
   .nav-item:hover .dropdown-wrap{opacity:1; pointer-events:auto;}
   .dropdown{
-    background:var(--ivory); color:var(--charcoal); min-width:180px;
+    background:var(--ivory); color:var(--charcoal); min-width:230px;
     border:1px solid var(--line); padding:8px 0;
   }
   .dropdown a{
@@ -81,6 +81,22 @@
   }
   .dropdown a:last-child{border-bottom:none;}
   .dropdown a:hover{opacity:0.6;}
+  .dropdown-info{padding:14px 18px 16px; border-bottom:1px solid var(--line);}
+  .dropdown-plan{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; margin-bottom:6px;}
+  .dropdown-pill{
+    display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:600; letter-spacing:0.03em;
+    padding:3px 9px; border-radius:100px; margin-bottom:6px;
+  }
+  .dropdown-pill .dot{width:6px; height:6px; border-radius:50%;}
+  .dropdown-pill.ok{background:rgba(61,107,79,0.12); color:#3d6b4f;}
+  .dropdown-pill.ok .dot{background:#3d6b4f;}
+  .dropdown-pill.warn{background:rgba(156,77,46,0.12); color:#9c4d2e;}
+  .dropdown-pill.warn .dot{background:#9c4d2e;}
+  .dropdown-pill.err{background:rgba(168,68,42,0.12); color:#a8442a;}
+  .dropdown-pill.err .dot{background:#a8442a;}
+  .dropdown-pill.neutral{background:var(--stone); color:var(--concrete);}
+  .dropdown-pill.neutral .dot{background:var(--taupe);}
+  .dropdown-detail{font-size:11px; color:var(--concrete); line-height:1.5; text-transform:none; letter-spacing:normal;}
 
   /* ---------- HERO ---------- */
   .pricing-hero{padding:190px 56px 60px; text-align:center;}
@@ -435,7 +451,7 @@
 
 <script type="module">
   import {
-    DC_FIREBASE_CONFIGURED, onDCAuthChange,
+    DC_FIREBASE_CONFIGURED, onDCAuthChange, dcAccountSummary,
     dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
     dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent, dcStartTrial,
   } from './assets/js/dc-auth.js';
@@ -498,12 +514,20 @@
   onDCAuthChange(user => {
     signedIn = !!user;
     if (user) {
+      const s = dcAccountSummary(user);
       navAccount.innerHTML = `
         <div class="nav-item">
           <a href="account.html" class="link-u">Profile</a>
           <span class="chev">▾</span>
           <div class="dropdown-wrap">
             <div class="dropdown">
+              <div class="dropdown-info">
+                <span class="dropdown-pill ${s.pillClass}"><span class="dot"></span>${s.pillLabel}</span>
+                ${s.planLabel ? `<div class="dropdown-plan">${s.planLabel}</div>` : ''}
+                ${s.detail ? `<div class="dropdown-detail">${s.detail}</div>` : ''}
+              </div>
+              ${s.actionLabel ? `<a href="${s.actionHref}">${s.actionLabel}</a>` : ''}
+              <a href="account.html">View account</a>
               <a href="#" id="btnSignOut">Sign out</a>
             </div>
           </div>
