@@ -130,10 +130,19 @@ const DCR_SKILL_ID = "skill_015TttVjDjmjSBWfCd3RV6GY";
 const DCR_CHAT_COST = 0; // TEMP: free while testing — set back to 10 before going live
 const DCR_MAX_HISTORY = 20; // most recent messages kept, oldest trimmed first
 
+// DCR Copilot (coin-based) is being retired in favor of Feasibility Studio,
+// a subscription-gated product. Disabled here rather than removed so the
+// skill/deployment stays intact if it's needed for reference during that
+// rebuild.
+const DCR_CHAT_ENABLED = false;
+
 exports.sendDcrChatMessage = onCall(
   { secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 120, memory: "512MiB" },
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
+    if (!DCR_CHAT_ENABLED) {
+      throw new HttpsError("failed-precondition", "DCR Copilot is being rebuilt into Feasibility Studio — check back soon.");
+    }
     if (DCR_SKILL_ID === "REPLACE_ME") {
       throw new HttpsError("failed-precondition", "DCR Copilot chat isn't set up yet.");
     }

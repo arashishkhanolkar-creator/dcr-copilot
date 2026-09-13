@@ -519,15 +519,15 @@
   <div class="wrap hero-inner">
     <div class="eyebrow">For architects · planners · designers</div>
     <h1>Stop searching.<br><span class="accent">Start asking.</span></h1>
-    <p class="sub">DCR Copilot answers UDCPR and DCPR-2034 questions in a chat, right on this page — ask your question, get the clause, table, and page reference. No more digging through 500-page PDFs.</p>
+    <p class="sub">DCR Copilot is being rebuilt into Feasibility Studio — full site feasibility reports plus grounded, project-specific UDCPR and DCPR-2034 Q&amp;A, part of Designhaus AI Lab.</p>
     <div class="cta-row">
-      <a class="btn" href="#chat" id="start-chat-link">Ask DCR Copilot — 10 DC/question →</a>
-      <a class="btn btn-ghost" href="#how">See how it works</a>
+      <a class="btn" href="#chat">Coming soon →</a>
+      <a class="btn btn-ghost" href="#how">See how it worked</a>
     </div>
     <div class="badges">
-      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat right here, no install</div>
-      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>Pay per question</div>
-      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>No subscription</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>Rebuilding as Feasibility Studio</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Grounded per-site Q&amp;A</div>
+      <div class="badge"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Part of AI Lab Practice plan</div>
     </div>
   </div>
   <div class="citation-float">
@@ -668,33 +668,17 @@
 <section class="chat-section" id="chat">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">Ask DCR Copilot</div>
-      <h2>Ask your question below.</h2>
-      <p>10 DC per question, less than the cost of a coffee. Sign in to get a DC Coins balance — no subscription, top up whenever you need to.</p>
+      <div class="eyebrow">DCR Copilot</div>
+      <h2>Becoming Feasibility Studio.</h2>
+      <p>DCR Copilot's chat is offline while we rebuild it into Feasibility Studio — a full site feasibility report plus grounded, project-specific Q&amp;A, part of the Designhaus AI Lab Practice plan. Check back soon.</p>
     </div>
     <div class="chat-shell">
       <div class="chat-top">
         <span class="chat-top-title">DCR Copilot</span>
-        <span class="chat-top-cost">10 DC / question</span>
+        <span class="chat-top-cost">Coming back as Feasibility Studio</span>
       </div>
-
-      <div id="chatSignedOut" class="chat-gate">
-        <p>Sign in to start asking UDCPR and DCPR-2034 questions — Google, phone, or email.</p>
-        <button class="btn" id="btnChatSignIn">Sign in to chat →</button>
-      </div>
-
-      <div id="chatSignedIn" style="display:none;">
-        <div class="chat-log" id="chatLog">
-          <p class="chat-empty">Ask about FSI, setbacks, parking, TDR, premiums — anything UDCPR or DCPR-2034.</p>
-        </div>
-        <div class="chat-low-balance">
-          <span id="chatBalanceText">0 DC available</span>
-          <button class="btn" style="background:transparent;border:1px solid var(--line);color:var(--ink);padding:9px 16px;font-size:12.5px;" id="btnChatTopUp">Top up →</button>
-        </div>
-        <div class="chat-input-row">
-          <textarea id="chatInput" rows="1" placeholder="e.g. What's the parking requirement for a hospital in Pune?"></textarea>
-          <button class="btn" id="btnChatSend">Ask — 10 DC</button>
-        </div>
+      <div class="chat-gate">
+        <p>This chat is temporarily unavailable while it's rebuilt into Feasibility Studio.</p>
       </div>
     </div>
   </div>
@@ -717,11 +701,11 @@
     </details>
     <details>
       <summary>Do I need a Claude account?</summary>
-      <p>No. The chat runs directly on this page — no Claude account, no download, no install. Just sign in with Google, phone, or email and you're ready to ask.</p>
+      <p>No. Feasibility Studio will run directly on this page — no Claude account, no download, no install. Just sign in with Google, phone, or email.</p>
     </details>
     <details>
-      <summary>How much does each question cost?</summary>
-      <p>10 DC per question. ₹50 gets you 200 DC (20 questions) — larger top-up packs work out to less per question. If a question fails to answer for any reason, you're not charged.</p>
+      <summary>How does pricing work?</summary>
+      <p>Feasibility Studio will be part of Designhaus AI Lab's Practice subscription plan, not a per-question charge. Details on pricing and plans are coming soon.</p>
     </details>
     <details>
       <summary>What happens when UDCPR or DCPR-2034 gets amended?</summary>
@@ -846,10 +830,9 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script type="module">
   import {
-    DC_FIREBASE_CONFIGURED, COIN_PACKAGES, DCR_CHAT_COST, onDCAuthChange,
+    DC_FIREBASE_CONFIGURED, COIN_PACKAGES, onDCAuthChange,
     dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
     dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent, dcBuyCoinPackage,
-    dcSendChatMessage,
   } from './assets/js/dc-auth.js';
 
   const $ = id => document.getElementById(id);
@@ -858,8 +841,6 @@
   const buyCoinsOverlay = $('buyCoinsOverlay');
   let selectedPackage = null;
   let currentCoins = 0;
-  let chatHistory = [];
-  let sending = false;
 
   function showStep(id) {
     document.querySelectorAll('.dc-step').forEach(s => s.classList.toggle('on', s.id === id));
@@ -894,15 +875,10 @@
       $('coinBadgeBtn').addEventListener('click', () => { renderCoinPackages(); openModal(buyCoinsOverlay); });
       $('btnSignOut').addEventListener('click', () => dcSignOut());
       $('buyModalBalance').textContent = user.coins;
-      $('chatSignedOut').style.display = 'none';
-      $('chatSignedIn').style.display = '';
-      $('chatBalanceText').textContent = `${user.coins} DC available`;
     } else {
       currentCoins = 0;
       navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
       $('btnSignIn').addEventListener('click', openSignIn);
-      $('chatSignedOut').style.display = '';
-      $('chatSignedIn').style.display = 'none';
     }
   });
 
@@ -1019,7 +995,6 @@
       const newBalance = parseInt($('buyModalBalance').textContent, 10) + (result.alreadyCredited ? 0 : result.coins);
       $('buyModalBalance').textContent = newBalance;
       currentCoins = newBalance;
-      $('chatBalanceText').textContent = `${newBalance} DC available`;
       const badge = $('coinBadgeBtn');
       if (badge) badge.innerHTML = `<span class="dot"></span>${newBalance} DC`;
     } catch (err) {
@@ -1027,89 +1002,6 @@
       $('buyStatus').className = 'dc-status err';
     }
     $('btnBuySelected').disabled = false;
-  });
-
-  // ---- Chat ----
-  $('btnChatSignIn').addEventListener('click', openSignIn);
-  $('btnChatTopUp').addEventListener('click', () => { renderCoinPackages(); openModal(buyCoinsOverlay); });
-
-  // Minimal, safe markdown-ish rendering: escape HTML, then render just
-  // paragraphs, tables (from a leading |, GFM-style) and **bold**.
-  function renderAssistantText(text) {
-    const escape = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const lines = text.split('\n');
-    let html = '';
-    let i = 0;
-    while (i < lines.length) {
-      const line = lines[i];
-      if (/^\s*\|.*\|\s*$/.test(line) && lines[i + 1] && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
-        const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
-        const headers = cells(line);
-        i += 2;
-        let rows = [];
-        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(cells(lines[i])); i++; }
-        html += '<table><thead><tr>' + headers.map(h => `<th>${escape(h)}</th>`).join('') + '</tr></thead><tbody>' +
-          rows.map(r => '<tr>' + r.map(c => `<td>${escape(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
-      } else if (line.trim() === '') {
-        i++;
-      } else {
-        let para = line;
-        i++;
-        while (i < lines.length && lines[i].trim() !== '' && !/^\s*\|.*\|\s*$/.test(lines[i])) { para += '\n' + lines[i]; i++; }
-        html += `<p>${escape(para).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>`;
-      }
-    }
-    return html;
-  }
-
-  function appendMessage(role, text) {
-    const log = $('chatLog');
-    const empty = log.querySelector('.chat-empty');
-    if (empty) empty.remove();
-    const el = document.createElement('div');
-    el.className = `chat-msg ${role}`;
-    if (role === 'assistant') el.innerHTML = renderAssistantText(text);
-    else el.textContent = text;
-    log.appendChild(el);
-    log.scrollTop = log.scrollHeight;
-    return el;
-  }
-
-  async function sendChat() {
-    if (sending) return;
-    const input = $('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
-    if (currentCoins < DCR_CHAT_COST) {
-      appendMessage('error', `You need at least ${DCR_CHAT_COST} DC to ask a question — top up to keep going.`);
-      return;
-    }
-    sending = true;
-    $('btnChatSend').disabled = true;
-    input.value = '';
-    appendMessage('user', text);
-    chatHistory.push({ role: 'user', content: text });
-    const pending = appendMessage('pending assistant', 'Reading the relevant chapters…');
-    try {
-      const result = await dcSendChatMessage(chatHistory);
-      pending.remove();
-      appendMessage('assistant', result.reply);
-      chatHistory.push({ role: 'assistant', content: result.reply });
-      currentCoins = result.coins;
-      $('chatBalanceText').textContent = `${result.coins} DC available`;
-      const badge = $('coinBadgeBtn');
-      if (badge) badge.innerHTML = `<span class="dot"></span>${result.coins} DC`;
-    } catch (err) {
-      pending.remove();
-      chatHistory.pop();
-      appendMessage('error', err.message || 'Something went wrong — try again.');
-    }
-    sending = false;
-    $('btnChatSend').disabled = false;
-  }
-  $('btnChatSend').addEventListener('click', sendChat);
-  $('chatInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
   });
 </script>
 
