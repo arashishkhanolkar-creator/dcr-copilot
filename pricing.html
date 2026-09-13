@@ -63,6 +63,24 @@
   @media (max-width:860px){ nav.links{display:none;} }
   .nav-account{display:contents;}
   .nav-account button.link-u{background:none; border:none; padding:0; cursor:pointer; font-family:'Manrope',sans-serif; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; font-weight:500; color:var(--charcoal);}
+  .nav-item{position:relative; display:flex; align-items:center; gap:6px;}
+  .nav-item .chev{font-size:8px; opacity:0.6;}
+  .dropdown-wrap{
+    position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    padding-top:22px;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  .nav-item:hover .dropdown-wrap{opacity:1; pointer-events:auto;}
+  .dropdown{
+    background:var(--ivory); color:var(--charcoal); min-width:180px;
+    border:1px solid var(--line); padding:8px 0;
+  }
+  .dropdown a{
+    display:block; padding:13px 22px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;
+    color:var(--charcoal); border-bottom:1px solid var(--line); transition:opacity .2s ease;
+  }
+  .dropdown a:last-child{border-bottom:none;}
+  .dropdown a:hover{opacity:0.6;}
 
   /* ---------- HERO ---------- */
   .pricing-hero{padding:190px 56px 60px; text-align:center;}
@@ -481,10 +499,17 @@
     signedIn = !!user;
     if (user) {
       navAccount.innerHTML = `
-        <a href="account.html" class="link-u">${user.displayName || user.email || user.phoneNumber || 'Account'}</a>
-        <button class="link-u" id="btnSignOut">Sign out</button>
+        <div class="nav-item">
+          <a href="account.html" class="link-u">Profile</a>
+          <span class="chev">▾</span>
+          <div class="dropdown-wrap">
+            <div class="dropdown">
+              <a href="#" id="btnSignOut">Sign out</a>
+            </div>
+          </div>
+        </div>
       `;
-      $('btnSignOut').addEventListener('click', () => dcSignOut());
+      $('btnSignOut').addEventListener('click', (e) => { e.preventDefault(); dcSignOut(); });
     } else {
       navAccount.innerHTML = `<a href="#" class="link-u" id="btnSignIn">Sign in</a>`;
       $('btnSignIn').addEventListener('click', (e) => { e.preventDefault(); openSignIn(null); });

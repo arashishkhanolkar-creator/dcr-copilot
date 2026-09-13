@@ -379,10 +379,6 @@
 
   /* ---------- account (nav sits over the hero photo) ---------- */
   .nav-account{display:flex;align-items:center;gap:16px;}
-  .account-name{
-    font-size:12.5px;color:var(--hero-text-dim);max-width:110px;overflow:hidden;
-    text-overflow:ellipsis;white-space:nowrap;
-  }
   .nav-signin-btn{
     font-family:'Manrope',sans-serif;font-weight:600;font-size:12.5px;
     background:transparent;border:1px solid rgba(255,255,255,0.4);border-radius:var(--radius);
@@ -390,6 +386,23 @@
   }
   .nav-signin-btn:hover{border-color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.06);}
   @media(max-width:600px){ .nav-account{display:none;} }
+  .nav-item{position:relative;display:flex;align-items:center;}
+  .nav-item .chev{font-size:8px;opacity:0.7;margin-left:6px;}
+  .dropdown-wrap{
+    position:absolute;top:100%;right:0;padding-top:14px;
+    opacity:0;pointer-events:none;transition:opacity .3s ease;
+  }
+  .nav-item:hover .dropdown-wrap{opacity:1;pointer-events:auto;}
+  .dropdown{
+    background:var(--paper);color:var(--ink);min-width:170px;
+    border:1px solid var(--line);border-radius:var(--radius);padding:8px 0;
+  }
+  .dropdown a{
+    display:block;padding:12px 18px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;
+    color:var(--ink);border-bottom:1px solid var(--line);transition:opacity .2s ease;
+  }
+  .dropdown a:last-child{border-bottom:none;}
+  .dropdown a:hover{opacity:0.6;}
 
   /* Modal shell (shared by sign-in + buy-coins) */
   .dc-modal-overlay{
@@ -827,10 +840,16 @@
   onDCAuthChange(user => {
     if (user) {
       navAccount.innerHTML = `
-        <a href="account.html" class="account-name">${user.displayName || user.email || user.phoneNumber || 'Account'}</a>
-        <button class="nav-signin-btn" id="btnSignOut">Sign out</button>
+        <div class="nav-item">
+          <a href="account.html" class="nav-signin-btn" style="display:inline-flex;align-items:center;">Profile<span class="chev">▾</span></a>
+          <div class="dropdown-wrap">
+            <div class="dropdown">
+              <a href="#" id="btnSignOut">Sign out</a>
+            </div>
+          </div>
+        </div>
       `;
-      $('btnSignOut').addEventListener('click', () => dcSignOut());
+      $('btnSignOut').addEventListener('click', (e) => { e.preventDefault(); dcSignOut(); });
     } else {
       navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
       $('btnSignIn').addEventListener('click', openSignIn);

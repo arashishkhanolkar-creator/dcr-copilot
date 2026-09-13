@@ -456,10 +456,17 @@
   onDCAuthChange(user => {
     if (user) {
       navAccount.innerHTML = `
-        <a href="account.html" class="link-u">${user.displayName || user.email || user.phoneNumber || 'Account'}</a>
-        <button class="link-u" id="btnSignOut">Sign out</button>
+        <div class="nav-item">
+          <a href="account.html" class="link-u">Profile</a>
+          <span class="chev">▾</span>
+          <div class="dropdown-wrap">
+            <div class="dropdown">
+              <a href="#" id="btnSignOut">Sign out</a>
+            </div>
+          </div>
+        </div>
       `;
-      $('btnSignOut').addEventListener('click', () => dcSignOut());
+      $('btnSignOut').addEventListener('click', (e) => { e.preventDefault(); dcSignOut(); });
     } else {
       navAccount.innerHTML = `<a href="#" class="link-u" id="btnSignIn">Sign in</a>`;
       $('btnSignIn').addEventListener('click', (e) => { e.preventDefault(); showStep('stepProviders'); openModal(signInOverlay); });
