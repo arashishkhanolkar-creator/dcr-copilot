@@ -101,32 +101,56 @@
     0%, 100%{transform:translateY(0);}
     50%{transform:translateY(8px);}
   }
-  .work-section{background:var(--stone); padding:170px 56px 100px; min-height:100vh; display:flex; align-items:center;}
-  .work-frame-inner{display:grid; grid-template-columns:61.8% 38.2%; width:100%; height:70vh; min-height:460px;}
-  .work-image-col .ph{border-radius:4px 0 0 4px;}
-  .work-disciplines{background:var(--ivory); padding:32px 40px; display:flex; flex-direction:column; justify-content:flex-start; overflow-y:auto; border-radius:0 4px 4px 0;}
-  .work-disciplines .wd-item{padding:18px 0; border-bottom:1px solid var(--line);}
-  .work-disciplines .wd-item:last-child{border-bottom:none;}
-  .work-disciplines .wd-item h4{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; color:var(--charcoal); margin-bottom:8px;}
-  .work-disciplines .wd-item p{font-size:12.5px; line-height:1.65; color:var(--concrete); font-weight:300;}
-  .work-frame-inner .ph{height:100%;}
-  @media(max-width:860px){
-    .work-frame-inner{grid-template-columns:1fr; grid-template-rows:auto 1fr; height:auto;}
-    .work-disciplines{padding:20px 24px;}
-  }
   @media(max-width:700px){
     .hero-work-about{max-width:260px; left:24px; bottom:120px;}
     .hero-intro-work{right:24px; bottom:26px;}
     .hero-intro-work svg{width:14px; height:18px;}
-    .work-section{padding:140px 24px 60px;}
   }
 
-  .work-image-col{position:relative; height:100%;}
-  .work-image-col .ph{height:100%;}
+  .work-image-col{position:relative;}
   .work-credit{
     position:absolute; top:100%; left:0; margin-top:16px;
     display:block; color:var(--earth); transition:opacity .5s ease;
   }
+
+  /* ---------- WORK GALLERY ---------- */
+  .work-gallery{padding:150px 56px 40px;}
+  .work-gallery-head{max-width:640px; margin-bottom:56px;}
+  .work-gallery-head .micro{margin-bottom:20px; display:block;}
+  .work-gallery-head h2{
+    font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:clamp(28px,3.8vw,50px);
+    line-height:1.2; letter-spacing:-0.005em;
+  }
+  .filter-tabs{display:flex; gap:32px; border-bottom:1px solid var(--line); margin-bottom:64px; flex-wrap:wrap;}
+  .filter-tab{
+    font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;
+    padding:0 0 16px; border:none; background:none; cursor:pointer; color:var(--concrete);
+    border-bottom:1.5px solid transparent; margin-bottom:-1px; transition:color .2s ease, border-color .2s ease;
+  }
+  .filter-tab.active{color:var(--charcoal); border-color:var(--charcoal);}
+  .thumb-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:44px 32px; padding-bottom:110px;}
+  @media(max-width:980px){.thumb-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:620px){.thumb-grid{grid-template-columns:1fr;}}
+  .thumb{display:none;}
+  .thumb.show{display:block;}
+  .thumb .ph{aspect-ratio:4/5; margin-bottom:16px; border-radius:4px;}
+  .thumb-cat{margin-bottom:6px; display:block;}
+  .thumb-title{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:16px;}
+  @media(max-width:700px){ .work-gallery{padding:140px 24px 20px;} }
+
+  /* ---------- SERVICES + STUDIO (side by side) ---------- */
+  .services-studio{background:var(--stone); padding:110px 56px 130px;}
+  .ss-grid{display:grid; grid-template-columns:1fr 1fr; gap:80px; max-width:1400px; margin:0 auto;}
+  .ss-col-head{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(28px,3.4vw,44px);
+    text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:40px; line-height:1;
+  }
+  .ss-slideshow{aspect-ratio:4/5; border-radius:4px;}
+  .ss-col .work-credit{position:static; margin-top:16px;}
+  .ss-col .work-disciplines{border-radius:4px; margin-top:40px;}
+  .ss-col .studio-block{max-width:none; margin:0;}
+  @media(max-width:980px){ .ss-grid{grid-template-columns:1fr; gap:110px;} }
+  @media(max-width:700px){ .services-studio{padding:90px 24px 90px;} }
   .slide-nav{
     position:absolute; top:50%; transform:translateY(-50%); z-index:10;
     width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;
@@ -218,20 +242,11 @@
   .intro-desc{font-size:13px; letter-spacing:0.04em; color:var(--concrete); font-weight:400;}
 
   /* ---------- STUDIO STATEMENT ---------- */
-  .studio{background:var(--ivory); padding:120px 56px 100px;}
-  .studio-name{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(34px,6vw,72px);
-    text-transform:uppercase; line-height:1; margin-bottom:140px; letter-spacing:-0.01em;
-  }
-  .studio-block{max-width:640px; margin:0 auto;}
   .studio-photo{width:280px; max-width:100%; aspect-ratio:4/5; margin:0 0 56px; position:relative;}
   .studio-bottom{padding-top:40px; border-top:1px solid var(--line);}
   .studio-bottom .micro{margin-bottom:16px; display:block;}
   .studio-copy{max-width:600px; text-align:left;}
   .studio-copy p{font-size:14px; line-height:1.8; color:var(--concrete); font-weight:300;}
-  @media(max-width:860px){
-    .studio-name{margin-bottom:80px;}
-  }
 
   /* ---------- CONTACT ---------- */
   .contact{background:var(--charcoal); color:var(--ivory); padding:150px 56px 110px;}
@@ -298,8 +313,9 @@
     </a>
   </div>
   <nav class="links">
+    <a href="#work" class="link-u">Work</a>
+    <a href="#services" class="link-u">Services</a>
     <a href="#studio" class="link-u">Studio</a>
-    <a href="#work" class="link-u">Services</a>
     <a href="#contact" class="link-u">Contact</a>
     <a href="ai-lab.html" class="link-u">AI Lab</a>
   </nav>
@@ -318,53 +334,101 @@
   </a>
 </section>
 
-<section id="work" class="work-section">
-  <div class="work-frame-inner">
-    <div class="work-image-col">
-      <div class="ph charcoal" data-slideshow id="heroSlideshow">
-        <button type="button" class="slide-nav slide-prev" id="slidePrev" aria-label="Previous image">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button type="button" class="slide-nav slide-next" id="slideNext" aria-label="Next image">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-      <span class="micro work-credit" id="heroSlideshowCredit"></span>
+<section id="work" class="work-gallery">
+  <div class="work-gallery-head">
+    <span class="micro">Selected Work</span>
+    <h2>Work, by discipline.</h2>
+  </div>
+  <div class="filter-tabs" role="tablist">
+    <button class="filter-tab active" data-filter="all">All</button>
+    <button class="filter-tab" data-filter="architecture">Architecture</button>
+    <button class="filter-tab" data-filter="interior">Interior</button>
+    <button class="filter-tab" data-filter="3d-visualisation">3D Visualisation</button>
+    <button class="filter-tab" data-filter="graphics">Branding &amp; Graphic Design</button>
+  </div>
+  <div class="thumb-grid">
+    <div class="thumb show" data-cat="3d-visualisation">
+      <div class="ph"><img class="zoom" src="assets/work/commercial-office-borivali.jpg" alt="Commercial office at Borivali — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
+      <span class="micro thumb-cat">3D Visualisation</span>
+      <div class="thumb-title">Commercial Office, Borivali</div>
     </div>
-    <div class="work-disciplines">
-      <div class="wd-item">
-        <h4>Architecture</h4>
-        <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character. From concept to construction, every detail is considered.</p>
-      </div>
-      <div class="wd-item">
-        <h4>Interior Design</h4>
-        <p>Interiors shaped through material, proportion, light, and detail. We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
-      </div>
-      <div class="wd-item">
-        <h4>3D Visualization</h4>
-        <p>We turn design intent into compelling visual experiences. Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
-      </div>
-      <div class="wd-item">
-        <h4>Branding &amp; Graphic Design</h4>
-        <p>We build identities that extend beyond the logo into a cohesive visual language. Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
-      </div>
-      <div class="wd-item">
-        <h4>AI &amp; Design Tools</h4>
-        <p>We explore how AI can make design work smarter, faster, and more capable. From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
-      </div>
+    <div class="thumb show" data-cat="interior">
+      <div class="ph"><img class="zoom" src="assets/work/residential-interior-bandra.jpg" alt="Residential interior at Bandra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
+      <span class="micro thumb-cat">Interior</span>
+      <div class="thumb-title">Residential Interior, Bandra</div>
+    </div>
+    <div class="thumb show" data-cat="3d-visualisation">
+      <div class="ph"><img class="zoom" src="assets/work/residential-interior-worli.jpg" alt="Residential interior at Worli — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
+      <span class="micro thumb-cat">3D Visualisation</span>
+      <div class="thumb-title">Residential Interior, Worli</div>
+    </div>
+    <div class="thumb show" data-cat="3d-visualisation">
+      <div class="ph"><img class="zoom" src="assets/work/residential-interior-chembur.jpg" alt="Residential interior at Chembur — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
+      <span class="micro thumb-cat">3D Visualisation</span>
+      <div class="thumb-title">Residential Interior, Chembur</div>
+    </div>
+    <div class="thumb show" data-cat="3d-visualisation">
+      <div class="ph"><img class="zoom" src="assets/work/residential-interior.jpg" alt="Residential interior — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
+      <span class="micro thumb-cat">3D Visualisation</span>
+      <div class="thumb-title">Residential Interior</div>
+    </div>
+    <div class="thumb show" data-cat="3d-visualisation">
+      <div class="ph"><img class="zoom" src="assets/work/textile-design.jpg" alt="Textile design — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
+      <span class="micro thumb-cat">3D Visualisation</span>
+      <div class="thumb-title">Textile Design</div>
     </div>
   </div>
 </section>
 
+<section class="services-studio">
+  <div class="ss-grid">
+    <div id="services" class="ss-col">
+      <h2 class="ss-col-head">Services</h2>
+      <div class="work-image-col">
+        <div class="ph charcoal ss-slideshow" data-slideshow id="heroSlideshow">
+          <button type="button" class="slide-nav slide-prev" id="slidePrev" aria-label="Previous image">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="slide-nav slide-next" id="slideNext" aria-label="Next image">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <span class="micro work-credit" id="heroSlideshowCredit"></span>
+      </div>
+      <div class="work-disciplines">
+        <div class="wd-item">
+          <h4>Architecture</h4>
+          <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character. From concept to construction, every detail is considered.</p>
+        </div>
+        <div class="wd-item">
+          <h4>Interior Design</h4>
+          <p>Interiors shaped through material, proportion, light, and detail. We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
+        </div>
+        <div class="wd-item">
+          <h4>3D Visualization</h4>
+          <p>We turn design intent into compelling visual experiences. Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
+        </div>
+        <div class="wd-item">
+          <h4>Branding &amp; Graphic Design</h4>
+          <p>We build identities that extend beyond the logo into a cohesive visual language. Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
+        </div>
+        <div class="wd-item">
+          <h4>AI &amp; Design Tools</h4>
+          <p>We explore how AI can make design work smarter, faster, and more capable. From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
+        </div>
+      </div>
+    </div>
 
-<section id="studio" class="studio">
-  <h2 class="studio-name">The Studio</h2>
-  <div class="studio-block">
-    <div class="ph studio-photo"><img src="assets/ashish-khanolkar.jpg" alt="Ashish Khanolkar" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"></div>
-    <div class="studio-bottom">
-      <span class="micro">About</span>
-      <div class="studio-copy">
-        <p>Ashish Khanolkar is an Architect, designer and founder of Designhaus Collective, driven by a passion for design and technology. He is always keen to bring the work at the intersection of creativity, strategy and emerging technology with a focus on creating thoughtful, contemporary design experiences.</p>
+    <div id="studio" class="ss-col">
+      <h2 class="ss-col-head">Studio</h2>
+      <div class="studio-block">
+        <div class="ph studio-photo"><img src="assets/ashish-khanolkar.jpg" alt="Ashish Khanolkar" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"></div>
+        <div class="studio-bottom">
+          <span class="micro">About</span>
+          <div class="studio-copy">
+            <p>Ashish Khanolkar is an Architect, designer and founder of Designhaus Collective, driven by a passion for design and technology. He is always keen to bring the work at the intersection of creativity, strategy and emerging technology with a focus on creating thoughtful, contemporary design experiences.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -418,8 +482,9 @@
   <div class="footer-row">
     <img src="assets/icons/logo-mark.png" alt="Designhaus Collective">
     <div class="footer-links">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
       <a href="#studio">Studio</a>
-      <a href="#work">Services</a>
       <a href="#contact">Contact</a>
     </div>
     <span class="foot-copy">© Designhaus Collective</span>
@@ -431,6 +496,19 @@
   window.addEventListener('scroll', ()=>{
     nav.classList.toggle('scrolled', window.scrollY > 60);
   });
+
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const thumbs = document.querySelectorAll('.thumb');
+  function applyWorkFilter(cat){
+    filterTabs.forEach(t=>t.classList.toggle('active', t.dataset.filter === cat));
+    thumbs.forEach(th=>{
+      th.classList.toggle('show', cat === 'all' || th.dataset.cat === cat);
+    });
+  }
+  filterTabs.forEach(tab=>{
+    tab.addEventListener('click', ()=> applyWorkFilter(tab.dataset.filter));
+  });
+
   const workLink = document.getElementById('workTrigger');
   const workSection = document.getElementById('work');
   if(workLink && workSection){
