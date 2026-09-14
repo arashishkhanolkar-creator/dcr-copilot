@@ -120,6 +120,7 @@ onAuthStateChanged(auth, async (user) => {
           createdAt: ms(d.createdAt),
           feasibilityUsageDate: d.feasibilityUsageDate || null,
           feasibilityUsageCount: d.feasibilityUsageCount || 0,
+          internalTestAccount: !!d.internalTestAccount,
         };
         notify();
       }

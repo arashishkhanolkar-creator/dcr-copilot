@@ -274,6 +274,30 @@ exports.expireTrials = onSchedule("every 1 hours", async () => {
   console.log(`expireTrials: transitioned ${snap.size} user(s) to trial_expired`);
 });
 
+// Internal team accounts — permanent Practice access and exempt from the
+// daily message cap, for testing the product. Checked against the signed-in
+// Firebase Auth email (server-verified, never client-supplied), so this
+// can't be spoofed from the browser. Add emails here as the team grows.
+const ADMIN_EMAILS = ["ar.ashishkhanolkar@gmail.com"];
+
+// Self-service for the account.html "internal access" button — the caller
+// can only ever grant access to themselves (request.auth.uid), and only if
+// their own signed-in email is on the server-side allowlist above, so a
+// regular user calling this directly gets permission-denied.
+exports.grantInternalAccess = onCall(async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
+  const email = request.auth.token.email || "";
+  if (!ADMIN_EMAILS.includes(email)) {
+    throw new HttpsError("permission-denied", "This account isn't on the internal access list.");
+  }
+  await db.collection("users").doc(request.auth.uid).set({
+    tier: "practice",
+    status: "subscribed_practice",
+    internalTestAccount: true,
+  }, { merge: true });
+  return { ok: true };
+});
+
 // ══════════════════════════════════════════════════════
 // Feasibility Studio — the DCR Copilot regulation skill, grounded in a
 // specific user-created project's site data instead of answering generic
@@ -363,14 +387,17 @@ exports.sendFeasibilityMessage = onCall(
       throw new HttpsError("permission-denied", "Feasibility Studio is on the Practice plan — subscribe or start a Practice trial to use it.");
     }
 
-    const usage = await checkAndBumpFeasibilityUsage(userRef);
-    if (!usage.allowed) {
-      throw new HttpsError(
-        "resource-exhausted",
-        `You've reached today's Feasibility Studio limit (${FEASIBILITY_DAILY_MESSAGE_CAP} messages) — ` +
-        "plenty to take a full project from site details to a complete feasibility report. " +
-        "It resets at midnight IST, so you can pick back up tomorrow."
-      );
+    const isAdmin = ADMIN_EMAILS.includes(request.auth.token.email || "");
+    if (!isAdmin) {
+      const usage = await checkAndBumpFeasibilityUsage(userRef);
+      if (!usage.allowed) {
+        throw new HttpsError(
+          "resource-exhausted",
+          `You've reached today's Feasibility Studio limit (${FEASIBILITY_DAILY_MESSAGE_CAP} messages) — ` +
+          "plenty to take a full project from site details to a complete feasibility report. " +
+          "It resets at midnight IST, so you can pick back up tomorrow."
+        );
+      }
     }
 
     const projectRef = db.collection("users").doc(uid).collection("projects").doc(projectId);

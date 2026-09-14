@@ -262,6 +262,15 @@
       </div>
     </div>
 
+    <div class="plan-card" id="adminTools" style="display:none;">
+      <div class="plan-card-top"><span class="plan-tier">Internal team account</span></div>
+      <p class="plan-detail">Grant this account permanent Practice access for testing — no trial, no billing, and exempt from the Feasibility Studio daily message cap.</p>
+      <div class="acct-actions">
+        <button class="btn" id="btnGrantInternal">Enable internal access</button>
+      </div>
+      <p class="plan-detail" id="adminToolsStatus" style="margin-top:10px;"></p>
+    </div>
+
     <div class="acct-signout">
       <button id="btnSignOut">Sign out</button>
     </div>
@@ -329,10 +338,11 @@
 
 <script type="module">
   import {
-    DC_FIREBASE_CONFIGURED, onDCAuthChange, dcAccountSummary,
+    DC_FIREBASE_CONFIGURED, onDCAuthChange, dcAccountSummary, dcFunctions,
     dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
     dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent,
   } from './assets/js/dc-auth.js';
+  import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js';
 
   const $ = id => document.getElementById(id);
   const navAccount = $('navAccount');
@@ -358,6 +368,23 @@
     el.className = 'dc-status err';
   }
   function openSignIn() { showStep('stepProviders'); openModal(signInOverlay); }
+
+  const ADMIN_EMAILS = ["ar.ashishkhanolkar@gmail.com"];
+
+  $('btnGrantInternal').addEventListener('click', async () => {
+    const btn = $('btnGrantInternal');
+    const status = $('adminToolsStatus');
+    btn.disabled = true;
+    status.textContent = 'Granting…';
+    try {
+      await httpsCallable(dcFunctions, 'grantInternalAccess')();
+      status.textContent = 'Done — internal access granted. Reloading…';
+      setTimeout(() => location.reload(), 900);
+    } catch (err) {
+      status.textContent = err.message || 'Something went wrong.';
+      btn.disabled = false;
+    }
+  });
 
   const TIER_LABEL = { designer: 'Designer', practice: 'Practice' };
   const fmtDate = ms => ms ? new Date(ms).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
@@ -445,6 +472,16 @@
       $('infoPeriodEnd').textContent = fmtDate(user.currentPeriodEnd) || '—';
     } else {
       infoGrid.style.display = 'none';
+    }
+
+    // Cosmetic gate only — clicking still calls a Cloud Function that
+    // re-checks the signed-in email against its own server-side allowlist,
+    // so hiding/showing this button client-side isn't a security boundary.
+    const adminTools = $('adminTools');
+    if (ADMIN_EMAILS.includes(user.email) && !user.internalTestAccount) {
+      adminTools.style.display = '';
+    } else {
+      adminTools.style.display = 'none';
     }
   }
 
