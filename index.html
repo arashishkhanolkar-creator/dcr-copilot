@@ -138,6 +138,7 @@
   .lightbox-caption{margin-top:18px; text-align:center;}
   .lightbox-caption .micro{color:rgba(243,239,232,0.55); margin-bottom:6px; display:block;}
   .lightbox-caption div{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:16px; color:var(--ivory);}
+  #lightboxCount{margin-top:8px; margin-bottom:0;}
   .lightbox-close{
     position:absolute; top:28px; right:36px; background:none; border:none; color:var(--ivory);
     font-size:34px; line-height:1; cursor:pointer; z-index:2; font-weight:300;
@@ -359,32 +360,32 @@
     <button class="filter-tab" data-filter="graphics">Branding &amp; Graphic Design</button>
   </div>
   <div class="thumb-grid">
-    <div class="thumb show" data-cat="3d-visualisation">
+    <div class="thumb show" data-cat="3d-visualisation" data-project="commercial-office-borivali">
       <div class="ph"><img class="zoom" src="assets/work/commercial-office-borivali.jpg" alt="Commercial office at Borivali — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
       <span class="micro thumb-cat">3D Visualisation</span>
       <div class="thumb-title">Commercial Office, Borivali</div>
     </div>
-    <div class="thumb show" data-cat="interior">
+    <div class="thumb show" data-cat="interior" data-project="residential-interior-bandra">
       <div class="ph"><img class="zoom" src="assets/work/residential-interior-bandra.jpg" alt="Residential interior at Bandra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
       <span class="micro thumb-cat">Interior</span>
       <div class="thumb-title">Residential Interior, Bandra</div>
     </div>
-    <div class="thumb show" data-cat="3d-visualisation">
+    <div class="thumb show" data-cat="3d-visualisation" data-project="residential-interior-worli">
       <div class="ph"><img class="zoom" src="assets/work/residential-interior-worli.jpg" alt="Residential interior at Worli — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
       <span class="micro thumb-cat">3D Visualisation</span>
       <div class="thumb-title">Residential Interior, Worli</div>
     </div>
-    <div class="thumb show" data-cat="3d-visualisation">
+    <div class="thumb show" data-cat="3d-visualisation" data-project="residential-interior-chembur">
       <div class="ph"><img class="zoom" src="assets/work/residential-interior-chembur.jpg" alt="Residential interior at Chembur — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
       <span class="micro thumb-cat">3D Visualisation</span>
       <div class="thumb-title">Residential Interior, Chembur</div>
     </div>
-    <div class="thumb show" data-cat="3d-visualisation">
+    <div class="thumb show" data-cat="3d-visualisation" data-project="residential-interior">
       <div class="ph"><img class="zoom" src="assets/work/residential-interior.jpg" alt="Residential interior — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
       <span class="micro thumb-cat">3D Visualisation</span>
       <div class="thumb-title">Residential Interior</div>
     </div>
-    <div class="thumb show" data-cat="3d-visualisation">
+    <div class="thumb show" data-cat="3d-visualisation" data-project="textile-design">
       <div class="ph"><img class="zoom" src="assets/work/textile-design.jpg" alt="Textile design — 3D visualisation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></div>
       <span class="micro thumb-cat">3D Visualisation</span>
       <div class="thumb-title">Textile Design</div>
@@ -510,7 +511,7 @@
 
 <div class="lightbox-overlay" id="workLightbox">
   <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
-  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous project">
+  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous image">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div class="lightbox-box">
@@ -518,9 +519,10 @@
     <div class="lightbox-caption">
       <span class="micro" id="lightboxCat"></span>
       <div id="lightboxTitle"></div>
+      <span class="micro" id="lightboxCount"></span>
     </div>
   </div>
-  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next project">
+  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next image">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 </div>
@@ -544,10 +546,30 @@
   });
 
   (function(){
+    // Number of images available per project in assets/work/ — image 1 is
+    // <slug>.jpg (the grid thumbnail itself), images 2+ are <slug>-N.jpg.
+    const PROJECT_IMAGE_COUNTS = {
+      'commercial-office-borivali': 10,
+      'residential-interior-bandra': 2,
+      'residential-interior-worli': 6,
+      'residential-interior-chembur': 14,
+      'residential-interior': 13,
+      'textile-design': 17,
+    };
+    function projectImages(slug){
+      const count = PROJECT_IMAGE_COUNTS[slug] || 1;
+      const list = [`assets/work/${slug}.jpg`];
+      for (let i = 2; i <= count; i++) list.push(`assets/work/${slug}-${i}.jpg`);
+      return list;
+    }
+
     const overlay = document.getElementById('workLightbox');
     const imgEl = document.getElementById('lightboxImg');
     const catEl = document.getElementById('lightboxCat');
     const titleEl = document.getElementById('lightboxTitle');
+    const countEl = document.getElementById('lightboxCount');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
     let items = [];
     let current = 0;
 
@@ -557,6 +579,7 @@
       imgEl.alt = item.title;
       catEl.textContent = item.cat;
       titleEl.textContent = item.title;
+      countEl.textContent = items.length > 1 ? `${current + 1} / ${items.length}` : '';
     }
     function show(delta){
       current = (current + delta + items.length) % items.length;
@@ -566,6 +589,9 @@
       items = list;
       current = index;
       render();
+      const multi = items.length > 1;
+      prevBtn.style.display = multi ? '' : 'none';
+      nextBtn.style.display = multi ? '' : 'none';
       overlay.classList.add('on');
       document.body.style.overflow = 'hidden';
     }
@@ -576,20 +602,16 @@
 
     thumbs.forEach(thumb=>{
       thumb.addEventListener('click', ()=>{
-        const visible = Array.from(document.querySelectorAll('.thumb.show'));
-        const list = visible.map(t => ({
-          src: t.querySelector('img').src,
-          title: t.querySelector('.thumb-title').textContent,
-          cat: t.querySelector('.thumb-cat').textContent,
-        }));
-        const index = visible.indexOf(thumb);
-        openLightbox(list, index === -1 ? 0 : index);
+        const title = thumb.querySelector('.thumb-title').textContent;
+        const cat = thumb.querySelector('.thumb-cat').textContent;
+        const list = projectImages(thumb.dataset.project).map(src => ({ src, title, cat }));
+        openLightbox(list, 0);
       });
     });
 
     document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
-    document.getElementById('lightboxPrev').addEventListener('click', ()=> show(-1));
-    document.getElementById('lightboxNext').addEventListener('click', ()=> show(1));
+    prevBtn.addEventListener('click', ()=> show(-1));
+    nextBtn.addEventListener('click', ()=> show(1));
     overlay.addEventListener('click', (e)=>{ if (e.target === overlay) closeLightbox(); });
     document.addEventListener('keydown', (e)=>{
       if (!overlay.classList.contains('on')) return;
