@@ -122,6 +122,44 @@
   .thumb-cat{margin-bottom:5px; display:block;}
   .thumb-title{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:14px;}
   @media(max-width:700px){ .work-gallery{padding:140px 24px 20px;} }
+  .thumb{cursor:pointer;}
+
+  /* ---------- WORK LIGHTBOX ---------- */
+  .lightbox-overlay{
+    position:fixed; inset:0; z-index:500; background:rgba(20,17,15,0.94);
+    display:none; align-items:center; justify-content:center;
+  }
+  .lightbox-overlay.on{display:flex;}
+  .lightbox-box{
+    width:70vw; height:70vh; max-width:1300px; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .lightbox-box img{max-width:100%; max-height:calc(100% - 54px); object-fit:contain; border-radius:4px;}
+  .lightbox-caption{margin-top:18px; text-align:center;}
+  .lightbox-caption .micro{color:rgba(243,239,232,0.55); margin-bottom:6px; display:block;}
+  .lightbox-caption div{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:16px; color:var(--ivory);}
+  .lightbox-close{
+    position:absolute; top:28px; right:36px; background:none; border:none; color:var(--ivory);
+    font-size:34px; line-height:1; cursor:pointer; z-index:2; font-weight:300;
+  }
+  .lightbox-nav{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:2;
+    width:52px; height:52px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,0.08); color:var(--ivory); display:flex; align-items:center; justify-content:center;
+    transition:background .25s ease;
+  }
+  .lightbox-nav:hover{background:rgba(255,255,255,0.18);}
+  .lightbox-nav svg{width:20px; height:20px;}
+  .lightbox-prev{left:36px;}
+  .lightbox-next{right:36px;}
+  @media(max-width:700px){
+    .lightbox-box{width:88vw; height:60vh;}
+    .lightbox-nav{width:40px; height:40px;}
+    .lightbox-nav svg{width:16px; height:16px;}
+    .lightbox-prev{left:14px;}
+    .lightbox-next{right:14px;}
+    .lightbox-close{top:16px; right:18px; font-size:28px;}
+  }
 
   /* ---------- SERVICES + STUDIO (side by side) ---------- */
   #work, #services, #studio{scroll-margin-top:130px;}
@@ -470,6 +508,23 @@
   </div>
 </footer>
 
+<div class="lightbox-overlay" id="workLightbox">
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous project">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="lightbox-box">
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption">
+      <span class="micro" id="lightboxCat"></span>
+      <div id="lightboxTitle"></div>
+    </div>
+  </div>
+  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next project">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
 <script>
   const nav = document.getElementById('siteNav');
   window.addEventListener('scroll', ()=>{
@@ -487,6 +542,62 @@
   filterTabs.forEach(tab=>{
     tab.addEventListener('click', ()=> applyWorkFilter(tab.dataset.filter));
   });
+
+  (function(){
+    const overlay = document.getElementById('workLightbox');
+    const imgEl = document.getElementById('lightboxImg');
+    const catEl = document.getElementById('lightboxCat');
+    const titleEl = document.getElementById('lightboxTitle');
+    let items = [];
+    let current = 0;
+
+    function render(){
+      const item = items[current];
+      imgEl.src = item.src;
+      imgEl.alt = item.title;
+      catEl.textContent = item.cat;
+      titleEl.textContent = item.title;
+    }
+    function show(delta){
+      current = (current + delta + items.length) % items.length;
+      render();
+    }
+    function openLightbox(list, index){
+      items = list;
+      current = index;
+      render();
+      overlay.classList.add('on');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(){
+      overlay.classList.remove('on');
+      document.body.style.overflow = '';
+    }
+
+    thumbs.forEach(thumb=>{
+      thumb.addEventListener('click', ()=>{
+        const visible = Array.from(document.querySelectorAll('.thumb.show'));
+        const list = visible.map(t => ({
+          src: t.querySelector('img').src,
+          title: t.querySelector('.thumb-title').textContent,
+          cat: t.querySelector('.thumb-cat').textContent,
+        }));
+        const index = visible.indexOf(thumb);
+        openLightbox(list, index === -1 ? 0 : index);
+      });
+    });
+
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    document.getElementById('lightboxPrev').addEventListener('click', ()=> show(-1));
+    document.getElementById('lightboxNext').addEventListener('click', ()=> show(1));
+    overlay.addEventListener('click', (e)=>{ if (e.target === overlay) closeLightbox(); });
+    document.addEventListener('keydown', (e)=>{
+      if (!overlay.classList.contains('on')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') show(-1);
+      if (e.key === 'ArrowRight') show(1);
+    });
+  })();
 
   const workLink = document.getElementById('workTrigger');
   const workSection = document.getElementById('work');
