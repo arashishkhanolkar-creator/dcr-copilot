@@ -133,12 +133,20 @@
   .ss-grid{display:grid; grid-template-columns:1fr 1fr; gap:80px; max-width:1400px; margin:0 auto;}
   .ss-col-head{
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(28px,3.4vw,44px);
-    text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:40px; line-height:1;
+    text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:18px; line-height:1;
   }
-  .ss-col .work-disciplines{border-radius:4px;}
+  .ss-col-sub{max-width:400px; font-size:13.5px; line-height:1.7; color:var(--concrete); font-weight:300; margin-bottom:48px;}
+  .work-disciplines{border-top:1px solid var(--line);}
+  .wd-item{display:grid; grid-template-columns:36px 1fr; gap:18px; padding:26px 0; border-bottom:1px solid var(--line);}
+  .wd-num{font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:12.5px; color:var(--earth); padding-top:3px;}
+  .wd-body h4{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; color:var(--charcoal); margin-bottom:8px;}
+  .wd-body p{font-size:12.5px; line-height:1.65; color:var(--concrete); font-weight:300; max-width:400px;}
   .ss-col .studio-block{max-width:none; margin:0;}
   @media(max-width:980px){ .ss-grid{grid-template-columns:1fr; gap:110px;} }
-  @media(max-width:700px){ .services-studio{padding:90px 24px 90px;} }
+  @media(max-width:700px){
+    .services-studio{padding:90px 24px 90px;}
+    .wd-item{grid-template-columns:28px 1fr; gap:14px;}
+  }
 
   .link-u{position:relative; display:inline-block;}
   .link-u::after{
@@ -358,32 +366,49 @@
   <div class="ss-grid">
     <div id="services" class="ss-col">
       <h2 class="ss-col-head">Services</h2>
+      <p class="ss-col-sub">Five disciplines, one integrated practice — each project draws on whichever mix it needs.</p>
       <div class="work-disciplines">
         <div class="wd-item">
-          <h4>Architecture</h4>
-          <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character. From concept to construction, every detail is considered.</p>
+          <span class="wd-num">01</span>
+          <div class="wd-body">
+            <h4>Architecture</h4>
+            <p>We design thoughtful spaces from the ground up, balancing context, function, and architectural character. From concept to construction, every detail is considered.</p>
+          </div>
         </div>
         <div class="wd-item">
-          <h4>Interior Design</h4>
-          <p>Interiors shaped through material, proportion, light, and detail. We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
+          <span class="wd-num">02</span>
+          <div class="wd-body">
+            <h4>Interior Design</h4>
+            <p>Interiors shaped through material, proportion, light, and detail. We create considered environments that feel cohesive, tactile, and distinctly their own.</p>
+          </div>
         </div>
         <div class="wd-item">
-          <h4>3D Visualization</h4>
-          <p>We turn design intent into compelling visual experiences. Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
+          <span class="wd-num">03</span>
+          <div class="wd-body">
+            <h4>3D Visualization</h4>
+            <p>We turn design intent into compelling visual experiences. Precise, atmospheric imagery built from real design information—not generic stock assets.</p>
+          </div>
         </div>
         <div class="wd-item">
-          <h4>Branding &amp; Graphic Design</h4>
-          <p>We build identities that extend beyond the logo into a cohesive visual language. Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
+          <span class="wd-num">04</span>
+          <div class="wd-body">
+            <h4>Branding &amp; Graphic Design</h4>
+            <p>We build identities that extend beyond the logo into a cohesive visual language. Thoughtful systems designed for studios, spaces, and brands with a connection to the built world.</p>
+          </div>
         </div>
         <div class="wd-item">
-          <h4>AI &amp; Design Tools</h4>
-          <p>We explore how AI can make design work smarter, faster, and more capable. From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
+          <span class="wd-num">05</span>
+          <div class="wd-body">
+            <h4>AI &amp; Design Tools</h4>
+            <p>We explore how AI can make design work smarter, faster, and more capable. From internal tools to intelligent workflows, we build technology around the way designers actually work.</p>
+          </div>
         </div>
       </div>
     </div>
 
     <div id="studio" class="ss-col">
       <h2 class="ss-col-head">Studio</h2>
+      <p class="ss-col-sub">Founder-led, working closely on every project from first sketch to final render.</p>
       <div class="studio-block">
         <div class="ph studio-photo"><img src="assets/ashish-khanolkar.jpg" alt="Ashish Khanolkar" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"></div>
         <div class="studio-bottom">
