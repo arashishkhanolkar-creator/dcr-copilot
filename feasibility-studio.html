@@ -112,6 +112,12 @@
     font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; border:none; background:none;
     color:var(--charcoal); flex:1; padding:4px 0;
   }
+  .usage-counter{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--concrete);
+    white-space:nowrap; padding:4px 10px; border:1px solid var(--line); border-radius:999px;
+  }
+  .usage-counter.near-limit{color:var(--amber-deep); border-color:var(--amber);}
+  .usage-counter.at-limit{color:#fff; background:var(--amber-deep); border-color:var(--amber-deep);}
   .chat-log{flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px;}
   .chat-empty{margin:auto; text-align:center; max-width:360px; color:var(--concrete); font-size:14px; line-height:1.7;}
   .msg{max-width:78%; font-size:14px; line-height:1.65;}
@@ -233,6 +239,7 @@
       <div id="chatArea" class="chat-area">
         <div class="chat-header">
           <input type="text" id="projectNameInput" placeholder="Project name">
+          <span class="usage-counter" id="usageCounter" title="Fair-use limit — resets at midnight IST"></span>
         </div>
         <div class="chat-log" id="chatLog">
           <p class="chat-empty">Describe the site — location, plot area, what you're planning — and ask your feasibility question. Add site details or files on the right for sharper answers.</p>
@@ -393,6 +400,19 @@
     return user.tier === 'practice' && ['trial_active', 'subscribed_practice', 'subscription_lapsed', 'subscription_cancelled'].includes(user.status);
   }
 
+  // Must match FEASIBILITY_DAILY_MESSAGE_CAP in firebase/functions/index.js.
+  const FEASIBILITY_DAILY_MESSAGE_CAP = 40;
+  function todayIST() {
+    return new Date(Date.now() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  }
+  function renderUsageCounter(user) {
+    const el = $('usageCounter');
+    const used = user.feasibilityUsageDate === todayIST() ? (user.feasibilityUsageCount || 0) : 0;
+    el.textContent = `${used}/${FEASIBILITY_DAILY_MESSAGE_CAP} today`;
+    el.classList.toggle('at-limit', used >= FEASIBILITY_DAILY_MESSAGE_CAP);
+    el.classList.toggle('near-limit', used < FEASIBILITY_DAILY_MESSAGE_CAP && used >= FEASIBILITY_DAILY_MESSAGE_CAP - 5);
+  }
+
   // ---- Auth state → nav + gate ----
   onDCAuthChange(user => {
     currentUser = user;
@@ -433,6 +453,7 @@
     if (hasFeasibilityAccess(user)) {
       $('gateNoAccess').style.display = 'none';
       $('appBody').style.display = 'flex';
+      renderUsageCounter(user);
       setupProjectListeners();
     } else {
       $('gateNoAccess').style.display = '';

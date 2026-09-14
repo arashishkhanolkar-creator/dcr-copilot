@@ -118,6 +118,8 @@ onAuthStateChanged(auth, async (user) => {
           launchPricingExpiry: ms(d.launchPricingExpiry),
           gracePeriodEnd: ms(d.gracePeriodEnd),
           createdAt: ms(d.createdAt),
+          feasibilityUsageDate: d.feasibilityUsageDate || null,
+          feasibilityUsageCount: d.feasibilityUsageCount || 0,
         };
         notify();
       }
