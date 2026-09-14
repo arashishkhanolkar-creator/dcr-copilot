@@ -273,3 +273,115 @@ exports.expireTrials = onSchedule("every 1 hours", async () => {
   await batch.commit();
   console.log(`expireTrials: transitioned ${snap.size} user(s) to trial_expired`);
 });
+
+// ══════════════════════════════════════════════════════
+// Feasibility Studio — the DCR Copilot regulation skill, grounded in a
+// specific user-created project's site data instead of answering generic
+// lookups. Practice tier only (trial or subscribed). Unlike the retired
+// coin-based chat, there's no per-message charge — access is gated by
+// subscription status, checked server-side on every call (never trust
+// the client's own UI gating).
+// ══════════════════════════════════════════════════════
+const FEASIBILITY_MAX_HISTORY = 30;
+
+function hasFeasibilityAccess(userData) {
+  if (!userData || userData.tier !== "practice") return false;
+  return ["trial_active", "subscribed_practice", "subscription_lapsed", "subscription_cancelled"].includes(userData.status);
+}
+
+function buildSiteContext(project) {
+  const line = (label, value) => `- ${label}: ${value || "not provided yet"}`;
+  return [
+    `Site details for this project ("${project.name || "Untitled project"}"):`,
+    line("Location", project.location),
+    line("Zone / ward", project.zone),
+    line("Plot area", project.plotArea ? `${project.plotArea} sqm` : null),
+    line("Land use", project.landUse),
+    line("Existing structure", project.existingStructure),
+    line("Development intent", project.developmentIntent),
+    "",
+    "Ground every answer in this specific site — never fall back to a generic, " +
+    "unattributed answer. If a detail you need is missing above and hasn't been " +
+    "mentioned in the conversation, ask the user for it rather than guessing.",
+  ].join("\n");
+}
+
+exports.sendFeasibilityMessage = onCall(
+  { secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 120, memory: "512MiB" },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
+    if (DCR_SKILL_ID === "REPLACE_ME") {
+      throw new HttpsError("failed-precondition", "Feasibility Studio isn't set up yet.");
+    }
+
+    const uid = request.auth.uid;
+    const projectId = request.data && request.data.projectId;
+    const messageText = request.data && request.data.message;
+    if (!projectId || typeof projectId !== "string") {
+      throw new HttpsError("invalid-argument", "projectId is required.");
+    }
+    if (!messageText || typeof messageText !== "string" || !messageText.trim()) {
+      throw new HttpsError("invalid-argument", "message must be non-empty.");
+    }
+
+    const userSnap = await db.collection("users").doc(uid).get();
+    if (!hasFeasibilityAccess(userSnap.exists ? userSnap.data() : null)) {
+      throw new HttpsError("permission-denied", "Feasibility Studio is on the Practice plan — subscribe or start a Practice trial to use it.");
+    }
+
+    const projectRef = db.collection("users").doc(uid).collection("projects").doc(projectId);
+    const projectSnap = await projectRef.get();
+    if (!projectSnap.exists) {
+      throw new HttpsError("not-found", "Project not found.");
+    }
+    const project = projectSnap.data();
+
+    const conversationRef = projectRef.collection("conversation").doc("main");
+    const conversationSnap = await conversationRef.get();
+    const history = (conversationSnap.exists ? conversationSnap.data().messages : []) || [];
+    const trimmedHistory = history.slice(-FEASIBILITY_MAX_HISTORY);
+
+    const messages = [...trimmedHistory, { role: "user", content: messageText }]
+      .map(m => ({ role: m.role, content: m.content }));
+
+    try {
+      const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY.value() });
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-5",
+        max_tokens: 4096,
+        system:
+          "You are Feasibility Studio, part of Designhaus AI Lab, embedded as a chat on a project " +
+          "workspace page — not in Claude Code or claude.ai. There is no terminal or file explorer " +
+          "visible to the user, so never refer to files, the skill, or your own tool use. Answer as " +
+          "the product itself, following the loaded skill's instructions for tone, citations, and scope.\n\n" +
+          buildSiteContext(project),
+        container: { skills: [{ type: "custom", skill_id: DCR_SKILL_ID, version: "latest" }] },
+        tools: [{ type: "code_execution_20260521", name: "code_execution" }],
+        messages,
+      });
+
+      const reply = response.content
+        .filter(block => block.type === "text")
+        .map(block => block.text)
+        .join("\n\n")
+        .trim();
+      if (!reply) throw new Error("Model returned no text content.");
+
+      // Not arrayUnion: it dedupes exact-match entries, which would
+      // silently drop a message if the user (or the model) repeats
+      // itself verbatim — a plain read-append-write is correct here.
+      const now = admin.firestore.FieldValue.serverTimestamp();
+      await conversationRef.set({
+        messages: [...history, { role: "user", content: messageText }, { role: "assistant", content: reply }],
+        updatedAt: now,
+      }, { merge: true });
+      await projectRef.set({ lastActiveAt: now }, { merge: true });
+
+      return { reply };
+    } catch (err) {
+      if (err instanceof HttpsError) throw err;
+      console.error("sendFeasibilityMessage failed", err);
+      throw new HttpsError("internal", "Feasibility Studio couldn't answer that just now — try again.");
+    }
+  }
+);

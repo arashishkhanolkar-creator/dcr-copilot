@@ -52,6 +52,10 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app);
 
+// Exported so other pages (e.g. Feasibility Studio) can build on the same
+// initialized Firebase instances instead of calling initializeApp again.
+export { app as dcFirebaseApp, db as dcFirestore, functions as dcFunctions, auth as dcAuth };
+
 // Keep these in sync with firebase/functions/index.js's PACKAGES map.
 export const COIN_PACKAGES = [
   { id: "pack_200", coins: 200, priceINR: 50 },

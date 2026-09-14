@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<title>Feasibility Studio — Designhaus AI Lab</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --ivory:#f3efe8; --stone:#e8e1d3; --taupe:#b8ac97; --concrete:#8b8478;
+    --charcoal:#2b2724; --earth:#3d372e; --amber:#c1653e; --amber-deep:#9c4d2e;
+    --line: rgba(43,39,36,0.14); --ok:#3d6b4f; --warn:#9c4d2e; --err:#a8442a;
+  }
+  html,body{height:100%;overflow:hidden;}
+  body{
+    background:var(--ivory); color:var(--charcoal); font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+  :focus-visible{outline:1.5px solid var(--earth); outline-offset:2px;}
+
+  .app{display:flex;flex-direction:column;height:100vh;}
+
+  /* ---------- HEADER ---------- */
+  header.app-header{
+    flex:0 0 auto; display:flex; align-items:center; gap:16px;
+    padding:14px 22px; border-bottom:1px solid var(--line); background:var(--stone);
+  }
+  .app-header .brand{display:flex; align-items:center; gap:10px;}
+  .app-header .brand img{height:24px; width:auto;}
+  .app-header .brand span{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; letter-spacing:-0.01em;}
+  .app-header .spacer{flex:1;}
+  .app-header a.back{font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--concrete);}
+
+  .nav-item{position:relative; display:flex; align-items:center; gap:6px;}
+  .nav-item .chev{font-size:8px; opacity:0.6;}
+  .dropdown-wrap{
+    position:absolute; top:100%; right:0; padding-top:14px;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .nav-item:hover .dropdown-wrap{opacity:1; pointer-events:auto;}
+  .dropdown{background:var(--ivory); color:var(--charcoal); min-width:230px; border:1px solid var(--line); padding:8px 0;}
+  .dropdown a{display:block; padding:12px 18px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-weight:500; color:var(--charcoal); border-bottom:1px solid var(--line);}
+  .dropdown a:last-child{border-bottom:none;}
+  .dropdown a:hover{opacity:0.6;}
+  .dropdown-info{padding:14px 18px 16px; border-bottom:1px solid var(--line);}
+  .dropdown-plan{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; margin-bottom:6px;}
+  .dropdown-pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:0.03em;padding:3px 9px;border-radius:100px;margin-bottom:6px;}
+  .dropdown-pill .dot{width:6px;height:6px;border-radius:50%;}
+  .dropdown-pill.ok{background:rgba(61,107,79,0.12);color:var(--ok);}
+  .dropdown-pill.ok .dot{background:var(--ok);}
+  .dropdown-pill.warn{background:rgba(156,77,46,0.12);color:var(--warn);}
+  .dropdown-pill.warn .dot{background:var(--warn);}
+  .dropdown-pill.err{background:rgba(168,68,42,0.12);color:var(--err);}
+  .dropdown-pill.err .dot{background:var(--err);}
+  .dropdown-pill.neutral{background:var(--stone);color:var(--concrete);}
+  .dropdown-pill.neutral .dot{background:var(--taupe);}
+  .dropdown-detail{font-size:11px;color:var(--concrete);line-height:1.5;text-transform:none;letter-spacing:normal;}
+  .nav-signin-btn{
+    font-family:'Manrope',sans-serif;font-weight:600;font-size:12px;
+    background:var(--charcoal);border:none;border-radius:4px;padding:9px 16px;cursor:pointer;color:var(--ivory);
+  }
+
+  /* ---------- GATE STATES ---------- */
+  .gate{flex:1; display:flex; align-items:center; justify-content:center; padding:40px;}
+  .gate-card{max-width:420px; text-align:center;}
+  .gate-card h1{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:26px; margin-bottom:14px; letter-spacing:-0.01em;}
+  .gate-card p{color:var(--concrete); font-size:14.5px; line-height:1.7; margin-bottom:26px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:600;
+    font-size:14px; padding:13px 24px; background:var(--charcoal); color:var(--ivory); border:none;
+    border-radius:4px; cursor:pointer; transition:opacity .2s ease;
+  }
+  .btn:hover{opacity:0.85;}
+  .btn-outline{background:transparent; border:1px solid var(--line); color:var(--charcoal);}
+  #gateHidden{display:none;}
+
+  /* ---------- 3-COLUMN LAYOUT ---------- */
+  .columns{flex:1; display:flex; min-height:0;}
+
+  .col-projects{
+    flex:0 0 260px; border-right:1px solid var(--line); background:var(--stone);
+    display:flex; flex-direction:column; min-height:0;
+  }
+  .col-projects .new-project{padding:16px;}
+  .col-projects .new-project button{
+    width:100%; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px;
+    padding:11px; background:var(--charcoal); color:var(--ivory); border:none; border-radius:4px; cursor:pointer;
+  }
+  .project-list{flex:1; overflow-y:auto; padding:0 8px 16px;}
+  .project-item{
+    display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer;
+    padding:11px 12px; border-radius:4px; margin-bottom:2px; color:var(--charcoal);
+  }
+  .project-item:hover{background:rgba(43,39,36,0.05);}
+  .project-item.active{background:#fff; box-shadow:0 1px 0 var(--line);}
+  .project-item .pname{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .project-item .ptime{font-size:11px; color:var(--concrete);}
+  .project-empty{padding:24px 16px; font-size:12.5px; color:var(--concrete); line-height:1.6;}
+
+  .col-chat{flex:1; display:flex; flex-direction:column; min-height:0;}
+  .chat-header{padding:16px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px;}
+  .chat-header input{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; border:none; background:none;
+    color:var(--charcoal); flex:1; padding:4px 0;
+  }
+  .chat-log{flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px;}
+  .chat-empty{margin:auto; text-align:center; max-width:360px; color:var(--concrete); font-size:14px; line-height:1.7;}
+  .msg{max-width:78%; font-size:14px; line-height:1.65;}
+  .msg.user{align-self:flex-end; background:var(--charcoal); color:var(--ivory); padding:11px 15px; border-radius:10px 10px 2px 10px;}
+  .msg.assistant{align-self:flex-start; color:var(--charcoal);}
+  .msg.assistant p{margin:0 0 10px;}
+  .msg.assistant table{width:100%; border-collapse:collapse; font-size:12.5px; margin:10px 0;}
+  .msg.assistant th{text-align:left; font-weight:600; color:var(--concrete); padding:6px 8px; border-bottom:1px solid var(--line); font-size:11px; text-transform:uppercase;}
+  .msg.assistant td{padding:7px 8px; border-bottom:1px solid var(--line);}
+  .msg.pending{color:var(--concrete); font-style:italic;}
+  .msg.error{color:var(--err); align-self:flex-start;}
+  .chat-input-row{display:flex; gap:10px; padding:16px 20px; border-top:1px solid var(--line);}
+  .chat-input-row textarea{
+    flex:1; resize:none; font-family:'Manrope',sans-serif; font-size:14px; padding:11px 14px;
+    border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--charcoal); max-height:120px;
+  }
+  .chat-input-row button{flex-shrink:0;}
+  .no-project{flex:1; display:flex; align-items:center; justify-content:center; color:var(--concrete); font-size:14px; text-align:center; padding:40px;}
+  .chat-area{flex:1; display:none; flex-direction:column; min-height:0;}
+  .chat-area.on{display:flex;}
+
+  .col-side{
+    flex:0 0 300px; border-left:1px solid var(--line); background:var(--stone);
+    overflow-y:auto; padding:20px;
+  }
+  .side-section{margin-bottom:28px;}
+  .side-section h4{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--concrete); margin-bottom:12px;}
+  .site-field{margin-bottom:10px;}
+  .site-field label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--concrete); margin-bottom:4px;}
+  .site-field input{
+    width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:9px 10px;
+    border:1px solid var(--line); border-radius:4px; background:#fff; color:var(--charcoal);
+  }
+  .upload-zone{
+    border:1.5px dashed var(--taupe); border-radius:6px; padding:20px 14px; text-align:center;
+    cursor:pointer; transition:border-color .2s ease, background .2s ease; font-size:12.5px; color:var(--concrete);
+  }
+  .upload-zone:hover, .upload-zone.drag{border-color:var(--amber); background:rgba(193,101,62,0.05);}
+  .upload-zone input{display:none;}
+  .file-list{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+  .file-item{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--line); border-radius:6px; padding:8px 10px;}
+  .file-item img{width:32px; height:32px; object-fit:cover; border-radius:3px; flex-shrink:0;}
+  .file-icon{width:32px; height:32px; border-radius:3px; background:var(--stone); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px; font-weight:700; color:var(--concrete);}
+  .file-name{flex:1; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .file-remove{background:none; border:none; color:var(--taupe); cursor:pointer; font-size:14px; flex-shrink:0;}
+  .file-remove:hover{color:var(--err);}
+  .upload-status{font-size:11.5px; color:var(--concrete); margin-top:8px; min-height:14px;}
+
+  /* ---------- SIGN-IN MODAL ---------- */
+  .dc-modal-overlay{position:fixed; inset:0; z-index:500; background:rgba(43,39,36,0.55); display:none; align-items:center; justify-content:center; padding:24px;}
+  .dc-modal-overlay.on{display:flex;}
+  .dc-modal{background:var(--ivory); color:var(--charcoal); width:100%; max-width:380px; padding:44px 36px 36px; position:relative; max-height:88vh; overflow-y:auto;}
+  .dc-modal-close{position:absolute; top:18px; right:18px; background:none; border:none; cursor:pointer; color:var(--concrete); font-size:20px; line-height:1; padding:4px;}
+  .dc-modal h3{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:22px; margin-bottom:8px; letter-spacing:-0.01em;}
+  .dc-modal .dc-sub{font-size:12.5px; color:var(--concrete); margin-bottom:28px; line-height:1.6;}
+  .dc-provider-btn{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; font-family:'Manrope',sans-serif; font-weight:600; font-size:12.5px; padding:13px; margin-bottom:11px; border:1px solid var(--line); border-radius:2px; background:#fff; color:var(--charcoal); cursor:pointer;}
+  .dc-provider-btn:hover{border-color:var(--charcoal);}
+  .dc-field{width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:12px 14px; margin-bottom:10px; border:1px solid var(--line); border-radius:2px; background:#fff; color:var(--charcoal);}
+  .dc-primary-btn{width:100%; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; padding:13px; background:var(--charcoal); color:var(--ivory); border:none; border-radius:2px; cursor:pointer;}
+  .dc-primary-btn:disabled{opacity:0.4; cursor:default;}
+  .dc-status{font-size:11.5px; color:var(--concrete); margin-top:12px; min-height:16px; line-height:1.6;}
+  .dc-status.err{color:var(--err);}
+  .dc-back-link{display:inline-block; margin-top:16px; font-size:11px; color:var(--concrete); text-decoration:underline; cursor:pointer; background:none; border:none;}
+  .dc-step{display:none;}
+  .dc-step.on{display:block;}
+  #dcRecaptchaContainer{display:none;}
+
+  @media(max-width:900px){
+    .col-side{display:none;}
+  }
+  @media(max-width:700px){
+    .col-projects{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="app-header">
+    <a href="ai-lab.html" class="brand">
+      <img src="assets/icons/logo-mark.png" alt="">
+      <span>Feasibility Studio</span>
+    </a>
+    <div class="spacer"></div>
+    <a href="ai-lab.html" class="back">AI Lab</a>
+    <span id="navAccount">
+      <button class="nav-signin-btn" id="btnSignIn">Sign in</button>
+    </span>
+  </header>
+
+  <div id="gateSignedOut" class="gate">
+    <div class="gate-card">
+      <h1>Sign in to continue</h1>
+      <p>Feasibility Studio is part of the Practice plan. Sign in to check your access or start a trial.</p>
+      <button class="btn" id="btnGateSignIn">Sign in →</button>
+    </div>
+  </div>
+
+  <div id="gateNoAccess" class="gate" style="display:none;">
+    <div class="gate-card">
+      <h1>Practice plan required</h1>
+      <p id="gateNoAccessDetail">Feasibility Studio — unlimited site feasibility reports and grounded Q&amp;A — is included in the Practice plan.</p>
+      <a class="btn" href="pricing.html">See plans →</a>
+    </div>
+  </div>
+
+  <div id="appBody" class="columns" style="display:none;">
+    <aside class="col-projects">
+      <div class="new-project">
+        <button id="btnNewProject">+ New project</button>
+      </div>
+      <div class="project-list" id="projectList">
+        <div class="project-empty">No projects yet — create one to get started.</div>
+      </div>
+    </aside>
+
+    <main class="col-chat">
+      <div id="noProjectState" class="no-project">Select or create a project on the left to start.</div>
+      <div id="chatArea" class="chat-area">
+        <div class="chat-header">
+          <input type="text" id="projectNameInput" placeholder="Project name">
+        </div>
+        <div class="chat-log" id="chatLog">
+          <p class="chat-empty">Describe the site — location, plot area, what you're planning — and ask your feasibility question. Add site details or files on the right for sharper answers.</p>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chatInput" rows="1" placeholder="Ask about this site's FSI, setbacks, parking, TDR…"></textarea>
+          <button class="btn" id="btnSend">Send</button>
+        </div>
+      </div>
+    </main>
+
+    <aside class="col-side" id="sideCol" style="display:none;">
+      <div class="side-section">
+        <h4>Site details</h4>
+        <div class="site-field"><label>Location (city / area)</label><input type="text" id="fLocation"></div>
+        <div class="site-field"><label>Zone / ward</label><input type="text" id="fZone"></div>
+        <div class="site-field"><label>Plot area (sqm)</label><input type="number" id="fPlotArea"></div>
+        <div class="site-field"><label>Land use</label><input type="text" id="fLandUse"></div>
+        <div class="site-field"><label>Existing structure</label><input type="text" id="fExisting"></div>
+        <div class="site-field"><label>Development intent</label><input type="text" id="fIntent"></div>
+      </div>
+      <div class="side-section">
+        <h4>Site files</h4>
+        <label class="upload-zone" id="uploadZone">
+          Drop a DXF or site image here, or click to choose
+          <input type="file" id="fileInput" accept=".dxf,image/*" multiple>
+        </label>
+        <div class="upload-status" id="uploadStatus"></div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Sign-in modal -->
+<div class="dc-modal-overlay" id="signInOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="signInOverlay">&times;</button>
+    <div class="dc-step on" id="stepProviders">
+      <h3>Sign in</h3>
+      <p class="dc-sub">Google, phone, or email.</p>
+      <button class="dc-provider-btn" id="btnGoogle">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.86-.08-1.68-.22-2.47H12v4.68h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.84z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.88-3a7.4 7.4 0 0 1-11-3.9H1.05v3.09A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.05 14.2a7.2 7.2 0 0 1 0-4.4V6.71H1.05a12 12 0 0 0 0 10.58z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44A11.6 11.6 0 0 0 12 0 12 12 0 0 0 1.05 6.71l4 3.1A7.16 7.16 0 0 1 12 4.75z"/></svg>
+        Continue with Google
+      </button>
+      <button class="dc-provider-btn" id="btnUsePhone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Continue with Phone
+      </button>
+      <button class="dc-provider-btn" id="btnUseEmail">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        Continue with Email
+      </button>
+      <p class="dc-status" id="providerStatus"></p>
+    </div>
+    <div class="dc-step" id="stepPhoneNumber">
+      <h3>Enter your phone number</h3>
+      <p class="dc-sub">We'll text you a one-time code. Include your country code.</p>
+      <input class="dc-field" type="tel" id="phoneInput" placeholder="+91 98765 43210">
+      <button class="dc-primary-btn" id="btnSendCode">Send code</button>
+      <p class="dc-status" id="phoneStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+    <div class="dc-step" id="stepPhoneCode">
+      <h3>Enter the code</h3>
+      <p class="dc-sub">Sent by SMS just now.</p>
+      <input class="dc-field" type="text" inputmode="numeric" id="codeInput" placeholder="123456" maxlength="6">
+      <button class="dc-primary-btn" id="btnConfirmCode">Confirm</button>
+      <p class="dc-status" id="codeStatus"></p>
+      <button class="dc-back-link" data-back="stepPhoneNumber">&larr; Back</button>
+    </div>
+    <div class="dc-step" id="stepEmail">
+      <h3>Enter your email</h3>
+      <p class="dc-sub">We'll send you a sign-in link — no password to remember.</p>
+      <input class="dc-field" type="email" id="emailInput" placeholder="you@example.com">
+      <button class="dc-primary-btn" id="btnSendEmailLink">Send link</button>
+      <p class="dc-status" id="emailStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+    <div class="dc-step" id="stepEmailSent">
+      <h3>Check your inbox</h3>
+      <p class="dc-sub">Click the link we just sent — it'll bring you straight back here, signed in.</p>
+    </div>
+  </div>
+</div>
+<div id="dcRecaptchaContainer"></div>
+
+<script type="module">
+  import {
+    DC_FIREBASE_CONFIGURED, onDCAuthChange, dcAccountSummary,
+    dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
+    dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent,
+    dcFirestore, dcFunctions, dcFirebaseApp,
+  } from './assets/js/dc-auth.js';
+  import {
+    collection, doc, addDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp,
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+  import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js';
+  import {
+    getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject,
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js';
+
+  const $ = id => document.getElementById(id);
+  const storage = getStorage(dcFirebaseApp);
+
+  let currentUser = null;
+  let currentUid = null;
+  let projects = [];
+  let activeProjectId = null;
+  let unsubProjects = null;
+  let unsubConversation = null;
+  let unsubFiles = null;
+  let sending = false;
+
+  // ---- Sign-in modal wiring (shared pattern) ----
+  const signInOverlay = $('signInOverlay');
+  function showStep(id) { document.querySelectorAll('.dc-step').forEach(s => s.classList.toggle('on', s.id === id)); }
+  function openModal(overlay) { overlay.classList.add('on'); }
+  function closeModal(overlay) { overlay.classList.remove('on'); }
+  document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal($(btn.dataset.close))));
+  document.querySelectorAll('[data-back]').forEach(btn => btn.addEventListener('click', () => showStep(btn.dataset.back)));
+  signInOverlay.addEventListener('click', e => { if (e.target === signInOverlay) closeModal(signInOverlay); });
+  function notConfiguredMessage(el) { el.textContent = "Sign-in isn't switched on yet — check back soon."; el.className = 'dc-status err'; }
+  function openSignIn() { showStep('stepProviders'); openModal(signInOverlay); }
+
+  $('btnGoogle').addEventListener('click', async () => {
+    if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus'));
+    $('providerStatus').textContent = 'Opening Google sign-in…'; $('providerStatus').className = 'dc-status';
+    try { await dcSignInWithGoogle(); closeModal(signInOverlay); }
+    catch (err) { $('providerStatus').textContent = err.message; $('providerStatus').className = 'dc-status err'; }
+  });
+  $('btnUsePhone').addEventListener('click', () => { if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus')); showStep('stepPhoneNumber'); });
+  $('btnSendCode').addEventListener('click', async () => {
+    const phone = $('phoneInput').value.trim();
+    if (!phone.startsWith('+')) { $('phoneStatus').textContent = 'Include the country code, e.g. +91…'; $('phoneStatus').className = 'dc-status err'; return; }
+    $('btnSendCode').disabled = true; $('phoneStatus').textContent = 'Sending…'; $('phoneStatus').className = 'dc-status';
+    try { await dcStartPhoneSignIn(phone, 'dcRecaptchaContainer'); showStep('stepPhoneCode'); }
+    catch (err) { $('phoneStatus').textContent = err.message; $('phoneStatus').className = 'dc-status err'; }
+    $('btnSendCode').disabled = false;
+  });
+  $('btnConfirmCode').addEventListener('click', async () => {
+    $('codeStatus').textContent = 'Checking…'; $('codeStatus').className = 'dc-status';
+    try { await dcConfirmPhoneCode($('codeInput').value.trim()); closeModal(signInOverlay); }
+    catch (err) { $('codeStatus').textContent = err.message; $('codeStatus').className = 'dc-status err'; }
+  });
+  $('btnUseEmail').addEventListener('click', () => { if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage($('providerStatus')); showStep('stepEmail'); });
+  $('btnSendEmailLink').addEventListener('click', async () => {
+    const email = $('emailInput').value.trim();
+    if (!email.includes('@')) { $('emailStatus').textContent = "That doesn't look like an email address."; $('emailStatus').className = 'dc-status err'; return; }
+    $('emailStatus').textContent = 'Sending…'; $('emailStatus').className = 'dc-status';
+    try { await dcSendEmailLink(email); showStep('stepEmailSent'); }
+    catch (err) { $('emailStatus').textContent = err.message; $('emailStatus').className = 'dc-status err'; }
+  });
+  if (DC_FIREBASE_CONFIGURED) dcCompleteEmailLinkSignInIfPresent().catch(() => {});
+  $('btnGateSignIn').addEventListener('click', openSignIn);
+
+  function hasFeasibilityAccess(user) {
+    return user.tier === 'practice' && ['trial_active', 'subscribed_practice', 'subscription_lapsed', 'subscription_cancelled'].includes(user.status);
+  }
+
+  // ---- Auth state → nav + gate ----
+  onDCAuthChange(user => {
+    currentUser = user;
+    currentUid = user ? user.uid : null;
+    const navAccount = $('navAccount');
+
+    if (!user) {
+      navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
+      $('btnSignIn').addEventListener('click', openSignIn);
+      $('gateSignedOut').style.display = '';
+      $('gateNoAccess').style.display = 'none';
+      $('appBody').style.display = 'none';
+      teardownProjectListeners();
+      return;
+    }
+
+    const s = dcAccountSummary(user);
+    navAccount.innerHTML = `
+      <div class="nav-item">
+        <a href="account.html" class="nav-signin-btn" style="display:inline-flex;align-items:center;">Profile</a>
+        <div class="dropdown-wrap">
+          <div class="dropdown">
+            <div class="dropdown-info">
+              <span class="dropdown-pill ${s.pillClass}"><span class="dot"></span>${s.pillLabel}</span>
+              ${s.planLabel ? `<div class="dropdown-plan">${s.planLabel}</div>` : ''}
+              ${s.detail ? `<div class="dropdown-detail">${s.detail}</div>` : ''}
+            </div>
+            ${s.actionLabel ? `<a href="${s.actionHref}">${s.actionLabel}</a>` : ''}
+            <a href="account.html">View account</a>
+            <a href="#" id="btnSignOut">Sign out</a>
+          </div>
+        </div>
+      </div>
+    `;
+    $('btnSignOut').addEventListener('click', (e) => { e.preventDefault(); dcSignOut(); });
+
+    $('gateSignedOut').style.display = 'none';
+    if (hasFeasibilityAccess(user)) {
+      $('gateNoAccess').style.display = 'none';
+      $('appBody').style.display = 'flex';
+      setupProjectListeners();
+    } else {
+      $('gateNoAccess').style.display = '';
+      $('appBody').style.display = 'none';
+      $('gateNoAccessDetail').textContent = user.tier === 'designer'
+        ? "You're on the Designer plan. Feasibility Studio needs Practice — upgrade to unlock unlimited site feasibility reports and grounded Q&A."
+        : 'Feasibility Studio — unlimited site feasibility reports and grounded Q&A — is included in the Practice plan.';
+      teardownProjectListeners();
+    }
+  });
+
+  function teardownProjectListeners() {
+    if (unsubProjects) { unsubProjects(); unsubProjects = null; }
+    teardownProject();
+  }
+  function teardownProject() {
+    if (unsubConversation) { unsubConversation(); unsubConversation = null; }
+    if (unsubFiles) { unsubFiles(); unsubFiles = null; }
+    activeProjectId = null;
+  }
+
+  // ---- Projects list ----
+  function setupProjectListeners() {
+    if (unsubProjects) return;
+    const q = query(collection(dcFirestore, 'users', currentUid, 'projects'), orderBy('lastActiveAt', 'desc'));
+    unsubProjects = onSnapshot(q, snap => {
+      projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderProjectList();
+    });
+  }
+
+  function fmtRelative(ts) {
+    if (!ts || !ts.toMillis) return '';
+    const diff = Date.now() - ts.toMillis();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  }
+
+  function renderProjectList() {
+    const list = $('projectList');
+    if (!projects.length) {
+      list.innerHTML = '<div class="project-empty">No projects yet — create one to get started.</div>';
+      return;
+    }
+    list.innerHTML = projects.map(p => `
+      <button class="project-item ${p.id === activeProjectId ? 'active' : ''}" data-id="${p.id}">
+        <div class="pname">${escapeHtml(p.name || 'Untitled project')}</div>
+        <div class="ptime">${fmtRelative(p.lastActiveAt)}</div>
+      </button>
+    `).join('');
+    list.querySelectorAll('.project-item').forEach(btn => {
+      btn.addEventListener('click', () => selectProject(btn.dataset.id));
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  $('btnNewProject').addEventListener('click', async () => {
+    const name = window.prompt('Name this project (e.g. "Bandra plot — residential redevelopment")');
+    if (!name || !name.trim()) return;
+    const docRef = await addDoc(collection(dcFirestore, 'users', currentUid, 'projects'), {
+      name: name.trim(), createdAt: serverTimestamp(), lastActiveAt: serverTimestamp(),
+    });
+    selectProject(docRef.id);
+  });
+
+  // ---- Active project: chat + site details + files ----
+  function selectProject(projectId) {
+    if (projectId === activeProjectId) return;
+    teardownProject();
+    activeProjectId = projectId;
+    renderProjectList();
+
+    $('noProjectState').style.display = 'none';
+    $('chatArea').classList.add('on');
+    $('sideCol').style.display = '';
+
+    const project = projects.find(p => p.id === projectId) || {};
+    $('projectNameInput').value = project.name || '';
+    $('fLocation').value = project.location || '';
+    $('fZone').value = project.zone || '';
+    $('fPlotArea').value = project.plotArea || '';
+    $('fLandUse').value = project.landUse || '';
+    $('fExisting').value = project.existingStructure || '';
+    $('fIntent').value = project.developmentIntent || '';
+
+    const convRef = doc(dcFirestore, 'users', currentUid, 'projects', projectId, 'conversation', 'main');
+    unsubConversation = onSnapshot(convRef, snap => {
+      renderChatLog(snap.exists() ? (snap.data().messages || []) : []);
+    });
+
+    const filesQ = collection(dcFirestore, 'users', currentUid, 'projects', projectId, 'files');
+    unsubFiles = onSnapshot(filesQ, snap => {
+      renderFileList(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+  }
+
+  function renderChatLog(messages) {
+    const log = $('chatLog');
+    if (!messages.length) {
+      log.innerHTML = '<p class="chat-empty">Describe the site — location, plot area, what you\'re planning — and ask your feasibility question. Add site details or files on the right for sharper answers.</p>';
+      return;
+    }
+    log.innerHTML = messages.map(m => {
+      if (m.role === 'user') return `<div class="msg user">${escapeHtml(m.content)}</div>`;
+      return `<div class="msg assistant">${renderAssistantText(m.content)}</div>`;
+    }).join('');
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function renderAssistantText(text) {
+    const lines = text.split('\n');
+    let html = ''; let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      if (/^\s*\|.*\|\s*$/.test(line) && lines[i + 1] && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+        const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+        const headers = cells(line); i += 2; let rows = [];
+        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(cells(lines[i])); i++; }
+        html += '<table><thead><tr>' + headers.map(h => `<th>${escapeHtml(h)}</th>`).join('') + '</tr></thead><tbody>' +
+          rows.map(r => '<tr>' + r.map(c => `<td>${escapeHtml(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+      } else if (line.trim() === '') { i++; }
+      else {
+        let para = line; i++;
+        while (i < lines.length && lines[i].trim() !== '' && !/^\s*\|.*\|\s*$/.test(lines[i])) { para += '\n' + lines[i]; i++; }
+        html += `<p>${escapeHtml(para).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>`;
+      }
+    }
+    return html;
+  }
+
+  async function sendChat() {
+    if (sending || !activeProjectId) return;
+    const input = $('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    sending = true; $('btnSend').disabled = true; input.value = '';
+
+    const log = $('chatLog');
+    const empty = log.querySelector('.chat-empty'); if (empty) empty.remove();
+    const userEl = document.createElement('div'); userEl.className = 'msg user'; userEl.textContent = text;
+    log.appendChild(userEl);
+    const pendingEl = document.createElement('div'); pendingEl.className = 'msg pending assistant'; pendingEl.textContent = 'Reading the relevant chapters…';
+    log.appendChild(pendingEl);
+    log.scrollTop = log.scrollHeight;
+
+    try {
+      const send = httpsCallable(dcFunctions, 'sendFeasibilityMessage');
+      await send({ projectId: activeProjectId, message: text });
+      // The Firestore onSnapshot listener re-renders the log with the
+      // persisted (source-of-truth) messages, replacing this optimistic view.
+    } catch (err) {
+      pendingEl.remove();
+      const errEl = document.createElement('div'); errEl.className = 'msg error'; errEl.textContent = err.message || 'Something went wrong — try again.';
+      log.appendChild(errEl);
+      log.scrollTop = log.scrollHeight;
+    }
+    sending = false; $('btnSend').disabled = false;
+  }
+  $('btnSend').addEventListener('click', sendChat);
+  $('chatInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } });
+
+  // ---- Site details: autosave on blur ----
+  const siteFieldMap = { fLocation: 'location', fZone: 'zone', fPlotArea: 'plotArea', fLandUse: 'landUse', fExisting: 'existingStructure', fIntent: 'developmentIntent' };
+  Object.keys(siteFieldMap).forEach(id => {
+    $(id).addEventListener('blur', async () => {
+      if (!activeProjectId) return;
+      const field = siteFieldMap[id];
+      let value = $(id).value.trim();
+      if (id === 'fPlotArea') value = value ? Number(value) : null;
+      const projectRef = doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId);
+      await setDoc(projectRef, { [field]: value }, { merge: true });
+    });
+  });
+  $('projectNameInput').addEventListener('blur', async () => {
+    if (!activeProjectId) return;
+    const name = $('projectNameInput').value.trim() || 'Untitled project';
+    const projectRef = doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId);
+    await setDoc(projectRef, { name }, { merge: true });
+  });
+
+  // ---- Site files ----
+  function renderFileList(files) {
+    const list = $('fileList');
+    if (!files.length) { list.innerHTML = ''; return; }
+    list.innerHTML = files.map(f => `
+      <div class="file-item" data-id="${f.id}">
+        ${f.contentType && f.contentType.startsWith('image/')
+          ? `<img src="${f.downloadURL}" alt="">`
+          : `<div class="file-icon">${(f.name || '').split('.').pop().slice(0, 3).toUpperCase()}</div>`}
+        <span class="file-name">${escapeHtml(f.name)}</span>
+        <button class="file-remove" data-id="${f.id}" data-path="${f.storagePath}" title="Remove">✕</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('.file-remove').forEach(btn => {
+      btn.addEventListener('click', () => removeFile(btn.dataset.id, btn.dataset.path));
+    });
+  }
+
+  async function removeFile(fileId, storagePath) {
+    try { await deleteObject(storageRef(storage, storagePath)); } catch (e) { /* already gone is fine */ }
+    const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
+    await deleteDoc(doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId, 'files', fileId));
+  }
+
+  async function uploadFiles(fileListObj) {
+    if (!activeProjectId) return;
+    const status = $('uploadStatus');
+    for (const file of fileListObj) {
+      if (file.size > 20 * 1024 * 1024) { status.textContent = `${file.name} is over 20MB — skipped.`; continue; }
+      status.textContent = `Uploading ${file.name}…`;
+      const path = `users/${currentUid}/projects/${activeProjectId}/files/${Date.now()}_${file.name}`;
+      try {
+        const ref = storageRef(storage, path);
+        await uploadBytes(ref, file, { contentType: file.type || 'application/octet-stream' });
+        const url = await getDownloadURL(ref);
+        await addDoc(collection(dcFirestore, 'users', currentUid, 'projects', activeProjectId, 'files'), {
+          name: file.name, contentType: file.type || '', size: file.size,
+          storagePath: path, downloadURL: url, uploadedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        status.textContent = `Failed to upload ${file.name}: ${err.message}`;
+        return;
+      }
+    }
+    status.textContent = '';
+  }
+
+  const uploadZone = $('uploadZone');
+  $('fileInput').addEventListener('change', e => uploadFiles(e.target.files));
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone.classList.remove('drag');
+    if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+  });
+</script>
+
+</body>
+</html>

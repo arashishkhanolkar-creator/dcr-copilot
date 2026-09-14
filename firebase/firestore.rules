@@ -17,6 +17,26 @@ service cloud.firestore {
       allow update: if request.auth != null && request.auth.uid == uid
                     && request.resource.data.diff(resource.data).affectedKeys()
                          .hasOnly(['displayName', 'email', 'phone']);
+
+      // Feasibility Studio — each project is owner-only. Project metadata
+      // (name, site details) is simple, non-sensitive data the client can
+      // write directly. The conversation is different: only the
+      // sendFeasibilityMessage Cloud Function (Admin SDK) may write it,
+      // so a user can never fabricate an "assistant" message in their own
+      // history or bypass the Practice-tier check by calling Firestore
+      // directly from the browser console.
+      match /projects/{projectId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+
+        match /conversation/{doc} {
+          allow read: if request.auth != null && request.auth.uid == uid;
+          allow write: if false;
+        }
+
+        match /files/{fileId} {
+          allow read, write: if request.auth != null && request.auth.uid == uid;
+        }
+      }
     }
 
     // Coin orders are created and settled entirely by Cloud
