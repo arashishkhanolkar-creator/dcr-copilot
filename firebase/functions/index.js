@@ -284,9 +284,42 @@ exports.expireTrials = onSchedule("every 1 hours", async () => {
 // ══════════════════════════════════════════════════════
 const FEASIBILITY_MAX_HISTORY = 30;
 
+// Generous enough to take one full project from site details through a
+// complete feasibility report in a single sitting, with room for follow-up
+// questions — this is a cost guardrail against runaway API spend, not a
+// feature limit. Resets at midnight IST. See PHASE1-DATA-MODEL.md.
+const FEASIBILITY_DAILY_MESSAGE_CAP = 40;
+
 function hasFeasibilityAccess(userData) {
   if (!userData || userData.tier !== "practice") return false;
   return ["trial_active", "subscribed_practice", "subscription_lapsed", "subscription_cancelled"].includes(userData.status);
+}
+
+function istDateString(date) {
+  const ist = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+  return ist.toISOString().slice(0, 10);
+}
+
+// Atomically checks and increments today's message count for this user.
+// Returns {allowed, count}. A transaction (not a plain read-then-write)
+// prevents two rapid-fire messages from both reading the same count and
+// both being let through past the cap.
+async function checkAndBumpFeasibilityUsage(userRef) {
+  const today = istDateString(new Date());
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(userRef);
+    const data = snap.exists ? snap.data() : {};
+    const sameDay = data.feasibilityUsageDate === today;
+    const current = sameDay ? (data.feasibilityUsageCount || 0) : 0;
+    if (current >= FEASIBILITY_DAILY_MESSAGE_CAP) {
+      return { allowed: false, count: current };
+    }
+    tx.set(userRef, {
+      feasibilityUsageDate: today,
+      feasibilityUsageCount: current + 1,
+    }, { merge: true });
+    return { allowed: true, count: current + 1 };
+  });
 }
 
 function buildSiteContext(project) {
@@ -324,9 +357,20 @@ exports.sendFeasibilityMessage = onCall(
       throw new HttpsError("invalid-argument", "message must be non-empty.");
     }
 
-    const userSnap = await db.collection("users").doc(uid).get();
+    const userRef = db.collection("users").doc(uid);
+    const userSnap = await userRef.get();
     if (!hasFeasibilityAccess(userSnap.exists ? userSnap.data() : null)) {
       throw new HttpsError("permission-denied", "Feasibility Studio is on the Practice plan — subscribe or start a Practice trial to use it.");
+    }
+
+    const usage = await checkAndBumpFeasibilityUsage(userRef);
+    if (!usage.allowed) {
+      throw new HttpsError(
+        "resource-exhausted",
+        `You've reached today's Feasibility Studio limit (${FEASIBILITY_DAILY_MESSAGE_CAP} messages) — ` +
+        "plenty to take a full project from site details to a complete feasibility report. " +
+        "It resets at midnight IST, so you can pick back up tomorrow."
+      );
     }
 
     const projectRef = db.collection("users").doc(uid).collection("projects").doc(projectId);

@@ -60,6 +60,8 @@ actually need your sign-off before I write any code:
 | `launchPricing` | boolean | true if they signed up during the launch window |
 | `launchPricingExpiry` | timestamp | `signup date + 6 months` — when they roll to regular pricing |
 | `gracePeriodEnd` | timestamp | only set while `status = subscription_lapsed` |
+| `feasibilityUsageDate` | string `"YYYY-MM-DD"` (IST) | today's date, per the last message sent |
+| `feasibilityUsageCount` | number | messages sent today; resets when `feasibilityUsageDate` rolls over — cost guardrail, cap is `FEASIBILITY_DAILY_MESSAGE_CAP` (40) in `functions/index.js` |
 
 ### `users/{uid}/projects/{projectId}` — Feasibility Studio, Practice only
 
