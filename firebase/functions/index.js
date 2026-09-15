@@ -314,6 +314,12 @@ const FEASIBILITY_MAX_HISTORY = 30;
 // feature limit. Resets at midnight IST. See PHASE1-DATA-MODEL.md.
 const FEASIBILITY_DAILY_MESSAGE_CAP = 40;
 
+// Must match the chat textarea's maxlength in feasibility-studio.html. The
+// client-side maxlength is only a UX nicety — this is the real enforcement,
+// since the daily message cap above is a per-message-count guardrail and
+// does nothing to bound a single oversized message's token cost.
+const FEASIBILITY_MAX_MESSAGE_LENGTH = 4000;
+
 function hasFeasibilityAccess(userData) {
   if (!userData || userData.tier !== "practice") return false;
   return ["trial_active", "subscribed_practice", "subscription_lapsed", "subscription_cancelled"].includes(userData.status);
@@ -379,6 +385,12 @@ exports.sendFeasibilityMessage = onCall(
     }
     if (!messageText || typeof messageText !== "string" || !messageText.trim()) {
       throw new HttpsError("invalid-argument", "message must be non-empty.");
+    }
+    if (messageText.length > FEASIBILITY_MAX_MESSAGE_LENGTH) {
+      throw new HttpsError(
+        "invalid-argument",
+        `Message is too long — keep it under ${FEASIBILITY_MAX_MESSAGE_LENGTH} characters.`
+      );
     }
 
     const userRef = db.collection("users").doc(uid);

@@ -39,6 +39,13 @@
   .app-header .brand span{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; letter-spacing:-0.01em;}
   .app-header .spacer{flex:1;}
   .app-header a.back{font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--concrete);}
+  .icon-toggle-btn{
+    display:none; background:none; border:none; cursor:pointer; font-size:18px;
+    color:var(--charcoal); padding:6px 8px; line-height:1; border-radius:4px;
+  }
+  .icon-toggle-btn:hover{background:rgba(43,39,36,0.08);}
+  .mobile-drawer-backdrop{display:none; position:fixed; inset:0; background:rgba(43,39,36,0.4); z-index:390;}
+  .mobile-drawer-backdrop.on{display:block;}
 
   .nav-item{position:relative; display:flex; align-items:center; gap:6px;}
   .nav-item .chev{font-size:8px; opacity:0.6;}
@@ -178,8 +185,14 @@
   .chat-area.on{display:flex;}
 
   .col-side{
+    display:none;
     flex:0 0 300px; border-left:1px solid var(--line); background:var(--stone);
     overflow-y:auto; padding:20px;
+  }
+  .col-side.visible{display:block;}
+  .archived-badge{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--concrete);
+    border:1px solid var(--line); border-radius:999px; padding:3px 9px; white-space:nowrap; flex-shrink:0;
   }
   .side-section{margin-bottom:28px;}
   .side-section h4{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--concrete); margin-bottom:12px;}
@@ -217,8 +230,11 @@
   .file-item img{width:32px; height:32px; object-fit:cover; border-radius:3px; flex-shrink:0;}
   .file-icon{width:32px; height:32px; border-radius:3px; background:var(--stone); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px; font-weight:700; color:var(--concrete);}
   .file-name{flex:1; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .file-remove{background:none; border:none; color:var(--taupe); cursor:pointer; font-size:14px; flex-shrink:0;}
-  .file-remove:hover{color:var(--err);}
+  .file-remove{
+    background:none; border:none; color:var(--taupe); cursor:pointer; font-size:14px; flex-shrink:0;
+    padding:8px; margin:-8px; border-radius:4px; line-height:1;
+  }
+  .file-remove:hover{color:var(--err); background:rgba(168,68,42,0.08);}
   .upload-status{font-size:11.5px; color:var(--concrete); margin-top:8px; min-height:14px;}
 
   /* ---------- SIGN-IN MODAL ---------- */
@@ -241,11 +257,26 @@
   .dc-step.on{display:block;}
   #dcRecaptchaContainer{display:none;}
 
+  /* Below these widths, the projects list and site-details panel become
+     off-canvas drawers (toggled via the header icon buttons) instead of
+     disappearing outright with no way back in. */
   @media(max-width:900px){
-    .col-side{display:none;}
+    .col-side.visible{
+      position:fixed; inset:0 0 0 auto; z-index:400; width:300px; max-width:85vw;
+      transform:translateX(100%); transition:transform .25s ease; box-shadow:-8px 0 24px rgba(0,0,0,0.2);
+    }
+    .col-side.visible.mobile-open{transform:translateX(0);}
   }
   @media(max-width:700px){
-    .col-projects{display:none;}
+    #btnToggleProjects{display:inline-flex;}
+    .col-projects{
+      position:fixed; inset:0 auto 0 0; z-index:400; width:280px; max-width:85vw;
+      transform:translateX(-100%); transition:transform .25s ease; box-shadow:8px 0 24px rgba(0,0,0,0.2);
+    }
+    .col-projects.mobile-open{transform:translateX(0);}
+  }
+  @media(max-width:900px){
+    #btnToggleSide{display:inline-flex;}
   }
 </style>
 </head>
@@ -253,16 +284,19 @@
 
 <div class="app">
   <header class="app-header">
+    <button type="button" id="btnToggleProjects" class="icon-toggle-btn" aria-label="Projects" title="Projects">&#9776;</button>
     <a href="ai-lab.html" class="brand">
       <img src="assets/icons/logo-mark.png" alt="">
       <span>Feasibility Studio</span>
     </a>
     <div class="spacer"></div>
+    <button type="button" id="btnToggleSide" class="icon-toggle-btn" aria-label="Site details" title="Site details">&#9881;</button>
     <a href="ai-lab.html" class="back">AI Lab</a>
     <span id="navAccount">
       <button class="nav-signin-btn" id="btnSignIn">Sign in</button>
     </span>
   </header>
+  <div class="mobile-drawer-backdrop" id="drawerBackdrop"></div>
 
   <div id="gateSignedOut" class="gate">
     <div class="gate-card">
@@ -302,19 +336,20 @@
       <div id="chatArea" class="chat-area">
         <div class="chat-header">
           <input type="text" id="projectNameInput" placeholder="Project name">
+          <span class="archived-badge" id="archivedBadge" style="display:none;" title="Unarchive from the project list to resume normally">Archived</span>
           <span class="usage-counter" id="usageCounter" title="Fair-use limit — resets at midnight IST"></span>
         </div>
         <div class="chat-log" id="chatLog">
           <p class="chat-empty">Describe the site — location, plot area, what you're planning — and ask your feasibility question. Add site details or files on the right for sharper answers.</p>
         </div>
         <div class="chat-input-row">
-          <textarea id="chatInput" rows="1" placeholder="Ask about this site's FSI, setbacks, parking, TDR…"></textarea>
+          <textarea id="chatInput" rows="1" maxlength="4000" placeholder="Ask about this site's FSI, setbacks, parking, TDR…"></textarea>
           <button class="btn" id="btnSend">Send</button>
         </div>
       </div>
     </main>
 
-    <aside class="col-side" id="sideCol" style="display:none;">
+    <aside class="col-side" id="sideCol">
       <div class="side-section">
         <h4>Site details</h4>
         <div class="site-field">
@@ -432,6 +467,30 @@
 
   const $ = id => document.getElementById(id);
   const storage = getStorage(dcFirebaseApp);
+
+  // ---- Mobile drawers for the projects list and site-details panel ----
+  // Below 700px/900px these columns are off-canvas drawers rather than
+  // hidden outright, so there's still a way to switch projects or reach
+  // site details/file upload on narrow screens.
+  const drawerBackdrop = $('drawerBackdrop');
+  function updateDrawerBackdrop() {
+    const anyOpen = document.querySelector('.col-projects').classList.contains('mobile-open')
+      || $('sideCol').classList.contains('mobile-open');
+    drawerBackdrop.classList.toggle('on', anyOpen);
+  }
+  $('btnToggleProjects').addEventListener('click', () => {
+    document.querySelector('.col-projects').classList.toggle('mobile-open');
+    updateDrawerBackdrop();
+  });
+  $('btnToggleSide').addEventListener('click', () => {
+    $('sideCol').classList.toggle('mobile-open');
+    updateDrawerBackdrop();
+  });
+  drawerBackdrop.addEventListener('click', () => {
+    document.querySelector('.col-projects').classList.remove('mobile-open');
+    $('sideCol').classList.remove('mobile-open');
+    updateDrawerBackdrop();
+  });
 
   // ---- Google Places Autocomplete on the Location field ----
   // Set to a real key (Google Cloud Console -> APIs & Services ->
@@ -681,6 +740,7 @@
       : '<div class="archived-empty">Nothing archived.</div>';
     wireProjectItemEvents(archivedList);
     $('archivedCount').textContent = archived.length;
+    updateArchivedBadge();
   }
 
   function handleProjectAction(action, projectId) {
@@ -701,7 +761,12 @@
   });
 
   function escapeHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   const newProjectOverlay = $('newProjectOverlay');
@@ -786,8 +851,21 @@
       teardownProject();
       $('noProjectState').style.display = '';
       $('chatArea').classList.remove('on');
-      $('sideCol').style.display = 'none';
+      $('sideCol').classList.remove('visible');
+      updateArchivedBadge();
     }
+  }
+
+  function updateArchivedBadge() {
+    const badge = $('archivedBadge');
+    const project = projects.find(p => p.id === activeProjectId);
+    badge.style.display = (project && project.archived) ? '' : 'none';
+  }
+
+  function closeMobileDrawers() {
+    document.querySelector('.col-projects').classList.remove('mobile-open');
+    $('sideCol').classList.remove('mobile-open');
+    $('drawerBackdrop').classList.remove('on');
   }
 
   // ---- Active project: chat + site details + files ----
@@ -796,10 +874,11 @@
     teardownProject();
     activeProjectId = projectId;
     renderProjectList();
+    closeMobileDrawers();
 
     $('noProjectState').style.display = 'none';
     $('chatArea').classList.add('on');
-    $('sideCol').style.display = '';
+    $('sideCol').classList.add('visible');
 
     const project = projects.find(p => p.id === projectId) || {};
     $('projectNameInput').value = project.name || '';
@@ -809,6 +888,14 @@
     $('fLandUse').value = project.landUse || '';
     $('fExisting').value = project.existingStructure || '';
     $('fIntent').value = project.developmentIntent || '';
+    updateArchivedBadge();
+
+    // Clear the previous project's content immediately rather than leaving
+    // it on screen until the new project's snapshots arrive — onSnapshot is
+    // usually near-instant but not synchronous, so without this a slow
+    // connection could flash the last project's messages/files for a moment.
+    $('chatLog').innerHTML = '<p class="chat-empty">Loading…</p>';
+    $('fileList').innerHTML = '';
 
     const convRef = doc(dcFirestore, 'users', currentUid, 'projects', projectId, 'conversation', 'main');
     unsubConversation = onSnapshot(convRef, snap => {
@@ -910,12 +997,12 @@
     const list = $('fileList');
     if (!files.length) { list.innerHTML = ''; return; }
     list.innerHTML = files.map(f => `
-      <div class="file-item" data-id="${f.id}">
+      <div class="file-item" data-id="${escapeHtml(f.id)}">
         ${f.contentType && f.contentType.startsWith('image/')
-          ? `<img src="${f.downloadURL}" alt="">`
-          : `<div class="file-icon">${(f.name || '').split('.').pop().slice(0, 3).toUpperCase()}</div>`}
+          ? `<img src="${escapeHtml(f.downloadURL)}" alt="">`
+          : `<div class="file-icon">${escapeHtml((f.name || '').split('.').pop().slice(0, 3).toUpperCase())}</div>`}
         <span class="file-name">${escapeHtml(f.name)}</span>
-        <button class="file-remove" data-id="${f.id}" data-path="${f.storagePath}" title="Remove">✕</button>
+        <button class="file-remove" data-id="${escapeHtml(f.id)}" data-path="${escapeHtml(f.storagePath)}" title="Remove">✕</button>
       </div>
     `).join('');
     list.querySelectorAll('.file-remove').forEach(btn => {
@@ -931,10 +1018,13 @@
   async function uploadFiles(fileListObj) {
     if (!activeProjectId) return;
     const status = $('uploadStatus');
+    const failed = [];
+    let uploaded = 0;
     for (const file of fileListObj) {
-      if (file.size > 20 * 1024 * 1024) { status.textContent = `${file.name} is over 20MB — skipped.`; continue; }
+      if (file.size > 20 * 1024 * 1024) { failed.push(`${file.name} (over 20MB)`); continue; }
       status.textContent = `Uploading ${file.name}…`;
-      const path = `users/${currentUid}/projects/${activeProjectId}/files/${Date.now()}_${file.name}`;
+      const unique = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const path = `users/${currentUid}/projects/${activeProjectId}/files/${unique}_${file.name}`;
       try {
         const ref = storageRef(storage, path);
         await uploadBytes(ref, file, { contentType: file.type || 'application/octet-stream' });
@@ -943,12 +1033,17 @@
           name: file.name, contentType: file.type || '', size: file.size,
           storagePath: path, downloadURL: url, uploadedAt: serverTimestamp(),
         });
+        uploaded++;
       } catch (err) {
-        status.textContent = `Failed to upload ${file.name}: ${err.message}`;
-        return;
+        failed.push(`${file.name} (${err.message})`);
       }
     }
-    status.textContent = '';
+    if (!failed.length) {
+      status.textContent = '';
+    } else {
+      const okPart = uploaded ? `Uploaded ${uploaded}. ` : '';
+      status.textContent = `${okPart}Failed: ${failed.join(', ')}`;
+    }
   }
 
   const uploadZone = $('uploadZone');
