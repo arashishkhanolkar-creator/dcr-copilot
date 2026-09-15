@@ -30,7 +30,10 @@ service cloud.firestore {
 
         match /conversation/{doc} {
           allow read: if request.auth != null && request.auth.uid == uid;
-          allow write: if false;
+          // The owner may delete their conversation (e.g. deleting the whole
+          // project) but never create/edit it — that stays Cloud-Function-only.
+          allow create, update: if false;
+          allow delete: if request.auth != null && request.auth.uid == uid;
         }
 
         match /files/{fileId} {

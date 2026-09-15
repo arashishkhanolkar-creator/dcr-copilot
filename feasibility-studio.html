@@ -97,14 +97,52 @@
   }
   .project-list{flex:1; overflow-y:auto; padding:0 8px 16px;}
   .project-item{
-    display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer;
-    padding:11px 12px; border-radius:4px; margin-bottom:2px; color:var(--charcoal);
+    position:relative; display:flex; align-items:center; border-radius:4px; margin-bottom:2px; color:var(--charcoal);
   }
   .project-item:hover{background:rgba(43,39,36,0.05);}
   .project-item.active{background:#fff; box-shadow:0 1px 0 var(--line);}
+  .project-item-main{
+    flex:1; min-width:0; display:block; text-align:left; background:none; border:none; cursor:pointer;
+    padding:11px 4px 11px 12px; color:inherit;
+  }
   .project-item .pname{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .project-item .ptime{font-size:11px; color:var(--concrete);}
+  .project-item.is-archived .pname{color:var(--concrete);}
   .project-empty{padding:24px 16px; font-size:12.5px; color:var(--concrete); line-height:1.6;}
+
+  .project-menu-wrap{position:relative; flex-shrink:0;}
+  .project-kebab{
+    background:none; border:none; cursor:pointer; color:var(--concrete);
+    font-size:15px; padding:8px 10px; line-height:1; border-radius:4px;
+  }
+  .project-kebab:hover{background:rgba(43,39,36,0.08); color:var(--charcoal);}
+  .project-dropdown{
+    position:absolute; right:4px; top:100%; z-index:20; margin-top:2px;
+    background:var(--ivory); border:1px solid var(--line); min-width:150px;
+    display:none; box-shadow:0 8px 24px rgba(43,39,36,0.14);
+  }
+  .project-dropdown.on{display:block;}
+  .project-dropdown button{
+    display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer;
+    padding:11px 16px; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; font-weight:500;
+    color:var(--charcoal); border-bottom:1px solid var(--line);
+  }
+  .project-dropdown button:last-child{border-bottom:none;}
+  .project-dropdown button:hover{background:rgba(43,39,36,0.06);}
+  .project-dropdown button.danger{color:var(--err);}
+
+  .archived-section{flex-shrink:0; border-top:1px solid var(--line);}
+  .archived-toggle{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:none; border:none; cursor:pointer; padding:13px 16px;
+    font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-weight:500; color:var(--concrete);
+  }
+  .archived-toggle:hover{color:var(--charcoal);}
+  .archived-toggle .chev{transition:transform .2s ease; font-size:9px; opacity:0.7;}
+  .archived-section.open .archived-toggle .chev{transform:rotate(180deg);}
+  .archived-list{display:none; max-height:220px; overflow-y:auto; padding:0 8px 12px;}
+  .archived-section.open .archived-list{display:block;}
+  .archived-empty{padding:4px 12px 10px; font-size:11.5px; color:var(--concrete);}
 
   .col-chat{flex:1; display:flex; flex-direction:column; min-height:0;}
   .chat-header{padding:16px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px;}
@@ -177,6 +215,7 @@
   .dc-provider-btn:hover{border-color:var(--charcoal);}
   .dc-field{width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:12px 14px; margin-bottom:10px; border:1px solid var(--line); border-radius:2px; background:#fff; color:var(--charcoal);}
   .dc-primary-btn{width:100%; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; padding:13px; background:var(--charcoal); color:var(--ivory); border:none; border-radius:2px; cursor:pointer;}
+  .dc-primary-btn.danger{background:var(--err);}
   .dc-primary-btn:disabled{opacity:0.4; cursor:default;}
   .dc-status{font-size:11.5px; color:var(--concrete); margin-top:12px; min-height:16px; line-height:1.6;}
   .dc-status.err{color:var(--err);}
@@ -231,6 +270,13 @@
       </div>
       <div class="project-list" id="projectList">
         <div class="project-empty">No projects yet — create one to get started.</div>
+      </div>
+      <div class="archived-section" id="archivedSection">
+        <button type="button" class="archived-toggle" id="archivedToggle">
+          <span>Archived (<span id="archivedCount">0</span>)</span>
+          <span class="chev">&#9662;</span>
+        </button>
+        <div class="archived-list" id="archivedList"></div>
       </div>
     </aside>
 
@@ -327,14 +373,24 @@
 </div>
 <div id="dcRecaptchaContainer"></div>
 
-<!-- New project modal -->
+<!-- New project / rename modal (shared) -->
 <div class="dc-modal-overlay" id="newProjectOverlay">
   <div class="dc-modal">
     <button class="dc-modal-close" data-close="newProjectOverlay">&times;</button>
-    <h3>New project</h3>
-    <p class="dc-sub">Give it a name you'll recognise later — e.g. "Bandra plot — residential redevelopment".</p>
+    <h3 id="projectModalTitle">New project</h3>
+    <p class="dc-sub" id="projectModalSub">Give it a name you'll recognise later — e.g. "Bandra plot — residential redevelopment".</p>
     <input class="dc-field" type="text" id="newProjectName" placeholder="Project name" maxlength="120">
     <button class="dc-primary-btn" id="btnCreateProject">Create project</button>
+  </div>
+</div>
+
+<!-- Delete project confirmation -->
+<div class="dc-modal-overlay" id="deleteProjectOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="deleteProjectOverlay">&times;</button>
+    <h3>Delete this project?</h3>
+    <p class="dc-sub" id="deleteProjectSub">This permanently deletes the project, its chat history, and any uploaded files. This can't be undone.</p>
+    <button class="dc-primary-btn danger" id="btnConfirmDelete">Delete project</button>
   </div>
 </div>
 
@@ -346,7 +402,7 @@
     dcFirestore, dcFunctions, dcFirebaseApp,
   } from './assets/js/dc-auth.js';
   import {
-    collection, doc, addDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp,
+    collection, doc, addDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, getDocs,
   } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
   import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js';
   import {
@@ -508,22 +564,87 @@
     return `${days}d ago`;
   }
 
-  function renderProjectList() {
-    const list = $('projectList');
-    if (!projects.length) {
-      list.innerHTML = '<div class="project-empty">No projects yet — create one to get started.</div>';
-      return;
-    }
-    list.innerHTML = projects.map(p => `
-      <button class="project-item ${p.id === activeProjectId ? 'active' : ''}" data-id="${p.id}">
-        <div class="pname">${escapeHtml(p.name || 'Untitled project')}</div>
-        <div class="ptime">${fmtRelative(p.lastActiveAt)}</div>
-      </button>
-    `).join('');
-    list.querySelectorAll('.project-item').forEach(btn => {
+  function projectItemHtml(p, isArchived) {
+    const activeClass = p.id === activeProjectId ? 'active' : '';
+    return `
+      <div class="project-item ${activeClass} ${isArchived ? 'is-archived' : ''}" data-id="${p.id}">
+        <button class="project-item-main" data-id="${p.id}">
+          <div class="pname">${escapeHtml(p.name || 'Untitled project')}</div>
+          <div class="ptime">${fmtRelative(p.lastActiveAt)}</div>
+        </button>
+        <div class="project-menu-wrap">
+          <button type="button" class="project-kebab" data-id="${p.id}" aria-label="Project options">&#8942;</button>
+          <div class="project-dropdown">
+            <button type="button" data-action="rename" data-id="${p.id}">Rename</button>
+            <button type="button" data-action="${isArchived ? 'unarchive' : 'archive'}" data-id="${p.id}">${isArchived ? 'Unarchive' : 'Archive'}</button>
+            <button type="button" class="danger" data-action="delete" data-id="${p.id}">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function wireProjectItemEvents(container) {
+    container.querySelectorAll('.project-item-main').forEach(btn => {
       btn.addEventListener('click', () => selectProject(btn.dataset.id));
     });
+    container.querySelectorAll('.project-kebab').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = btn.nextElementSibling;
+        const wasOpen = dropdown.classList.contains('on');
+        closeAllProjectDropdowns();
+        if (!wasOpen) dropdown.classList.add('on');
+      });
+    });
+    container.querySelectorAll('.project-dropdown button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllProjectDropdowns();
+        handleProjectAction(btn.dataset.action, btn.dataset.id);
+      });
+    });
   }
+
+  function closeAllProjectDropdowns() {
+    document.querySelectorAll('.project-dropdown.on').forEach(d => d.classList.remove('on'));
+  }
+  document.addEventListener('click', closeAllProjectDropdowns);
+
+  function renderProjectList() {
+    const active = projects.filter(p => !p.archived);
+    const archived = projects.filter(p => p.archived);
+
+    const list = $('projectList');
+    list.innerHTML = active.length
+      ? active.map(p => projectItemHtml(p, false)).join('')
+      : '<div class="project-empty">No projects yet — create one to get started.</div>';
+    wireProjectItemEvents(list);
+
+    const archivedList = $('archivedList');
+    archivedList.innerHTML = archived.length
+      ? archived.map(p => projectItemHtml(p, true)).join('')
+      : '<div class="archived-empty">Nothing archived.</div>';
+    wireProjectItemEvents(archivedList);
+    $('archivedCount').textContent = archived.length;
+  }
+
+  function handleProjectAction(action, projectId) {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+    if (action === 'rename') openRenameModal(project);
+    else if (action === 'archive') setProjectArchived(projectId, true);
+    else if (action === 'unarchive') setProjectArchived(projectId, false);
+    else if (action === 'delete') openDeleteConfirm(project);
+  }
+
+  async function setProjectArchived(projectId, archived) {
+    await setDoc(doc(dcFirestore, 'users', currentUid, 'projects', projectId), { archived }, { merge: true });
+  }
+
+  $('archivedToggle').addEventListener('click', () => {
+    $('archivedSection').classList.toggle('open');
+  });
 
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -532,23 +653,88 @@
   const newProjectOverlay = $('newProjectOverlay');
   newProjectOverlay.addEventListener('click', e => { if (e.target === newProjectOverlay) closeModal(newProjectOverlay); });
 
+  let projectModalMode = 'create';
+  let renameTargetId = null;
+
   $('btnNewProject').addEventListener('click', () => {
+    projectModalMode = 'create';
+    $('projectModalTitle').textContent = 'New project';
+    $('projectModalSub').textContent = 'Give it a name you\'ll recognise later — e.g. "Bandra plot — residential redevelopment".';
+    $('btnCreateProject').textContent = 'Create project';
     $('newProjectName').value = '';
     openModal(newProjectOverlay);
     setTimeout(() => $('newProjectName').focus(), 50);
   });
 
-  async function createProject() {
+  function openRenameModal(project) {
+    projectModalMode = 'rename';
+    renameTargetId = project.id;
+    $('projectModalTitle').textContent = 'Rename project';
+    $('projectModalSub').textContent = 'Choose a new name for this project.';
+    $('btnCreateProject').textContent = 'Save';
+    $('newProjectName').value = project.name || '';
+    openModal(newProjectOverlay);
+    setTimeout(() => { $('newProjectName').focus(); $('newProjectName').select(); }, 50);
+  }
+
+  async function submitProjectModal() {
     const name = $('newProjectName').value.trim();
     if (!name) return;
     closeModal(newProjectOverlay);
-    const docRef = await addDoc(collection(dcFirestore, 'users', currentUid, 'projects'), {
-      name, createdAt: serverTimestamp(), lastActiveAt: serverTimestamp(),
-    });
-    selectProject(docRef.id);
+    if (projectModalMode === 'rename' && renameTargetId) {
+      await setDoc(doc(dcFirestore, 'users', currentUid, 'projects', renameTargetId), { name }, { merge: true });
+      if (renameTargetId === activeProjectId) $('projectNameInput').value = name;
+      renameTargetId = null;
+    } else {
+      const docRef = await addDoc(collection(dcFirestore, 'users', currentUid, 'projects'), {
+        name, createdAt: serverTimestamp(), lastActiveAt: serverTimestamp(),
+      });
+      selectProject(docRef.id);
+    }
   }
-  $('btnCreateProject').addEventListener('click', createProject);
-  $('newProjectName').addEventListener('keydown', (e) => { if (e.key === 'Enter') createProject(); });
+  $('btnCreateProject').addEventListener('click', submitProjectModal);
+  $('newProjectName').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitProjectModal(); });
+
+  // ---- Delete project ----
+  let deleteTargetId = null;
+  const deleteProjectOverlay = $('deleteProjectOverlay');
+  deleteProjectOverlay.addEventListener('click', e => { if (e.target === deleteProjectOverlay) closeModal(deleteProjectOverlay); });
+
+  function openDeleteConfirm(project) {
+    deleteTargetId = project.id;
+    $('deleteProjectSub').textContent = `Permanently delete "${project.name || 'Untitled project'}"? This removes its chat history and files too. This can't be undone.`;
+    openModal(deleteProjectOverlay);
+  }
+
+  $('btnConfirmDelete').addEventListener('click', async () => {
+    if (!deleteTargetId) return;
+    const id = deleteTargetId;
+    deleteTargetId = null;
+    closeModal(deleteProjectOverlay);
+    await deleteProjectCompletely(id);
+  });
+
+  async function deleteProjectCompletely(projectId) {
+    const filesSnap = await getDocs(collection(dcFirestore, 'users', currentUid, 'projects', projectId, 'files'));
+    for (const fileDoc of filesSnap.docs) {
+      const data = fileDoc.data();
+      if (data.storagePath) {
+        try { await deleteObject(storageRef(storage, data.storagePath)); } catch (e) { /* already gone is fine */ }
+      }
+      await deleteDoc(fileDoc.ref);
+    }
+    try {
+      await deleteDoc(doc(dcFirestore, 'users', currentUid, 'projects', projectId, 'conversation', 'main'));
+    } catch (e) { /* may never have existed */ }
+    await deleteDoc(doc(dcFirestore, 'users', currentUid, 'projects', projectId));
+
+    if (projectId === activeProjectId) {
+      teardownProject();
+      $('noProjectState').style.display = '';
+      $('chatArea').classList.remove('on');
+      $('sideCol').style.display = 'none';
+    }
+  }
 
   // ---- Active project: chat + site details + files ----
   function selectProject(projectId) {
@@ -685,7 +871,6 @@
 
   async function removeFile(fileId, storagePath) {
     try { await deleteObject(storageRef(storage, storagePath)); } catch (e) { /* already gone is fine */ }
-    const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
     await deleteDoc(doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId, 'files', fileId));
   }
 

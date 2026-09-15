@@ -67,7 +67,9 @@ actually need your sign-off before I write any code:
 
 `name`, `location`, `zone`, `plotArea`, `landUse`, `existingStructure`,
 `developmentIntent`, `regulationSet` (`"udcpr"` \| `"dcpr-2034"`, auto-routed
-from location), `createdAt`, `lastActiveAt`, plus (pending §1.3):
+from location), `createdAt`, `lastActiveAt`, `archived` (boolean, owner-toggled
+from the project list's kebab menu — archived projects move to the collapsed
+"Archived" section instead of being deleted), plus (pending §1.3):
 
 - `report` (object: the structured feasibility data) + `reportPdfAssetId`
   (points to a stored PDF) + `reportGeneratedAt` — if latest-only, **or**
