@@ -183,12 +183,28 @@
   }
   .side-section{margin-bottom:28px;}
   .side-section h4{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--concrete); margin-bottom:12px;}
-  .site-field{margin-bottom:10px;}
+  .site-field{margin-bottom:16px;}
   .site-field label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--concrete); margin-bottom:4px;}
   .site-field input{
-    width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:9px 10px;
-    border:1px solid var(--line); border-radius:4px; background:#fff; color:var(--charcoal);
+    width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:6px 0 8px;
+    border:none; border-bottom:1px solid var(--line); border-radius:0; background:none; color:var(--charcoal);
+    transition:border-color .2s ease;
   }
+  .site-field input:focus{outline:none; border-bottom-color:var(--charcoal);}
+  .site-field-hint{font-size:10.5px; color:var(--concrete); margin-top:4px; line-height:1.5;}
+
+  /* Google Places Autocomplete dropdown — injected into <body>, so this
+     targets Google's own classes to match the rest of the page. */
+  .pac-container{
+    font-family:'Manrope',sans-serif; border:1px solid var(--line); border-radius:4px;
+    box-shadow:0 8px 24px rgba(43,39,36,0.14); margin-top:4px; z-index:600;
+  }
+  .pac-item{font-size:12.5px; padding:9px 12px; border-top:1px solid var(--line); cursor:pointer;}
+  .pac-item:first-child{border-top:none;}
+  .pac-item:hover{background:rgba(43,39,36,0.05);}
+  .pac-item-query{font-size:12.5px; color:var(--charcoal);}
+  .pac-matched{font-weight:600;}
+  .pac-icon{display:none;}
   .upload-zone{
     border:1.5px dashed var(--taupe); border-radius:6px; padding:20px 14px; text-align:center;
     cursor:pointer; transition:border-color .2s ease, background .2s ease; font-size:12.5px; color:var(--concrete);
@@ -300,7 +316,11 @@
     <aside class="col-side" id="sideCol" style="display:none;">
       <div class="side-section">
         <h4>Site details</h4>
-        <div class="site-field"><label>Location (city / area)</label><input type="text" id="fLocation"></div>
+        <div class="site-field">
+          <label>Location (city / area)</label>
+          <input type="text" id="fLocation" autocomplete="off" placeholder="Start typing an address…">
+          <div class="site-field-hint" id="locationHint">Optional — Google location suggestions help pin this precisely.</div>
+        </div>
         <div class="site-field"><label>Zone / ward</label><input type="text" id="fZone"></div>
         <div class="site-field"><label>Plot area (sqm)</label><input type="number" id="fPlotArea"></div>
         <div class="site-field"><label>Land use</label><input type="text" id="fLandUse"></div>
@@ -411,6 +431,39 @@
 
   const $ = id => document.getElementById(id);
   const storage = getStorage(dcFirebaseApp);
+
+  // ---- Google Places Autocomplete on the Location field ----
+  // Set to a real key (Google Cloud Console -> APIs & Services ->
+  // Credentials) with the "Places API" enabled and HTTP-referrer
+  // restricted to designhauscollective.in. Until then this quietly
+  // no-ops and the field behaves as a plain text input.
+  const GOOGLE_MAPS_API_KEY = 'REPLACE_ME';
+
+  window.initLocationAutocomplete = function () {
+    const input = $('fLocation');
+    if (!input || !window.google || !window.google.maps || !window.google.maps.places) return;
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['geocode'],
+      componentRestrictions: { country: 'in' },
+      fields: ['formatted_address'],
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place && place.formatted_address) {
+        input.value = place.formatted_address;
+        input.dispatchEvent(new Event('blur'));
+      }
+    });
+  };
+
+  if (GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== 'REPLACE_ME') {
+    const gmapsScript = document.createElement('script');
+    gmapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initLocationAutocomplete`;
+    gmapsScript.async = true;
+    document.head.appendChild(gmapsScript);
+  } else {
+    $('locationHint').textContent = 'Enter the site location — city / area.';
+  }
 
   let currentUser = null;
   let currentUid = null;
