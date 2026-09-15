@@ -126,7 +126,7 @@ exports.verifyRazorpayPayment = onCall(
 
 // Set this to the skill_id printed by firebase/scripts/upload-skill.js
 // after you upload the dcr-copilot skill via the Skills API.
-const DCR_SKILL_ID = "skill_015TttVjDjmjSBWfCd3RV6GY";
+const DCR_SKILL_ID = "skill_01MHJBUrVP8NcSn4Ax1d248t";
 const DCR_CHAT_COST = 0; // TEMP: free while testing — set back to 10 before going live
 const DCR_MAX_HISTORY = 20; // most recent messages kept, oldest trimmed first
 
