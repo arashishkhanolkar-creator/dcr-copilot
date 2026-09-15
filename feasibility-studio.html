@@ -327,6 +327,17 @@
 </div>
 <div id="dcRecaptchaContainer"></div>
 
+<!-- New project modal -->
+<div class="dc-modal-overlay" id="newProjectOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="newProjectOverlay">&times;</button>
+    <h3>New project</h3>
+    <p class="dc-sub">Give it a name you'll recognise later — e.g. "Bandra plot — residential redevelopment".</p>
+    <input class="dc-field" type="text" id="newProjectName" placeholder="Project name" maxlength="120">
+    <button class="dc-primary-btn" id="btnCreateProject">Create project</button>
+  </div>
+</div>
+
 <script type="module">
   import {
     DC_FIREBASE_CONFIGURED, onDCAuthChange, dcAccountSummary,
@@ -518,14 +529,26 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  $('btnNewProject').addEventListener('click', async () => {
-    const name = window.prompt('Name this project (e.g. "Bandra plot — residential redevelopment")');
-    if (!name || !name.trim()) return;
+  const newProjectOverlay = $('newProjectOverlay');
+  newProjectOverlay.addEventListener('click', e => { if (e.target === newProjectOverlay) closeModal(newProjectOverlay); });
+
+  $('btnNewProject').addEventListener('click', () => {
+    $('newProjectName').value = '';
+    openModal(newProjectOverlay);
+    setTimeout(() => $('newProjectName').focus(), 50);
+  });
+
+  async function createProject() {
+    const name = $('newProjectName').value.trim();
+    if (!name) return;
+    closeModal(newProjectOverlay);
     const docRef = await addDoc(collection(dcFirestore, 'users', currentUid, 'projects'), {
-      name: name.trim(), createdAt: serverTimestamp(), lastActiveAt: serverTimestamp(),
+      name, createdAt: serverTimestamp(), lastActiveAt: serverTimestamp(),
     });
     selectProject(docRef.id);
-  });
+  }
+  $('btnCreateProject').addEventListener('click', createProject);
+  $('newProjectName').addEventListener('keydown', (e) => { if (e.key === 'Enter') createProject(); });
 
   // ---- Active project: chat + site details + files ----
   function selectProject(projectId) {
