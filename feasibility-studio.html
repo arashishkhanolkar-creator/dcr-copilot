@@ -385,8 +385,8 @@
       <div class="side-section">
         <h4>Site files</h4>
         <label class="upload-zone" id="uploadZone">
-          Drop a DXF or site image here, or click to choose
-          <input type="file" id="fileInput" accept=".dxf,image/*" multiple>
+          Drop a DXF, DP Remark PDF, or site image here, or click to choose
+          <input type="file" id="fileInput" accept=".dxf,application/pdf,image/*" multiple>
         </label>
         <div class="upload-status" id="uploadStatus"></div>
         <div class="file-list" id="fileList"></div>
@@ -1064,8 +1064,9 @@
     await deleteDoc(doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId, 'files', fileId));
   }
 
-  function isReadableForAnalysis(contentType) {
-    return !!contentType && (contentType.startsWith('image/') || contentType === 'application/pdf');
+  function isReadableForAnalysis(file) {
+    return (file.name || '').toLowerCase().endsWith('.dxf')
+      || (!!file.type && (file.type.startsWith('image/') || file.type === 'application/pdf'));
   }
 
   async function uploadFiles(fileListObj) {
@@ -1088,7 +1089,7 @@
           storagePath: path, downloadURL: url, uploadedAt: serverTimestamp(),
         });
         uploaded++;
-        if (isReadableForAnalysis(file.type)) readableUploaded++;
+        if (isReadableForAnalysis(file)) readableUploaded++;
       } catch (err) {
         failed.push(`${file.name} (${err.message})`);
       }

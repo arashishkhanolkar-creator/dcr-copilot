@@ -371,9 +371,9 @@ function buildSiteContext(project, unreadableFileNames) {
     lines.push(
       "",
       `The user has also attached: ${unreadableFileNames.join(", ")} — these can't be read ` +
-      "automatically (only images and PDFs can be, e.g. not DXF). If it would help, ask the " +
+      "automatically (only images, PDFs, and DXF files can be). If it would help, ask the " +
       "user to describe what's in them, or to re-export/screenshot the relevant part as an " +
-      "image or PDF instead."
+      "image, PDF, or DXF instead."
     );
   }
   return lines.join("\n");
@@ -389,11 +389,150 @@ function buildSiteContext(project, unreadableFileNames) {
 // text in its reply, which is what actually persists in conversation
 // history — the raw file bytes never get written to Firestore.
 const FEASIBILITY_READABLE_NON_IMAGE_TYPES = new Set(["application/pdf"]);
-function isReadableFileType(contentType) {
-  return !!contentType && (contentType.startsWith("image/") || FEASIBILITY_READABLE_NON_IMAGE_TYPES.has(contentType));
+function isDxfFile(f) {
+  return (f.name || "").toLowerCase().endsWith(".dxf");
+}
+function isReadableFileType(f) {
+  return isDxfFile(f) || (!!f.contentType && (f.contentType.startsWith("image/") || FEASIBILITY_READABLE_NON_IMAGE_TYPES.has(f.contentType)));
 }
 const FEASIBILITY_MAX_FILE_BYTES = 15 * 1024 * 1024; // per file
 const FEASIBILITY_MAX_ATTACH_BYTES = 20 * 1024 * 1024; // combined per message
+
+// DXF isn't a format Claude can read as an image or PDF, but it's a
+// plain-text CAD format we can parse ourselves — giving Claude computed
+// geometry (area via the shoelace formula, exact segment lengths) and
+// every text label in the drawing, which is far more precise than
+// eyeballing dimensions off a rendered image. Deliberately much narrower
+// than floor-plan-renderer.html's parseAnyDXF (no blocks/INSERT
+// resolution, no colour/linetype, no arc/bulge geometry) — this only
+// needs to answer "how big is this plot and what's the road width", not
+// render anything.
+const DXF_INSUNITS_LABELS = {
+  0: "unspecified in the file (assume metres unless a label says otherwise)",
+  1: "inches", 2: "feet", 3: "miles", 4: "millimetres", 5: "centimetres", 6: "metres", 7: "kilometres",
+};
+
+function summarizeDxfForFeasibility(text, maxShapes = 50, maxLabels = 200) {
+  const rawLines = text.split(/\r?\n/);
+  const tok = [];
+  for (let i = 0; i + 1 < rawLines.length; i += 2) {
+    tok.push({ code: parseInt(rawLines[i].trim(), 10), value: rawLines[i + 1].trim() });
+  }
+
+  let insunits = 0;
+  for (let i = 0; i < tok.length - 1; i++) {
+    if (tok[i].code === 9 && tok[i].value === "$INSUNITS") {
+      for (let j = i + 1; j < Math.min(i + 4, tok.length); j++) {
+        if (tok[j].code === 70) { insunits = parseInt(tok[j].value, 10) || 0; break; }
+      }
+      break;
+    }
+  }
+
+  const layersUsed = new Set();
+  const closedShapes = [];
+  const lineSegments = [];
+  const textLabels = [];
+
+  let i = 0, inEntities = false;
+  while (i < tok.length) {
+    const t = tok[i];
+    if (t.code === 0 && t.value === "SECTION") {
+      i++;
+      if (i < tok.length && tok[i].code === 2 && tok[i].value === "ENTITIES") inEntities = true;
+      i++;
+      continue;
+    }
+    if (t.code === 0 && t.value === "ENDSEC") { inEntities = false; i++; continue; }
+    if (!inEntities || t.code !== 0) { i++; continue; }
+
+    const type = t.value;
+    const e = { type, layer: "0" };
+    i++;
+    while (i < tok.length && tok[i].code !== 0) {
+      const { code, value } = tok[i];
+      if (code === 8) e.layer = value;
+      if (code === 1) e.text = value;
+      if (code === 10) e.x = e.x ?? parseFloat(value);
+      if (code === 20) e.y = e.y ?? parseFloat(value);
+      if (code === 11) e.x2 = parseFloat(value);
+      if (code === 21) e.y2 = parseFloat(value);
+      if (code === 70 && type === "LWPOLYLINE") e.closed = (parseInt(value, 10) & 1) === 1;
+      if (type === "LWPOLYLINE") {
+        if (!e.verts) e.verts = [];
+        if (code === 10) e._px = parseFloat(value);
+        else if (code === 20 && e._px !== undefined) {
+          e.verts.push({ x: e._px, y: parseFloat(value) });
+          e._px = undefined;
+        }
+      }
+      i++;
+    }
+    layersUsed.add(e.layer);
+
+    if (type === "LWPOLYLINE" && e.verts && e.verts.length >= 3) {
+      const verts = e.verts;
+      let area = 0, perimeter = 0;
+      for (let k = 0; k < verts.length; k++) {
+        const a = verts[k], b = verts[(k + 1) % verts.length];
+        area += a.x * b.y - b.x * a.y;
+        if (e.closed || k < verts.length - 1) perimeter += Math.hypot(b.x - a.x, b.y - a.y);
+      }
+      area = Math.abs(area) / 2;
+      const xs = verts.map(v => v.x), ys = verts.map(v => v.y);
+      const bbox = { w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+      if (e.closed) closedShapes.push({ layer: e.layer, vertexCount: verts.length, area, perimeter, bbox });
+    } else if (type === "LINE" && e.x !== undefined && e.x2 !== undefined) {
+      lineSegments.push({ layer: e.layer, length: Math.hypot(e.x2 - e.x, e.y2 - e.y) });
+    } else if ((type === "TEXT" || type === "MTEXT") && e.text) {
+      textLabels.push(e.text.replace(/\\P/g, " ").replace(/[{}]/g, "").trim());
+    }
+  }
+
+  closedShapes.sort((a, b) => b.area - a.area);
+  const uniqueLabels = [...new Set(textLabels)].filter(Boolean);
+  const unitLabel = DXF_INSUNITS_LABELS[insunits] || `unrecognised unit code ${insunits} (assume metres)`;
+  const fmt = (n) => (Math.round(n * 100) / 100).toString();
+
+  const out = [];
+  out.push(`Units per the file's own header: ${unitLabel}. Treat all figures below as being in ` +
+    "that unit unless a text label states otherwise.");
+  out.push(`Layers present: ${[...layersUsed].join(", ") || "(none found)"}`);
+
+  if (closedShapes.length) {
+    out.push("Closed shapes found (largest first — the plot boundary is usually the largest one, " +
+      "or on a layer named for the property line; cross-check against any text label below):");
+    closedShapes.slice(0, maxShapes).forEach((s, idx) => {
+      out.push(`  ${idx + 1}. Layer "${s.layer}": ${s.vertexCount} vertices, area ≈ ${fmt(s.area)} ` +
+        `sq. units, perimeter ≈ ${fmt(s.perimeter)} units, bounding box ${fmt(s.bbox.w)} x ${fmt(s.bbox.h)} units.`);
+    });
+    if (closedShapes.length > maxShapes) out.push(`  (${closedShapes.length - maxShapes} more closed shapes not shown)`);
+  } else {
+    out.push("No closed polylines found — the plot boundary (if drawn) may be open, made of " +
+      "separate LINE segments, or on an entity type this parser doesn't read.");
+  }
+
+  if (lineSegments.length) {
+    out.push("Straight line segments (possible boundary/road edges), by layer:");
+    const byLayer = {};
+    lineSegments.forEach(l => { (byLayer[l.layer] = byLayer[l.layer] || []).push(l.length); });
+    Object.keys(byLayer).forEach(layer => {
+      const lens = byLayer[layer].map(fmt);
+      out.push(`  Layer "${layer}": ${lens.length} segment(s), lengths: ${lens.join(", ")} units.`);
+    });
+  }
+
+  if (uniqueLabels.length) {
+    out.push("Text/dimension labels found in the drawing — these often directly state plot area, " +
+      "road width, or setback figures, and take priority over the computed geometry above when they conflict:");
+    uniqueLabels.slice(0, maxLabels).forEach(l => out.push(`  - "${l}"`));
+    if (uniqueLabels.length > maxLabels) out.push(`  (${uniqueLabels.length - maxLabels} more labels not shown)`);
+  } else {
+    out.push("No text/dimension labels found in the drawing.");
+  }
+
+  return out.join("\n");
+}
 
 async function buildFileAttachments(projectRef) {
   const filesSnap = await projectRef.collection("files").get();
@@ -405,7 +544,7 @@ async function buildFileAttachments(projectRef) {
   for (const fileDoc of filesSnap.docs) {
     const f = fileDoc.data();
     if (f.analyzed) continue;
-    if (!isReadableFileType(f.contentType)) {
+    if (!isReadableFileType(f)) {
       unreadableNames.push(f.name || fileDoc.id);
       continue;
     }
@@ -418,12 +557,21 @@ async function buildFileAttachments(projectRef) {
     try {
       const [bytes] = await admin.storage().bucket().file(f.storagePath).download();
       totalBytes += bytes.length;
-      const data = bytes.toString("base64");
-      blocks.push(
-        f.contentType.startsWith("image/")
-          ? { type: "image", source: { type: "base64", media_type: f.contentType, data } }
-          : { type: "document", source: { type: "base64", media_type: "application/pdf", data } }
-      );
+      if (isDxfFile(f)) {
+        const summary = summarizeDxfForFeasibility(bytes.toString("utf8"));
+        blocks.push({
+          type: "text",
+          text: `DXF site-drawing summary for "${f.name}" (extracted programmatically from the ` +
+            `CAD file's coordinates, not an image):\n${summary}`,
+        });
+      } else {
+        const data = bytes.toString("base64");
+        blocks.push(
+          f.contentType.startsWith("image/")
+            ? { type: "image", source: { type: "base64", media_type: f.contentType, data } }
+            : { type: "document", source: { type: "base64", media_type: "application/pdf", data } }
+        );
+      }
       analyzedRefs.push(fileDoc.ref);
     } catch (err) {
       console.error("Failed to read attachment", f.storagePath, err);
@@ -511,16 +659,20 @@ exports.sendFeasibilityMessage = onCall(
           "the product itself, following the loaded skill's instructions for tone, citations, and scope.\n\n" +
           buildSiteContext(project, unreadableNames) +
           (attachmentBlocks.length
-            ? "\n\nThe user has attached one or more documents/images with this message — going by " +
-              "context, likely a DP Remark, site plan, survey plan, or AAI NOCAS height clearance. " +
-              "Read them carefully and extract every concrete figure relevant to development " +
+            ? "\n\nThe user has attached one or more documents/images/CAD drawings with this message — " +
+              "going by context, likely a DP Remark, site plan, survey plan, AAI NOCAS height clearance, " +
+              "or a DXF site drawing. For images/PDFs, read them carefully. For any DXF, its geometry " +
+              "has already been extracted programmatically (areas via the shoelace formula, exact " +
+              "segment lengths, and every text label in the drawing) — treat those figures as precise, " +
+              "not a visual estimate, and prefer an explicit text label over the computed geometry when " +
+              "they conflict. Either way, extract every concrete figure relevant to development " +
               "feasibility: plot dimensions/area, frontage, adjacent road width(s), zone/reservation " +
               "status, adjacent plot details, and any height clearance (state clearly if it's AMSL vs " +
               "ground-relative — see the skill's height-question guidance). State the extracted figures " +
-              "explicitly in your reply, as plain text — the document itself won't be available in " +
-              "later turns of this conversation, only what you write now, so anything you don't restate " +
-              "here is lost to the rest of the discussion. If a figure isn't legible or isn't shown, say " +
-              "so plainly rather than guessing."
+              "explicitly in your reply, as plain text — the source won't be available in later turns of " +
+              "this conversation, only what you write now, so anything you don't restate here is lost to " +
+              "the rest of the discussion. If a figure isn't legible or isn't present, say so plainly " +
+              "rather than guessing."
             : ""),
         container: { skills: [{ type: "custom", skill_id: DCR_SKILL_ID, version: "latest" }] },
         tools: [{ type: "code_execution_20260521", name: "code_execution" }],
