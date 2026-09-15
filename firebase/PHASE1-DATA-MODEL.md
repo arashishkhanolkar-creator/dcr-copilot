@@ -84,6 +84,17 @@ context (per the brief's "never allow generic lookup" requirement) —
 enforced server-side in the Cloud Function, not by trusting client-sent
 context.
 
+### `users/{uid}/projects/{projectId}/files/{fileId}` — uploaded site documents
+
+`name`, `contentType`, `size`, `storagePath`, `downloadURL`, `uploadedAt`,
+`analyzed` (boolean, absent until the Cloud Function has actually read it).
+Images and PDFs get sent to Claude as content blocks the first time
+`sendFeasibilityMessage` runs after upload, then flagged `analyzed: true` so
+the raw bytes aren't re-sent on every later turn — whatever Claude extracts
+persists only as plain text in `conversation/main`, never as file content in
+Firestore. DXF (and anything else) can't be read this way and is just
+mentioned by name in the system context.
+
 ### `users/{uid}/palettes/{paletteId}` — Material Library, both tiers
 
 `name`, `materials` (array), `createdAt`.

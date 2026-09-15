@@ -352,9 +352,9 @@ async function checkAndBumpFeasibilityUsage(userRef) {
   });
 }
 
-function buildSiteContext(project) {
+function buildSiteContext(project, unreadableFileNames) {
   const line = (label, value) => `- ${label}: ${value || "not provided yet"}`;
-  return [
+  const lines = [
     `Site details for this project ("${project.name || "Untitled project"}"):`,
     line("Location", project.location),
     line("Zone / ward", project.zone),
@@ -366,7 +366,72 @@ function buildSiteContext(project) {
     "Ground every answer in this specific site — never fall back to a generic, " +
     "unattributed answer. If a detail you need is missing above and hasn't been " +
     "mentioned in the conversation, ask the user for it rather than guessing.",
-  ].join("\n");
+  ];
+  if (unreadableFileNames && unreadableFileNames.length) {
+    lines.push(
+      "",
+      `The user has also attached: ${unreadableFileNames.join(", ")} — these can't be read ` +
+      "automatically (only images and PDFs can be, e.g. not DXF). If it would help, ask the " +
+      "user to describe what's in them, or to re-export/screenshot the relevant part as an " +
+      "image or PDF instead."
+    );
+  }
+  return lines.join("\n");
+}
+
+// ---- File attachments: uploaded DP remarks, site plans, and AAI NOCAS
+// certificates get actually read by Claude (as image/PDF content blocks)
+// instead of just sitting in Storage unused. Each file is only ever sent
+// once — after a successful reply, it's marked `analyzed` so it isn't
+// re-uploaded as base64 on every subsequent turn (that would be both
+// slow and a real cost multiplier against the daily message cap's whole
+// point). Whatever Claude extracts from it is expected to end up as plain
+// text in its reply, which is what actually persists in conversation
+// history — the raw file bytes never get written to Firestore.
+const FEASIBILITY_READABLE_NON_IMAGE_TYPES = new Set(["application/pdf"]);
+function isReadableFileType(contentType) {
+  return !!contentType && (contentType.startsWith("image/") || FEASIBILITY_READABLE_NON_IMAGE_TYPES.has(contentType));
+}
+const FEASIBILITY_MAX_FILE_BYTES = 15 * 1024 * 1024; // per file
+const FEASIBILITY_MAX_ATTACH_BYTES = 20 * 1024 * 1024; // combined per message
+
+async function buildFileAttachments(projectRef) {
+  const filesSnap = await projectRef.collection("files").get();
+  const blocks = [];
+  const analyzedRefs = [];
+  const unreadableNames = [];
+  let totalBytes = 0;
+
+  for (const fileDoc of filesSnap.docs) {
+    const f = fileDoc.data();
+    if (f.analyzed) continue;
+    if (!isReadableFileType(f.contentType)) {
+      unreadableNames.push(f.name || fileDoc.id);
+      continue;
+    }
+    if (f.size && f.size > FEASIBILITY_MAX_FILE_BYTES) {
+      unreadableNames.push(`${f.name || fileDoc.id} (too large to read automatically)`);
+      continue;
+    }
+    if (totalBytes + (f.size || 0) > FEASIBILITY_MAX_ATTACH_BYTES) break; // pick the rest up next turn
+
+    try {
+      const [bytes] = await admin.storage().bucket().file(f.storagePath).download();
+      totalBytes += bytes.length;
+      const data = bytes.toString("base64");
+      blocks.push(
+        f.contentType.startsWith("image/")
+          ? { type: "image", source: { type: "base64", media_type: f.contentType, data } }
+          : { type: "document", source: { type: "base64", media_type: "application/pdf", data } }
+      );
+      analyzedRefs.push(fileDoc.ref);
+    } catch (err) {
+      console.error("Failed to read attachment", f.storagePath, err);
+      unreadableNames.push(`${f.name || fileDoc.id} (couldn't be read)`);
+    }
+  }
+
+  return { blocks, analyzedRefs, unreadableNames };
 }
 
 exports.sendFeasibilityMessage = onCall(
@@ -424,8 +489,15 @@ exports.sendFeasibilityMessage = onCall(
     const history = (conversationSnap.exists ? conversationSnap.data().messages : []) || [];
     const trimmedHistory = history.slice(-FEASIBILITY_MAX_HISTORY);
 
-    const messages = [...trimmedHistory, { role: "user", content: messageText }]
-      .map(m => ({ role: m.role, content: m.content }));
+    const { blocks: attachmentBlocks, analyzedRefs, unreadableNames } = await buildFileAttachments(projectRef);
+    const userContent = attachmentBlocks.length
+      ? [...attachmentBlocks, { type: "text", text: messageText }]
+      : messageText;
+
+    const messages = [
+      ...trimmedHistory.map(m => ({ role: m.role, content: m.content })),
+      { role: "user", content: userContent },
+    ];
 
     try {
       const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY.value() });
@@ -437,7 +509,19 @@ exports.sendFeasibilityMessage = onCall(
           "workspace page — not in Claude Code or claude.ai. There is no terminal or file explorer " +
           "visible to the user, so never refer to files, the skill, or your own tool use. Answer as " +
           "the product itself, following the loaded skill's instructions for tone, citations, and scope.\n\n" +
-          buildSiteContext(project),
+          buildSiteContext(project, unreadableNames) +
+          (attachmentBlocks.length
+            ? "\n\nThe user has attached one or more documents/images with this message — going by " +
+              "context, likely a DP Remark, site plan, survey plan, or AAI NOCAS height clearance. " +
+              "Read them carefully and extract every concrete figure relevant to development " +
+              "feasibility: plot dimensions/area, frontage, adjacent road width(s), zone/reservation " +
+              "status, adjacent plot details, and any height clearance (state clearly if it's AMSL vs " +
+              "ground-relative — see the skill's height-question guidance). State the extracted figures " +
+              "explicitly in your reply, as plain text — the document itself won't be available in " +
+              "later turns of this conversation, only what you write now, so anything you don't restate " +
+              "here is lost to the rest of the discussion. If a figure isn't legible or isn't shown, say " +
+              "so plainly rather than guessing."
+            : ""),
         container: { skills: [{ type: "custom", skill_id: DCR_SKILL_ID, version: "latest" }] },
         tools: [{ type: "code_execution_20260521", name: "code_execution" }],
         messages,
@@ -453,12 +537,20 @@ exports.sendFeasibilityMessage = onCall(
       // Not arrayUnion: it dedupes exact-match entries, which would
       // silently drop a message if the user (or the model) repeats
       // itself verbatim — a plain read-append-write is correct here.
+      // Note: only messageText (plain string) is ever persisted here, never
+      // userContent — the raw attachment bytes never touch Firestore.
       const now = admin.firestore.FieldValue.serverTimestamp();
       await conversationRef.set({
         messages: [...history, { role: "user", content: messageText }, { role: "assistant", content: reply }],
         updatedAt: now,
       }, { merge: true });
       await projectRef.set({ lastActiveAt: now }, { merge: true });
+
+      if (analyzedRefs.length) {
+        const batch = db.batch();
+        analyzedRefs.forEach(ref => batch.update(ref, { analyzed: true }));
+        await batch.commit();
+      }
 
       return { reply };
     } catch (err) {

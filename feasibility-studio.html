@@ -198,12 +198,14 @@
   .side-section h4{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--concrete); margin-bottom:12px;}
   .site-field{margin-bottom:16px;}
   .site-field label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--concrete); margin-bottom:4px;}
-  .site-field input{
+  .site-field input, .site-field select{
     width:100%; font-family:'Manrope',sans-serif; font-size:13px; padding:6px 0 8px;
     border:none; border-bottom:1px solid var(--line); border-radius:0; background:none; color:var(--charcoal);
     transition:border-color .2s ease;
   }
-  .site-field input:focus{outline:none; border-bottom-color:var(--charcoal);}
+  .site-field select{cursor:pointer;}
+  .site-field select:invalid{color:var(--concrete);}
+  .site-field input:focus, .site-field select:focus{outline:none; border-bottom-color:var(--charcoal);}
   .site-field-hint{font-size:10.5px; color:var(--concrete); margin-top:4px; line-height:1.5;}
 
   /* Google Places Autocomplete dropdown — injected into <body>, so this
@@ -359,7 +361,24 @@
         </div>
         <div class="site-field"><label>Zone / ward</label><input type="text" id="fZone"></div>
         <div class="site-field"><label>Plot area (sqm)</label><input type="number" id="fPlotArea"></div>
-        <div class="site-field"><label>Land use</label><input type="text" id="fLandUse"></div>
+        <div class="site-field">
+          <label>Land use</label>
+          <select id="fLandUse">
+            <option value="">Select…</option>
+            <option value="Residential">Residential</option>
+            <option value="Commercial">Commercial</option>
+            <option value="Residential + Commercial (mixed use)">Residential + Commercial (mixed use)</option>
+            <option value="Industrial">Industrial</option>
+            <option value="Institutional">Institutional</option>
+            <option value="Public / Semi-Public (PSP)">Public / Semi-Public (PSP)</option>
+            <option value="Hospitality">Hospitality</option>
+            <option value="Agricultural">Agricultural</option>
+            <option value="Recreational / Open space">Recreational / Open space</option>
+            <option value="No Development Zone (NDZ) / Natural Area">No Development Zone (NDZ) / Natural Area</option>
+            <option value="Other">Other (specify)</option>
+          </select>
+          <input type="text" id="fLandUseOther" placeholder="Specify land use" style="display:none; margin-top:8px;">
+        </div>
         <div class="site-field"><label>Existing structure</label><input type="text" id="fExisting"></div>
         <div class="site-field"><label>Development intent</label><input type="text" id="fIntent"></div>
       </div>
@@ -524,6 +543,13 @@
   } else {
     $('locationHint').textContent = 'Enter the site location — city / area.';
   }
+
+  // Must match the <option> values in the #fLandUse <select>.
+  const LAND_USE_OPTIONS = [
+    'Residential', 'Commercial', 'Residential + Commercial (mixed use)', 'Industrial',
+    'Institutional', 'Public / Semi-Public (PSP)', 'Hospitality', 'Agricultural',
+    'Recreational / Open space', 'No Development Zone (NDZ) / Natural Area',
+  ];
 
   let currentUser = null;
   let currentUid = null;
@@ -885,7 +911,16 @@
     $('fLocation').value = project.location || '';
     $('fZone').value = project.zone || '';
     $('fPlotArea').value = project.plotArea || '';
-    $('fLandUse').value = project.landUse || '';
+    const savedLandUse = project.landUse || '';
+    if (savedLandUse && !LAND_USE_OPTIONS.includes(savedLandUse)) {
+      $('fLandUse').value = 'Other';
+      $('fLandUseOther').value = savedLandUse;
+      $('fLandUseOther').style.display = '';
+    } else {
+      $('fLandUse').value = savedLandUse;
+      $('fLandUseOther').value = '';
+      $('fLandUseOther').style.display = 'none';
+    }
     $('fExisting').value = project.existingStructure || '';
     $('fIntent').value = project.developmentIntent || '';
     updateArchivedBadge();
@@ -942,18 +977,20 @@
     return html;
   }
 
-  async function sendChat() {
+  async function sendChat(overrideText, pendingLabel) {
     if (sending || !activeProjectId) return;
     const input = $('chatInput');
-    const text = input.value.trim();
+    const text = overrideText !== undefined ? overrideText.trim() : input.value.trim();
     if (!text) return;
-    sending = true; $('btnSend').disabled = true; input.value = '';
+    sending = true; $('btnSend').disabled = true;
+    if (overrideText === undefined) input.value = '';
 
     const log = $('chatLog');
     const empty = log.querySelector('.chat-empty'); if (empty) empty.remove();
     const userEl = document.createElement('div'); userEl.className = 'msg user'; userEl.textContent = text;
     log.appendChild(userEl);
-    const pendingEl = document.createElement('div'); pendingEl.className = 'msg pending assistant'; pendingEl.textContent = 'Reading the relevant chapters…';
+    const pendingEl = document.createElement('div'); pendingEl.className = 'msg pending assistant';
+    pendingEl.textContent = pendingLabel || 'Reading the relevant chapters…';
     log.appendChild(pendingEl);
     log.scrollTop = log.scrollHeight;
 
@@ -975,15 +1012,27 @@
 
   // ---- Site details: autosave on blur ----
   const siteFieldMap = { fLocation: 'location', fZone: 'zone', fPlotArea: 'plotArea', fLandUse: 'landUse', fExisting: 'existingStructure', fIntent: 'developmentIntent' };
+  async function saveSiteField(id) {
+    if (!activeProjectId) return;
+    const field = siteFieldMap[id];
+    let value;
+    if (id === 'fLandUse') {
+      value = $('fLandUse').value === 'Other' ? $('fLandUseOther').value.trim() : $('fLandUse').value;
+    } else {
+      value = $(id).value.trim();
+    }
+    if (id === 'fPlotArea') value = value ? Number(value) : null;
+    const projectRef = doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId);
+    await setDoc(projectRef, { [field]: value }, { merge: true });
+  }
   Object.keys(siteFieldMap).forEach(id => {
-    $(id).addEventListener('blur', async () => {
-      if (!activeProjectId) return;
-      const field = siteFieldMap[id];
-      let value = $(id).value.trim();
-      if (id === 'fPlotArea') value = value ? Number(value) : null;
-      const projectRef = doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId);
-      await setDoc(projectRef, { [field]: value }, { merge: true });
-    });
+    $(id).addEventListener('blur', () => saveSiteField(id));
+  });
+  $('fLandUseOther').addEventListener('blur', () => saveSiteField('fLandUse'));
+  $('fLandUse').addEventListener('change', () => {
+    const isOther = $('fLandUse').value === 'Other';
+    $('fLandUseOther').style.display = isOther ? '' : 'none';
+    if (isOther) $('fLandUseOther').focus();
   });
   $('projectNameInput').addEventListener('blur', async () => {
     if (!activeProjectId) return;
@@ -1015,11 +1064,16 @@
     await deleteDoc(doc(dcFirestore, 'users', currentUid, 'projects', activeProjectId, 'files', fileId));
   }
 
+  function isReadableForAnalysis(contentType) {
+    return !!contentType && (contentType.startsWith('image/') || contentType === 'application/pdf');
+  }
+
   async function uploadFiles(fileListObj) {
     if (!activeProjectId) return;
     const status = $('uploadStatus');
     const failed = [];
     let uploaded = 0;
+    let readableUploaded = 0;
     for (const file of fileListObj) {
       if (file.size > 20 * 1024 * 1024) { failed.push(`${file.name} (over 20MB)`); continue; }
       status.textContent = `Uploading ${file.name}…`;
@@ -1034,6 +1088,7 @@
           storagePath: path, downloadURL: url, uploadedAt: serverTimestamp(),
         });
         uploaded++;
+        if (isReadableForAnalysis(file.type)) readableUploaded++;
       } catch (err) {
         failed.push(`${file.name} (${err.message})`);
       }
@@ -1043,6 +1098,20 @@
     } else {
       const okPart = uploaded ? `Uploaded ${uploaded}. ` : '';
       status.textContent = `${okPart}Failed: ${failed.join(', ')}`;
+    }
+
+    // Only images/PDFs can actually be read (see isReadableFileType in the
+    // backend) — auto-ask Claude to pull the site details out of them so
+    // the user doesn't have to remember to prompt for it, but skip this for
+    // DXF-only uploads (nothing there for Claude to read, and it would just
+    // burn one of the day's 40 messages to say so).
+    if (readableUploaded > 0) {
+      const plural = readableUploaded > 1 ? 's' : '';
+      sendChat(
+        `I've uploaded ${readableUploaded} new document${plural} — please review ${readableUploaded > 1 ? 'them' : 'it'} ` +
+        'and extract the key site details (dimensions, road width, zone/reservation status, height clearance, etc.) relevant to this project.',
+        'Reading the uploaded file' + plural + '…'
+      );
     }
   }
 
