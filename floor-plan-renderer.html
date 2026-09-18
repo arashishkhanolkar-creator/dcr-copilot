@@ -65,9 +65,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 .sb{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .ss{padding:16px 18px;border-bottom:1px solid var(--border)}
 .ss:last-child{border-bottom:none}
-.sb>.ss:first-child{flex:1;min-height:0;overflow-y:auto}
-.sb>.ss:first-child::-webkit-scrollbar{width:5px}
-.sb>.ss:first-child::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:3px}
+.sb-scroll{flex:1;min-height:0;overflow-y:auto}
+.sb-scroll::-webkit-scrollbar{width:5px}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--bstrong);border-radius:3px}
 .sl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ts);margin-bottom:13px}
 
 /* Layer colour rows */
@@ -318,27 +318,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 
 <aside class="sb">
 
-  <div class="ss">
-    <div class="sl">Saved projects</div>
-    <div class="proj-save-row">
-      <input type="text" id="projectNameInput" placeholder="Project name" maxlength="60">
-      <button class="proj-save-btn" id="btn-save-project" title="Save the current layer colours, weights, opacity and text scale under this name">Save</button>
-    </div>
-    <div id="projectsList"></div>
-  </div>
+  <div class="sb-scroll">
 
-  <div class="ss">
-    <div class="sl">Text size</div>
-    <div class="sub-row" style="margin-top:0">
-      <span class="sub-row-name">Scale</span>
-      <input type="range" id="textScaleSlider" min="50" max="300" step="10" value="100">
-      <span class="sub-row-val" id="textScaleVal">100%</span>
+    <div class="ss">
+      <div class="sl">Saved projects</div>
+      <div class="proj-save-row">
+        <input type="text" id="projectNameInput" placeholder="Project name" maxlength="60">
+        <button class="proj-save-btn" id="btn-save-project" title="Save the current layer colours, weights, opacity and text scale under this name">Save</button>
+      </div>
+      <div id="projectsList"></div>
     </div>
-  </div>
 
-  <div class="ss">
-    <div class="sl">Layers</div>
-    <div id="layersContainer"></div>
+    <div class="ss">
+      <div class="sl">Text size</div>
+      <div class="sub-row" style="margin-top:0">
+        <span class="sub-row-name">Scale</span>
+        <input type="range" id="textScaleSlider" min="50" max="300" step="10" value="100">
+        <span class="sub-row-val" id="textScaleVal">100%</span>
+      </div>
+    </div>
+
+    <div class="ss">
+      <div class="sl">Layers</div>
+      <div id="layersContainer"></div>
+    </div>
+
   </div>
 
   <!-- EXPORT — pinned below the tabs, always visible -->
@@ -604,14 +608,14 @@ function buildSVG(t) {
   }
 
   function renderText(t_, style) {
-    // A floor keeps tiny dimension labels legible at a zoomed-out fit-to-
-    // page view, but it's kept low (not the old 8px) so a genuinely larger
-    // heading/title height still clears it and renders visibly bigger than
-    // floor-pinned body text — the Text scale control (C.textScale) then
-    // multiplies raw heights BEFORE the floor is applied, so turning it up
-    // grows already-larger headings proportionally more than small labels
-    // pinned at the floor, instead of just enlarging everything equally.
-    const TEXT_FLOOR_PX = 6;
+    // Only a near-invisible floor here (not the old 6-8px) — a bigger one
+    // pins most real-world drawings' text to a single flat size across most
+    // of the Text scale slider's range, since at typical fit-to-page zoom
+    // raw heights are only a few px to start with. With a tiny floor, the
+    // slider's whole 50%-300% range has a visible, proportional effect in
+    // BOTH directions, and headings (taller raw height) end up bigger than
+    // body text at any given scale instead of both collapsing to the floor.
+    const TEXT_FLOOR_PX = 2;
     const fh = Math.max(TEXT_FLOOR_PX, t_.h * s * C.textScale).toFixed(1);
     const anchorMap = {1:'start',2:'middle',3:'end',4:'start',5:'middle',6:'end',7:'start',8:'middle',9:'end'};
     const anchor = t_.anchorOverride || anchorMap[t_.attach] || 'start';
