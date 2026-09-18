@@ -149,8 +149,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 .vp{flex:1;overflow:hidden;position:relative;cursor:grab;background:var(--bg);
   background-image:radial-gradient(var(--border) 1px, transparent 1px);background-size:16px 16px;}
 .vp.pan{cursor:grabbing}
+.vp.content-panning{cursor:move}
 .ci{position:absolute;transform-origin:0 0;will-change:transform}
 #rsvg{display:block;box-shadow:0 10px 34px rgba(0,0,0,.16);}
+/* Shown while double-clicking inside the sheet has put drags into
+   content-drag mode, so it's visually clear the sheet itself is now
+   fixed and only the drawing inside it will move. */
+#rsvg.content-drag-mode{outline:2px dashed var(--accent);outline-offset:2px}
+.content-drag-hint{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:5;
+  background:var(--accent);color:#fff;font-family:var(--fb);font-size:11.5px;font-weight:600;
+  padding:6px 12px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.18);pointer-events:none;
+  opacity:0;transition:opacity .15s;
+}
+.content-drag-hint.show{opacity:1}
 
 /* Floating canvas toolbar (pan/zoom), matching a CAD-tool convention
    of overlaying controls on the canvas instead of a separate bar. */
@@ -267,6 +279,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
     <div class="ci" id="ci">
       <svg id="rsvg" width="900" height="650"></svg>
     </div>
+    <div class="content-drag-hint" id="contentDragHint">Drawing move mode — double-click outside the sheet to exit</div>
     <div class="canvas-toolbar">
       <button class="ctb-btn" id="btn-fit" title="Fit view">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
@@ -420,6 +433,12 @@ let C = {
   paperSize:'A3', orientation:'landscape', scaleMode:'fit', scaleN:50,
   exportQuality:'print',
   textScale:1,
+  // dragMode 'viewport' (default): left-drag pans the whole view, sheet
+  // included — like scrolling. dragMode 'content': left-drag instead nudges
+  // the DRAWING within the fixed, on-screen sheet (contentOffsetX/Y, in the
+  // page's own px space, added into makePageTransform's ox/oy). Toggled by
+  // double-clicking inside vs. outside the sheet — see the dblclick handler.
+  dragMode:'viewport', contentOffsetX:0, contentOffsetY:0,
 };
 
 // ══════════════════════════════════════════════════════
@@ -488,7 +507,10 @@ function makePageTransform(pxPerMM) {
   const W = wmm * pxPerMM, H = hmm * pxPerMM;
   const B = FP.bounds;
   const dw = (B.x1 - B.x0) * s, dh = (B.y1 - B.y0) * s;
-  const ox = (W - dw) / 2, oy = (H - dh) / 2;
+  // The manual nudge from content-drag mode (see C.dragMode) — added on top
+  // of the automatic centering so dragging the drawing inside the sheet
+  // shifts it relative to that centered position, not to (0,0).
+  const ox = (W - dw) / 2 + C.contentOffsetX, oy = (H - dh) / 2 + C.contentOffsetY;
   return {
     s, W, H, N, ox, oy,
     overflow: dw > W || dh > H,
@@ -1397,10 +1419,48 @@ function applyT() {
 // Left-click drag pans, and so does middle-click (mouse-wheel-button) drag —
 // the standard CAD-app convention — with the browser's own middle-click
 // autoscroll gesture suppressed so it doesn't fight with our panning.
-vp.addEventListener('mousedown', e => { if(e.button!==0 && e.button!==1)return; if(e.button===1) e.preventDefault(); C.panning=true; C.lastPan={x:e.clientX,y:e.clientY}; vp.classList.add('pan'); });
+// Middle-click ALWAYS pans the viewport regardless of drag mode, as a
+// constant fallback; left-click's effect depends on C.dragMode (see the
+// dblclick handler below for how that mode gets toggled).
+vp.addEventListener('mousedown', e => {
+  if(e.button!==0 && e.button!==1)return;
+  if(e.button===1) e.preventDefault();
+  C.panning=true;
+  C.panningAsContent = (e.button===0 && C.dragMode==='content');
+  C.lastPan={x:e.clientX,y:e.clientY};
+  vp.classList.add(C.panningAsContent ? 'content-panning' : 'pan');
+});
 vp.addEventListener('auxclick', e => { if(e.button===1) e.preventDefault(); });
-window.addEventListener('mousemove', e => { if(!C.panning)return; C.panX+=e.clientX-C.lastPan.x; C.panY+=e.clientY-C.lastPan.y; C.lastPan={x:e.clientX,y:e.clientY}; applyT(); });
-window.addEventListener('mouseup', () => { C.panning=false; vp.classList.remove('pan'); });
+window.addEventListener('mousemove', e => {
+  if(!C.panning)return;
+  const dx = e.clientX-C.lastPan.x, dy = e.clientY-C.lastPan.y;
+  C.lastPan={x:e.clientX,y:e.clientY};
+  if (C.panningAsContent) {
+    // Screen px -> page px: the SVG's displayed size is lastTransform.W/H *
+    // C.scale (see applySvgSize), so one page unit is C.scale screen px.
+    C.contentOffsetX += dx / C.scale;
+    C.contentOffsetY += dy / C.scale;
+    render();
+  } else {
+    C.panX+=dx; C.panY+=dy; applyT();
+  }
+});
+window.addEventListener('mouseup', () => { C.panning=false; vp.classList.remove('pan','content-panning'); });
+
+// Double-click inside the sheet enters "move the drawing" mode (the sheet
+// stays put on screen, only the drawing inside it drags); double-click
+// anywhere outside the sheet exits back to normal viewport panning.
+function setDragMode(mode) {
+  C.dragMode = mode;
+  document.getElementById('rsvg').classList.toggle('content-drag-mode', mode === 'content');
+  document.getElementById('contentDragHint').classList.toggle('show', mode === 'content');
+}
+vp.addEventListener('dblclick', e => {
+  const svg = document.getElementById('rsvg');
+  const r = svg.getBoundingClientRect();
+  const insideSheet = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+  setDragMode(insideSheet ? 'content' : 'viewport');
+});
 vp.addEventListener('wheel', e => {
   e.preventDefault();
   const d=e.deltaY<0?1.12:0.89;
@@ -1754,6 +1814,8 @@ document.getElementById('dxf-input').addEventListener('change', function() {
       layerOrder = result.layerOrder;
       layerStyles = result.layerStyles;
       expandedLayers = new Set();
+      C.contentOffsetX = 0; C.contentOffsetY = 0;
+      setDragMode('viewport');
 
       // A revised drawing's layers keep their names even when the geometry
       // changes, so re-uploading under an active saved project reapplies
