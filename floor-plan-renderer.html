@@ -687,7 +687,14 @@ function render() {
   const t = makePageTransform(PAPER_PX_PER_MM);
   lastTransform = t;
   const svg = document.getElementById('rsvg');
-  svg.setAttribute('width', t.W); svg.setAttribute('height', t.H);
+  // The SVG's viewBox stays fixed at the page's logical pixel size (t.W×t.H);
+  // its displayed width/height are set separately, in applyT(), to that size
+  // times the current zoom. Resizing a viewBox'd SVG like this makes the
+  // browser re-rasterize the vector content at the actual on-screen size on
+  // every zoom step, so it stays crisp — a CSS `transform: scale()` on top of
+  // a fixed-resolution SVG instead gets GPU-cached as a bitmap and blurs once
+  // zoomed past its native size.
+  svg.setAttribute('viewBox', `0 0 ${t.W} ${t.H}`);
   const str = buildSVG(t);
   svg.innerHTML = str.replace(/<svg[^>]*>/, '').replace(/<\/svg>$/, '');
 
@@ -695,6 +702,7 @@ function render() {
   document.getElementById('paperDimsLabel').textContent = `${Math.round(wmm)} × ${Math.round(hmm)} mm`;
   document.getElementById('stripWarn').textContent = t.overflow ? 'Exceeds page at this scale' : '';
   updateScaleBar(t);
+  applySvgSize();
 }
 
 const NICE_METRES = [0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000];
@@ -1179,13 +1187,30 @@ document.getElementById('btn-exp').addEventListener('click', async () => {
 // ══════════════════════════════════════════════════════
 const vp = document.getElementById('vp');
 const ci = document.getElementById('ci');
+
+// Bakes the current zoom into the SVG's own displayed width/height (its
+// viewBox, set in render(), stays fixed) so the browser rescales the actual
+// vector content rather than stretching a cached bitmap of it — see the note
+// in render() for why that's what keeps zooming crisp instead of blurry.
+function applySvgSize() {
+  if (!lastTransform) return;
+  const svg = document.getElementById('rsvg');
+  svg.setAttribute('width', lastTransform.W * C.scale);
+  svg.setAttribute('height', lastTransform.H * C.scale);
+}
+
 function applyT() {
-  ci.style.transform=`translate(${C.panX}px,${C.panY}px) scale(${C.scale})`;
+  ci.style.transform=`translate(${C.panX}px,${C.panY}px)`;
+  applySvgSize();
   document.getElementById('zoomLabel').textContent = Math.round(C.scale*100)+'%';
   if (lastTransform) updateScaleBar(lastTransform);
 }
 
-vp.addEventListener('mousedown', e => { if(e.button!==0)return; C.panning=true; C.lastPan={x:e.clientX,y:e.clientY}; vp.classList.add('pan'); });
+// Left-click drag pans, and so does middle-click (mouse-wheel-button) drag —
+// the standard CAD-app convention — with the browser's own middle-click
+// autoscroll gesture suppressed so it doesn't fight with our panning.
+vp.addEventListener('mousedown', e => { if(e.button!==0 && e.button!==1)return; if(e.button===1) e.preventDefault(); C.panning=true; C.lastPan={x:e.clientX,y:e.clientY}; vp.classList.add('pan'); });
+vp.addEventListener('auxclick', e => { if(e.button===1) e.preventDefault(); });
 window.addEventListener('mousemove', e => { if(!C.panning)return; C.panX+=e.clientX-C.lastPan.x; C.panY+=e.clientY-C.lastPan.y; C.lastPan={x:e.clientX,y:e.clientY}; applyT(); });
 window.addEventListener('mouseup', () => { C.panning=false; vp.classList.remove('pan'); });
 vp.addEventListener('wheel', e => {
@@ -1232,9 +1257,13 @@ vp.addEventListener('touchmove',e=>{
 vp.addEventListener('touchend',e=>{for(const t of e.changedTouches)delete touches[t.identifier];});
 
 function fitView(){
-  const svg = document.getElementById('rsvg');
-  const svgW = parseFloat(svg.getAttribute('width'))||1;
-  const svgH = parseFloat(svg.getAttribute('height'))||1;
+  // Read the page's fixed, unscaled size from lastTransform rather than the
+  // SVG's own width/height attributes — those now hold the CURRENT zoomed
+  // size (applySvgSize bakes C.scale into them), so reading them back here
+  // would compound onto whatever zoom was already applied instead of fitting
+  // from a clean 1:1 baseline.
+  const svgW = (lastTransform && lastTransform.W) || 1;
+  const svgH = (lastTransform && lastTransform.H) || 1;
   const vpRect = vp.getBoundingClientRect();
   const pad = 24;
   const s = Math.min((vpRect.width-pad*2)/svgW, (vpRect.height-pad*2)/svgH);
