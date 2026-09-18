@@ -40,6 +40,14 @@ service cloud.firestore {
           allow read, write: if request.auth != null && request.auth.uid == uid;
         }
       }
+
+      // Floor Plan Renderer — saved styling presets (layer colours/
+      // weights/opacity, paper setup, text scale). Same owner-only shape
+      // as Material Library's palettes: plain data the client writes
+      // directly, nothing here needs Cloud-Function-level trust.
+      match /floorPlanProjects/{projectId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
     }
 
     // Coin orders are created and settled entirely by Cloud

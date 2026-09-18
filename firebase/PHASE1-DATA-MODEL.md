@@ -103,6 +103,17 @@ way and is just mentioned by name in the system context.
 
 `name`, `materials` (array), `createdAt`.
 
+### `users/{uid}/floorPlanProjects/{projectId}` — Floor Plan Renderer, both tiers
+
+`name`, `paperSize`, `orientation`, `scaleMode`, `scaleN`, `textScale`,
+`layerStyles` (map of DXF layer name → `{visible, strokeColor,
+strokeWeight, lineType, opacity, fillColor, fillOpacity}`), `savedAt`.
+A saved project is a styling preset, not the drawing itself — the DXF
+file is never uploaded or stored; re-importing a revised drawing while a
+project is active re-matches its `layerStyles` onto the new file's layers
+by name. Signed-out use falls back to this same shape in the browser's
+own localStorage instead (device-only, never synced here).
+
 ### `palette_shares/{shareToken}` — top-level, Practice only
 
 `ownerId`, `paletteId`, `materialsSnapshot` (array, copied at share-time so

@@ -57,6 +57,55 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 }
 .style-sw.on{border-color:var(--accent);}
 
+/* ---------- ACCOUNT NAV + SIGN-IN MODAL (matches the pattern used across
+   account.html / feasibility-studio.html / ai-lab.html, re-themed to this
+   page's own colour variables) ---------- */
+.nav-signin-btn{
+  font-family:var(--fb);font-weight:600;font-size:12px;
+  background:var(--text);border:none;border-radius:6px;padding:9px 16px;cursor:pointer;color:#fff;white-space:nowrap;
+}
+.nav-item{position:relative;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.dropdown-wrap{position:absolute;top:100%;right:0;padding-top:10px;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:50}
+.nav-item:hover .dropdown-wrap{opacity:1;pointer-events:auto}
+.dropdown{background:var(--surface);color:var(--text);min-width:230px;border:1px solid var(--border);border-radius:8px;padding:8px 0;box-shadow:0 10px 30px rgba(0,0,0,.14)}
+.dropdown a{display:block;padding:12px 18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+.dropdown a:last-child{border-bottom:none}
+.dropdown a:hover{opacity:.6}
+.dropdown-info{padding:14px 18px 16px;border-bottom:1px solid var(--border)}
+.dropdown-plan{font-family:var(--font);font-weight:700;font-size:13px;margin-bottom:6px}
+.dropdown-pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.03em;padding:3px 9px;border-radius:100px;margin-bottom:6px}
+.dropdown-pill .dot{width:6px;height:6px;border-radius:50%}
+.dropdown-pill.ok{background:rgba(61,107,79,.12);color:#3d6b4f}
+.dropdown-pill.ok .dot{background:#3d6b4f}
+.dropdown-pill.warn{background:rgba(156,77,46,.12);color:#9c4d2e}
+.dropdown-pill.warn .dot{background:#9c4d2e}
+.dropdown-pill.err{background:rgba(168,68,42,.12);color:#a8442a}
+.dropdown-pill.err .dot{background:#a8442a}
+.dropdown-pill.neutral{background:var(--s2);color:var(--ts)}
+.dropdown-pill.neutral .dot{background:var(--bstrong)}
+.dropdown-detail{font-size:11px;color:var(--ts);line-height:1.5;text-transform:none;letter-spacing:normal}
+
+.dc-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(26,26,24,.55);display:none;align-items:center;justify-content:center;padding:24px}
+.dc-modal-overlay.on{display:flex}
+.dc-modal{background:var(--surface);color:var(--text);width:100%;max-width:380px;padding:44px 36px 36px;position:relative;max-height:88vh;overflow-y:auto;border-radius:10px}
+.dc-modal-close{position:absolute;top:18px;right:18px;background:none;border:none;cursor:pointer;color:var(--ts);font-size:20px;line-height:1;padding:4px}
+.dc-modal h3{font-family:var(--font);font-weight:600;font-size:22px;margin-bottom:8px;letter-spacing:-0.01em}
+.dc-modal .dc-sub{font-size:12.5px;color:var(--ts);margin-bottom:28px;line-height:1.6}
+.dc-provider-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;font-family:var(--fb);font-weight:600;font-size:12.5px;padding:13px;margin-bottom:11px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);cursor:pointer}
+.dc-provider-btn:hover{border-color:var(--text)}
+.dc-field{width:100%;font-family:var(--fb);font-size:13px;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text)}
+.dc-primary-btn{width:100%;font-family:var(--font);font-weight:600;font-size:13px;padding:13px;background:var(--text);color:#fff;border:none;border-radius:6px;cursor:pointer}
+.dc-primary-btn:disabled{opacity:.4;cursor:default}
+.dc-status{font-size:11.5px;color:var(--ts);margin-top:12px;min-height:16px;line-height:1.6}
+.dc-status.err{color:#a8442a}
+.dc-back-link{display:inline-block;margin-top:16px;font-size:11px;color:var(--ts);text-decoration:underline;cursor:pointer;background:none;border:none}
+.dc-step{display:none}
+.dc-step.on{display:block}
+#dcRecaptchaContainer{display:none}
+
+.proj-sync-note{font-size:11px;color:var(--tm);font-family:var(--fb);line-height:1.5;margin-bottom:10px}
+.proj-sync-note a{color:var(--accent);font-weight:600;cursor:pointer}
+
 /* ---------- LAYOUT ---------- */
 .app{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:1fr 360px;overflow:hidden}
 @media(max-width:900px){ .app{grid-template-columns:1fr 320px} }
@@ -270,6 +319,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
     Import DXF
   </button>
   <input type="file" id="dxf-input" accept=".dxf" style="display:none">
+  <div class="hdr-sep"></div>
+  <span id="navAccount">
+    <button class="nav-signin-btn" id="btnSignIn">Sign in</button>
+  </span>
 </header>
 
 <div class="app">
@@ -335,6 +388,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 
     <div class="ss">
       <div class="sl">Saved projects</div>
+      <div class="proj-sync-note" id="projSyncNote">Signed out — saved on this device only. <a id="projSignInLink">Sign in</a> to sync across devices.</div>
       <div class="proj-save-row">
         <input type="text" id="projectNameInput" placeholder="Project name" maxlength="60">
         <button class="proj-save-btn" id="btn-save-project" title="Save the current layer colours, weights, opacity and text scale under this name">Save</button>
@@ -412,6 +466,185 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
   <p><strong>Hatching needs a closed loop.</strong> A shape only fills with colour if its outline forms one unbroken loop — a closed polyline, or lines and arcs that connect exactly end to end with no gaps or overlaps. Anything left open renders as an outline only, so if a fill isn't showing up, check that boundary is fully closed before raising its Fill opacity.</p>
   <button class="cpop-close" id="infoPop-close">Close</button>
 </div>
+
+<!-- Sign-in modal (shared pattern, see account.html / feasibility-studio.html) -->
+<div class="dc-modal-overlay" id="signInOverlay">
+  <div class="dc-modal">
+    <button class="dc-modal-close" data-close="signInOverlay">&times;</button>
+    <div class="dc-step on" id="stepProviders">
+      <h3>Sign in</h3>
+      <p class="dc-sub">Google, phone, or email — so your saved projects follow you across devices.</p>
+      <button class="dc-provider-btn" id="btnGoogle">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.86-.08-1.68-.22-2.47H12v4.68h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.84z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.88-3a7.4 7.4 0 0 1-11-3.9H1.05v3.09A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.05 14.2a7.2 7.2 0 0 1 0-4.4V6.71H1.05a12 12 0 0 0 0 10.58z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44A11.6 11.6 0 0 0 12 0 12 12 0 0 0 1.05 6.71l4 3.1A7.16 7.16 0 0 1 12 4.75z"/></svg>
+        Continue with Google
+      </button>
+      <button class="dc-provider-btn" id="btnUsePhone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Continue with Phone
+      </button>
+      <button class="dc-provider-btn" id="btnUseEmail">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        Continue with Email
+      </button>
+      <p class="dc-status" id="providerStatus"></p>
+    </div>
+    <div class="dc-step" id="stepPhoneNumber">
+      <h3>Enter your phone number</h3>
+      <p class="dc-sub">We'll text you a one-time code. Include your country code.</p>
+      <input class="dc-field" type="tel" id="phoneInput" placeholder="+91 98765 43210">
+      <button class="dc-primary-btn" id="btnSendCode">Send code</button>
+      <p class="dc-status" id="phoneStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+    <div class="dc-step" id="stepPhoneCode">
+      <h3>Enter the code</h3>
+      <p class="dc-sub">Sent by SMS just now.</p>
+      <input class="dc-field" type="text" inputmode="numeric" id="codeInput" placeholder="123456" maxlength="6">
+      <button class="dc-primary-btn" id="btnConfirmCode">Confirm</button>
+      <p class="dc-status" id="codeStatus"></p>
+      <button class="dc-back-link" data-back="stepPhoneNumber">&larr; Back</button>
+    </div>
+    <div class="dc-step" id="stepEmail">
+      <h3>Enter your email</h3>
+      <p class="dc-sub">We'll send you a sign-in link — no password to remember.</p>
+      <input class="dc-field" type="email" id="emailInput" placeholder="you@example.com">
+      <button class="dc-primary-btn" id="btnSendEmailLink">Send link</button>
+      <p class="dc-status" id="emailStatus"></p>
+      <button class="dc-back-link" data-back="stepProviders">&larr; Back</button>
+    </div>
+    <div class="dc-step" id="stepEmailSent">
+      <h3>Check your inbox</h3>
+      <p class="dc-sub">Click the link we just sent — it'll bring you straight back here, signed in.</p>
+    </div>
+  </div>
+</div>
+<div id="dcRecaptchaContainer"></div>
+
+<script type="module">
+import {
+  DC_FIREBASE_CONFIGURED, onDCAuthChange, dcAccountSummary,
+  dcSignInWithGoogle, dcSignOut, dcStartPhoneSignIn, dcConfirmPhoneCode,
+  dcSendEmailLink, dcCompleteEmailLinkSignInIfPresent, dcFirestore,
+} from './assets/js/dc-auth.js';
+import {
+  collection, doc, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp,
+} from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+
+// ── Sign-in modal wiring (shared pattern, see feasibility-studio.html) ──
+const signInOverlay = document.getElementById('signInOverlay');
+function showStep(id) { document.querySelectorAll('.dc-step').forEach(s => s.classList.toggle('on', s.id === id)); }
+function openModal(overlay) { overlay.classList.add('on'); }
+function closeModal(overlay) { overlay.classList.remove('on'); }
+document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal(document.getElementById(btn.dataset.close))));
+document.querySelectorAll('[data-back]').forEach(btn => btn.addEventListener('click', () => showStep(btn.dataset.back)));
+signInOverlay.addEventListener('click', e => { if (e.target === signInOverlay) closeModal(signInOverlay); });
+function notConfiguredMessage(el) { el.textContent = "Sign-in isn't switched on yet — check back soon."; el.className = 'dc-status err'; }
+function openSignIn() { showStep('stepProviders'); openModal(signInOverlay); }
+window.dcOpenSignIn = openSignIn;
+
+document.getElementById('btnGoogle').addEventListener('click', async () => {
+  if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage(document.getElementById('providerStatus'));
+  const status = document.getElementById('providerStatus');
+  status.textContent = 'Opening Google sign-in…'; status.className = 'dc-status';
+  try { await dcSignInWithGoogle(); closeModal(signInOverlay); }
+  catch (err) { status.textContent = err.message; status.className = 'dc-status err'; }
+});
+document.getElementById('btnUsePhone').addEventListener('click', () => { if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage(document.getElementById('providerStatus')); showStep('stepPhoneNumber'); });
+document.getElementById('btnSendCode').addEventListener('click', async () => {
+  const phone = document.getElementById('phoneInput').value.trim();
+  const phoneStatus = document.getElementById('phoneStatus');
+  if (!phone.startsWith('+')) { phoneStatus.textContent = 'Include the country code, e.g. +91…'; phoneStatus.className = 'dc-status err'; return; }
+  const btn = document.getElementById('btnSendCode');
+  btn.disabled = true; phoneStatus.textContent = 'Sending…'; phoneStatus.className = 'dc-status';
+  try { await dcStartPhoneSignIn(phone, 'dcRecaptchaContainer'); showStep('stepPhoneCode'); }
+  catch (err) { phoneStatus.textContent = err.message; phoneStatus.className = 'dc-status err'; }
+  btn.disabled = false;
+});
+document.getElementById('btnConfirmCode').addEventListener('click', async () => {
+  const codeStatus = document.getElementById('codeStatus');
+  codeStatus.textContent = 'Checking…'; codeStatus.className = 'dc-status';
+  try { await dcConfirmPhoneCode(document.getElementById('codeInput').value.trim()); closeModal(signInOverlay); }
+  catch (err) { codeStatus.textContent = err.message; codeStatus.className = 'dc-status err'; }
+});
+document.getElementById('btnUseEmail').addEventListener('click', () => { if (!DC_FIREBASE_CONFIGURED) return notConfiguredMessage(document.getElementById('providerStatus')); showStep('stepEmail'); });
+document.getElementById('btnSendEmailLink').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value.trim();
+  const emailStatus = document.getElementById('emailStatus');
+  if (!email.includes('@')) { emailStatus.textContent = "That doesn't look like an email address."; emailStatus.className = 'dc-status err'; return; }
+  emailStatus.textContent = 'Sending…'; emailStatus.className = 'dc-status';
+  try { await dcSendEmailLink(email); showStep('stepEmailSent'); }
+  catch (err) { emailStatus.textContent = err.message; emailStatus.className = 'dc-status err'; }
+});
+if (DC_FIREBASE_CONFIGURED) dcCompleteEmailLinkSignInIfPresent().catch(() => {});
+document.getElementById('projSignInLink').addEventListener('click', openSignIn);
+
+// ── Cloud-backed saved projects — see the SAVED PROJECTS section further
+// down for loadProjects()/renderProjectsList()/etc, which this feeds. ──
+let cloudUid = null;
+let cloudProjects = [];
+let unsubCloudProjects = null;
+window.dcCloud = {
+  isCloudMode: () => !!cloudUid,
+  getCloudProjects: () => cloudProjects,
+  getUid: () => cloudUid,
+  collection: (...args) => collection(dcFirestore, ...args),
+  doc: (...args) => doc(dcFirestore, ...args),
+  addDoc, setDoc, deleteDoc, serverTimestamp,
+};
+
+function setupCloudProjectListener(uid) {
+  if (unsubCloudProjects) unsubCloudProjects();
+  const q = query(collection(dcFirestore, 'users', uid, 'floorPlanProjects'), orderBy('savedAt', 'desc'));
+  unsubCloudProjects = onSnapshot(q, snap => {
+    cloudProjects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (window.renderProjectsList) window.renderProjectsList();
+  });
+}
+function teardownCloudProjectListener() {
+  if (unsubCloudProjects) { unsubCloudProjects(); unsubCloudProjects = null; }
+  cloudProjects = [];
+}
+
+onDCAuthChange(user => {
+  const navAccount = document.getElementById('navAccount');
+  const syncNote = document.getElementById('projSyncNote');
+
+  if (!user) {
+    navAccount.innerHTML = `<button class="nav-signin-btn" id="btnSignIn">Sign in</button>`;
+    document.getElementById('btnSignIn').addEventListener('click', openSignIn);
+    cloudUid = null;
+    teardownCloudProjectListener();
+    if (window.onCloudModeChanged) window.onCloudModeChanged();
+    syncNote.innerHTML = 'Signed out — saved on this device only. <a id="projSignInLink">Sign in</a> to sync across devices.';
+    document.getElementById('projSignInLink').addEventListener('click', openSignIn);
+    return;
+  }
+
+  const s = dcAccountSummary(user);
+  navAccount.innerHTML = `
+    <div class="nav-item">
+      <button class="nav-signin-btn" style="display:inline-flex;align-items:center;">${(user.displayName || user.email || 'Account').split(' ')[0]}</button>
+      <div class="dropdown-wrap">
+        <div class="dropdown">
+          <div class="dropdown-info">
+            <span class="dropdown-pill ${s.pillClass}"><span class="dot"></span>${s.pillLabel}</span>
+            ${s.planLabel ? `<div class="dropdown-plan">${s.planLabel}</div>` : ''}
+            ${s.detail ? `<div class="dropdown-detail">${s.detail}</div>` : ''}
+          </div>
+          <a href="account.html">View account</a>
+          <a href="#" id="btnSignOut">Sign out</a>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('btnSignOut').addEventListener('click', (e) => { e.preventDefault(); dcSignOut(); });
+
+  cloudUid = user.uid;
+  setupCloudProjectListener(cloudUid);
+  if (window.onCloudModeChanged) window.onCloudModeChanged();
+  syncNote.textContent = `Signed in as ${user.email || user.phoneNumber || 'you'} — projects sync to this account.`;
+});
+</script>
 
 <script>
 // ══════════════════════════════════════════════════════
@@ -1231,25 +1464,43 @@ document.getElementById('textScaleSlider').addEventListener('input', function() 
 
 // ══════════════════════════════════════════════════════
 // SAVED PROJECTS — a named preset of layer colours/weights/opacity, paper
-// setup and text scale, kept in this browser's localStorage (there's no
-// backend here, so presets live on this device/browser only). Saving marks
-// that preset "active"; importing a later revision of the same drawing
-// while a preset is active re-matches its layer styles onto the new file's
-// layers BY NAME, instead of resetting everything to fresh auto-picked
-// defaults — DXF layer names are stable across revisions even when the
-// geometry changes, so name-matching is what makes "re-upload the updated
-// drawing" work without redoing all the styling.
+// setup and text scale. Saving marks that preset "active"; importing a
+// later revision of the same drawing while a preset is active re-matches
+// its layer styles onto the new file's layers BY NAME, instead of
+// resetting everything to fresh auto-picked defaults — DXF layer names
+// are stable across revisions even when the geometry changes, so name-
+// matching is what makes "re-upload the updated drawing" work without
+// redoing all the styling.
+//
+// Signed out: kept in this browser's localStorage (device/browser-only).
+// Signed in: kept in Firestore under users/{uid}/floorPlanProjects, so the
+// same account sees the same saved projects on any device. The bridge to
+// Firebase Auth/Firestore lives in the `<script type="module">` above
+// (window.dcCloud + the onDCAuthChange handler there, which calls back
+// into window.renderProjectsList/window.onCloudModeChanged here) since
+// `import` needs a module script and this one deliberately isn't one.
 // ══════════════════════════════════════════════════════
 const PROJECTS_KEY = 'fpr_saved_projects_v1';
 let currentProjectId = null;
 
-function loadProjects() {
+function isCloudMode() { return window.dcCloud && window.dcCloud.isCloudMode(); }
+
+function loadLocalProjects() {
   try { return JSON.parse(localStorage.getItem(PROJECTS_KEY)) || []; }
   catch { return []; }
 }
-function persistProjects(list) {
+function persistLocalProjects(list) {
   try { localStorage.setItem(PROJECTS_KEY, JSON.stringify(list)); }
   catch (err) { console.error('Could not save project — localStorage unavailable', err); }
+}
+function loadProjects() {
+  return isCloudMode() ? window.dcCloud.getCloudProjects() : loadLocalProjects();
+}
+function savedAtMillis(p) {
+  if (!p.savedAt) return 0;
+  if (typeof p.savedAt === 'string') return new Date(p.savedAt).getTime();
+  if (typeof p.savedAt.toMillis === 'function') return p.savedAt.toMillis();
+  return 0;
 }
 
 function captureCurrentStyling() {
@@ -1294,7 +1545,7 @@ function renderProjectsList() {
     container.innerHTML = '<div class="proj-empty">No saved projects yet — style a drawing the way you want, then save it here.</div>';
     return;
   }
-  container.innerHTML = list.slice().sort((a,b)=>b.savedAt.localeCompare(a.savedAt)).map(p => `
+  container.innerHTML = list.slice().sort((a,b)=>savedAtMillis(b)-savedAtMillis(a)).map(p => `
     <div class="proj-row${p.id === currentProjectId ? ' active' : ''}">
       <span class="proj-name" title="${esc(p.name)}">${esc(p.name)}</span>
       <button class="proj-btn proj-load" data-id="${esc(p.id)}" title="Apply this project's saved styling to the current drawing, and use it for future re-uploads">Load</button>
@@ -1315,17 +1566,25 @@ function renderProjectsList() {
     });
   });
   container.querySelectorAll('.proj-del').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       if (!confirm('Delete this saved project?')) return;
-      const next = loadProjects().filter(p => p.id !== btn.dataset.id);
-      persistProjects(next);
+      if (isCloudMode()) {
+        try { await window.dcCloud.deleteDoc(window.dcCloud.doc('users', window.dcCloud.getUid(), 'floorPlanProjects', btn.dataset.id)); }
+        catch (err) { alert('Could not delete: ' + err.message); return; }
+        // The Firestore listener's onSnapshot re-renders the list once the delete lands.
+      } else {
+        const next = loadLocalProjects().filter(p => p.id !== btn.dataset.id);
+        persistLocalProjects(next);
+      }
       if (currentProjectId === btn.dataset.id) currentProjectId = null;
       renderProjectsList();
     });
   });
 }
+window.renderProjectsList = renderProjectsList;
+window.onCloudModeChanged = () => { currentProjectId = null; renderProjectsList(); };
 
-document.getElementById('btn-save-project').addEventListener('click', () => {
+document.getElementById('btn-save-project').addEventListener('click', async () => {
   const input = document.getElementById('projectNameInput');
   const typed = input.value.trim();
   const list = loadProjects();
@@ -1335,17 +1594,44 @@ document.getElementById('btn-save-project').addEventListener('click', () => {
 
   const styling = captureCurrentStyling();
   const matchIdx = list.findIndex(p => p.id === currentProjectId || p.name === name);
-  if (matchIdx >= 0) {
-    list[matchIdx] = { ...list[matchIdx], name, ...styling, savedAt: new Date().toISOString() };
-    currentProjectId = list[matchIdx].id;
+  const saveBtn = document.getElementById('btn-save-project');
+
+  if (isCloudMode()) {
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      const uid = window.dcCloud.getUid();
+      if (matchIdx >= 0) {
+        await window.dcCloud.setDoc(
+          window.dcCloud.doc('users', uid, 'floorPlanProjects', list[matchIdx].id),
+          { name, ...styling, savedAt: window.dcCloud.serverTimestamp() }, { merge: true }
+        );
+        currentProjectId = list[matchIdx].id;
+      } else {
+        const ref = await window.dcCloud.addDoc(
+          window.dcCloud.collection('users', uid, 'floorPlanProjects'),
+          { name, ...styling, savedAt: window.dcCloud.serverTimestamp() }
+        );
+        currentProjectId = ref.id;
+      }
+      input.value = '';
+      // The Firestore listener's onSnapshot re-renders the list once the write lands.
+    } catch (err) {
+      alert('Could not save: ' + err.message);
+    }
+    saveBtn.disabled = false; saveBtn.textContent = 'Save';
   } else {
-    const proj = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, ...styling, savedAt: new Date().toISOString() };
-    list.push(proj);
-    currentProjectId = proj.id;
+    if (matchIdx >= 0) {
+      list[matchIdx] = { ...list[matchIdx], name, ...styling, savedAt: new Date().toISOString() };
+      currentProjectId = list[matchIdx].id;
+    } else {
+      const proj = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, ...styling, savedAt: new Date().toISOString() };
+      list.push(proj);
+      currentProjectId = proj.id;
+    }
+    persistLocalProjects(list);
+    input.value = '';
+    renderProjectsList();
   }
-  persistProjects(list);
-  input.value = '';
-  renderProjectsList();
 });
 
 renderProjectsList();
