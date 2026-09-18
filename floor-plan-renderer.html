@@ -1242,6 +1242,24 @@ document.getElementById('btn-zo').addEventListener('click',()=>{C.scale*=0.8;app
 // table for a colour/linetype hint per layer, and produces the same
 // {bounds, layers, blocks} shape as the embedded demo.
 // ══════════════════════════════════════════════════════
+// Strips DXF/MTEXT inline formatting codes down to plain text. Order matters:
+// bare escapes with no semicolon terminator (\P paragraph break, \~ non-break
+// space) must be converted to whitespace FIRST — otherwise the semicolon-
+// terminated-code regex below greedily matches from that bare escape all the
+// way to the NEXT unrelated code's semicolon, silently deleting the paragraph
+// break along with the word boundary it represented (e.g. "room\P{\Fx;A..."
+// collapsing to "roomA..." instead of "room A...").
+function cleanMTextValue(raw) {
+  return String(raw || '')
+    .replace(/\\U\+([0-9A-Fa-f]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/\\P/g, ' ')
+    .replace(/\\~/g, ' ')
+    .replace(/\\[A-Za-z][^;{}\\]*;/g, '')
+    .replace(/[{}]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function parseAnyDXF(text) {
   const lines = text.split(/\r?\n/);
   const tok = [];
@@ -1391,28 +1409,51 @@ function parseAnyDXF(text) {
 
   function ex(x,y){if(x<fp.bounds.x0)fp.bounds.x0=x;if(y<fp.bounds.y0)fp.bounds.y0=y;if(x>fp.bounds.x1)fp.bounds.x1=x;if(y>fp.bounds.y1)fp.bounds.y1=y;}
 
+  // Real-world DXFs commonly carry a block reference (usually furniture,
+  // pasted from a library/catalog file) that was never dragged into place
+  // and still sits at some far-off origin — sometimes hundreds of metres
+  // or more from the actual drawing. A single such INSERT can blow the
+  // overall bounds out by orders of magnitude, which wrecks "fit to page"
+  // for the entire drawing (the real building shrinks to an invisible
+  // speck). So bounds are computed in two passes: first from every
+  // non-INSERT entity (the building's own lines/polylines/text, which is
+  // never a stray library reference), then INSERT positions are folded in
+  // only if they land within a generous multiple of that core drawing's
+  // own size — anything further out is treated as a misplaced block and
+  // excluded from the fit calculation, though it's still rendered normally.
+  for (const e of rawEnts) {
+    if (e.type === 'INSERT') continue;
+    const T = e.type;
+    if ((T==='LWPOLYLINE'||T==='PATH') && e.verts) { for (const v of e.verts) ex(v.x,v.y); }
+    else if (T==='LINE') { ex(e.x,e.y); ex(e.x2,e.y2); }
+    else if (T==='ARC' && e.r) { ex(e.x-e.r,e.y-e.r); ex(e.x+e.r,e.y+e.r); }
+    else if (T==='CIRCLE' && e.r) { ex(e.x-e.r,e.y-e.r); ex(e.x+e.r,e.y+e.r); }
+    else if ((T==='TEXT'||T==='MTEXT') && e.text!==undefined && e.x!==undefined) ex(e.x,e.y);
+  }
+  const core = { ...fp.bounds };
+  const coreOk = isFinite(core.x0) && isFinite(core.x1);
+  const coreCx = coreOk ? (core.x0+core.x1)/2 : 0;
+  const coreCy = coreOk ? (core.y0+core.y1)/2 : 0;
+  const coreDiag = coreOk ? Math.max(Math.hypot(core.x1-core.x0, core.y1-core.y0), 1) : Infinity;
+  const INSERT_OUTLIER_MULT = 1.5;
+
   for (const e of rawEnts) {
     const L = e.layer || '0';
     const T = e.type;
     if ((T==='LWPOLYLINE'||T==='PATH') && e.verts) {
-      for (const v of e.verts) ex(v.x,v.y);
       ensureLayer(L).entities.push({kind:'poly', type:T, closed:!!e.closed, verts:e.verts});
     } else if (T==='LINE') {
-      ex(e.x,e.y); ex(e.x2,e.y2);
       ensureLayer(L).entities.push({kind:'line', x1:e.x,y1:e.y,x2:e.x2,y2:e.y2});
     } else if (T==='ARC' && e.r) {
-      ex(e.x-e.r,e.y-e.r); ex(e.x+e.r,e.y+e.r);
       ensureLayer(L).entities.push({kind:'arc', x:e.x,y:e.y,r:e.r,sa:e.sa||0,ea:e.ea||0});
     } else if (T==='CIRCLE' && e.r) {
-      ex(e.x-e.r,e.y-e.r); ex(e.x+e.r,e.y+e.r);
       ensureLayer(L).entities.push({kind:'circle', x:e.x,y:e.y,r:e.r});
     } else if (T==='INSERT') {
-      ex(e.x||0, e.y||0);
-      ensureLayer(L).entities.push({kind:'insert', block:e.name||'', layer:L, ix:e.x||0, iy:e.y||0, sx:e.sx||1, sy:e.sy||1, rot:e.rot||0});
+      const ix=e.x||0, iy=e.y||0;
+      if (!coreOk || Math.hypot(ix-coreCx, iy-coreCy) <= coreDiag*INSERT_OUTLIER_MULT) ex(ix, iy);
+      ensureLayer(L).entities.push({kind:'insert', block:e.name||'', layer:L, ix, iy, sx:e.sx||1, sy:e.sy||1, rot:e.rot||0});
     } else if ((T==='TEXT'||T==='MTEXT') && e.text!==undefined && e.x!==undefined) {
-      ex(e.x,e.y);
-      const raw = e.text;
-      const clean = raw.replace(/\\[A-Za-z][^;]*;/g,'').replace(/[{}]/g,'').replace(/\\P/g,' ').trim();
+      const clean = cleanMTextValue(e.text);
       if (clean) ensureLayer(L).entities.push({kind:'text', x:e.x, y:e.y, h:e.height||150, w:e.width||0, rot:0, attach:e.attach||1, t:clean});
     }
     // DIMENSION entities are intentionally skipped: their geometry is
