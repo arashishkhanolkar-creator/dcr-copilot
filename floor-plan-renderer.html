@@ -482,6 +482,13 @@ function bulgeToPath(verts, closed, tx, ty) {
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
+let _measureCtx = null;
+function measureTextWidth(str, fontPx) {
+  if (!_measureCtx) _measureCtx = document.createElement('canvas').getContext('2d');
+  _measureCtx.font = `500 ${fontPx}px "Space Grotesk", sans-serif`;
+  return _measureCtx.measureText(str).width;
+}
+
 function dashArrayFor(lineType, baseSW) {
   switch(lineType){
     case 'dashed': return `${(baseSW*6).toFixed(2)},${(baseSW*4).toFixed(2)}`;
@@ -552,14 +559,18 @@ function buildSVG(t) {
     const anchor = t_.anchorOverride || anchorMap[t_.attach] || 'start';
     let lines = t_.t.split(/\\n|\n| \\n/g).filter(l=>l.trim());
     if (t_.w > 0) {
-      const maxChars = Math.max(1, Math.floor(t_.w * s / parseFloat(fh)));
+      // Wrap by actual measured glyph width, not a character-count guess —
+      // assuming each character is as wide as the font is tall (the old
+      // approach) is roughly 2x too wide for this font, which wrapped text
+      // into far more, far shorter lines than the box actually has room for.
+      const boxWidthPx = t_.w * s;
       const wrapped = [];
       lines.forEach(line => {
         const words = line.trim().split(/\s+/);
         let cur = '';
         words.forEach(word => {
           const candidate = cur ? cur + ' ' + word : word;
-          if (candidate.length > maxChars && cur) { wrapped.push(cur); cur = word; }
+          if (cur && measureTextWidth(candidate, parseFloat(fh)) > boxWidthPx) { wrapped.push(cur); cur = word; }
           else cur = candidate;
         });
         if (cur) wrapped.push(cur);
