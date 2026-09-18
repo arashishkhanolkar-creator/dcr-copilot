@@ -96,6 +96,33 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 .sub-row input[type=range]{flex:1;min-width:0;height:4px;accent-color:var(--accent)}
 .sub-row-val{font-size:11.5px;font-weight:600;color:var(--text);font-family:var(--fb);flex-shrink:0;min-width:34px;text-align:right}
 .lsw-sm{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--bstrong);cursor:pointer;flex-shrink:0;transition:transform .15s}
+
+/* SAVED PROJECTS */
+.proj-save-row{display:flex;gap:6px}
+.proj-save-row input[type=text]{
+  flex:1;min-width:0;font-family:var(--fb);font-size:12px;padding:7px 9px;
+  border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);
+}
+.proj-save-row input[type=text]:focus{outline:none;border-color:var(--accent)}
+.proj-save-btn{
+  flex-shrink:0;padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:7px;
+  font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;
+}
+.proj-save-btn:hover{opacity:.9}
+.proj-empty{font-size:11.5px;color:var(--tm);font-family:var(--fb);margin-top:10px}
+.proj-row{
+  display:flex;align-items:center;gap:6px;margin-top:8px;padding:7px 9px;
+  border:1px solid var(--border);border-radius:7px;background:var(--s2);
+}
+.proj-row.active{border-color:var(--accent);background:var(--al)}
+.proj-name{flex:1;min-width:0;font-size:12px;font-weight:500;color:var(--text);font-family:var(--fb);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-btn{
+  flex-shrink:0;border:none;background:none;cursor:pointer;font-family:var(--fb);
+  font-size:11px;font-weight:600;color:var(--ts);padding:3px 7px;border-radius:5px;
+}
+.proj-btn:hover{background:var(--border);color:var(--text)}
+.proj-btn.proj-del{font-size:14px;font-weight:700;padding:2px 7px}
 .lsw-sm:hover{transform:scale(1.1)}
 
 /* Export — pinned below the tabs, always visible regardless of which
@@ -290,6 +317,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 </div>
 
 <aside class="sb">
+
+  <div class="ss">
+    <div class="sl">Saved projects</div>
+    <div class="proj-save-row">
+      <input type="text" id="projectNameInput" placeholder="Project name" maxlength="60">
+      <button class="proj-save-btn" id="btn-save-project" title="Save the current layer colours, weights, opacity and text scale under this name">Save</button>
+    </div>
+    <div id="projectsList"></div>
+  </div>
 
   <div class="ss">
     <div class="sl">Text size</div>
@@ -1168,6 +1204,127 @@ document.getElementById('textScaleSlider').addEventListener('input', function() 
 });
 
 // ══════════════════════════════════════════════════════
+// SAVED PROJECTS — a named preset of layer colours/weights/opacity, paper
+// setup and text scale, kept in this browser's localStorage (there's no
+// backend here, so presets live on this device/browser only). Saving marks
+// that preset "active"; importing a later revision of the same drawing
+// while a preset is active re-matches its layer styles onto the new file's
+// layers BY NAME, instead of resetting everything to fresh auto-picked
+// defaults — DXF layer names are stable across revisions even when the
+// geometry changes, so name-matching is what makes "re-upload the updated
+// drawing" work without redoing all the styling.
+// ══════════════════════════════════════════════════════
+const PROJECTS_KEY = 'fpr_saved_projects_v1';
+let currentProjectId = null;
+
+function loadProjects() {
+  try { return JSON.parse(localStorage.getItem(PROJECTS_KEY)) || []; }
+  catch { return []; }
+}
+function persistProjects(list) {
+  try { localStorage.setItem(PROJECTS_KEY, JSON.stringify(list)); }
+  catch (err) { console.error('Could not save project — localStorage unavailable', err); }
+}
+
+function captureCurrentStyling() {
+  return {
+    paperSize: C.paperSize, orientation: C.orientation,
+    scaleMode: C.scaleMode, scaleN: C.scaleN, textScale: C.textScale,
+    layerStyles: JSON.parse(JSON.stringify(layerStyles)),
+  };
+}
+
+// Shared by "Load" (apply to the drawing on screen right now) and DXF
+// import (apply to a freshly parsed drawing) — only touches layers whose
+// name exists in BOTH the saved preset and the current layerStyles, so a
+// layer that's new in the revised file just keeps its fresh default.
+function mergeProjectStyling(saved) {
+  if (!saved) return;
+  C.paperSize = saved.paperSize || C.paperSize;
+  C.orientation = saved.orientation || C.orientation;
+  C.scaleMode = saved.scaleMode || C.scaleMode;
+  C.scaleN = saved.scaleN || C.scaleN;
+  C.textScale = typeof saved.textScale === 'number' ? saved.textScale : C.textScale;
+  if (saved.layerStyles) {
+    for (const name in saved.layerStyles) {
+      if (layerStyles[name]) layerStyles[name] = { ...layerStyles[name], ...saved.layerStyles[name] };
+    }
+  }
+}
+
+function syncGlobalControlsUI() {
+  document.getElementById('paperSizeSelect').value = C.paperSize;
+  document.getElementById('orientBtn').style.transform = C.orientation === 'portrait' ? 'rotate(90deg)' : 'rotate(0deg)';
+  document.getElementById('scaleSelect').value = C.scaleMode === 'fit' ? 'fit' : String(C.scaleN);
+  const pct = Math.round(C.textScale * 100);
+  document.getElementById('textScaleSlider').value = pct;
+  document.getElementById('textScaleVal').textContent = pct + '%';
+}
+
+function renderProjectsList() {
+  const list = loadProjects();
+  const container = document.getElementById('projectsList');
+  if (!list.length) {
+    container.innerHTML = '<div class="proj-empty">No saved projects yet — style a drawing the way you want, then save it here.</div>';
+    return;
+  }
+  container.innerHTML = list.slice().sort((a,b)=>b.savedAt.localeCompare(a.savedAt)).map(p => `
+    <div class="proj-row${p.id === currentProjectId ? ' active' : ''}">
+      <span class="proj-name" title="${esc(p.name)}">${esc(p.name)}</span>
+      <button class="proj-btn proj-load" data-id="${esc(p.id)}" title="Apply this project's saved styling to the current drawing, and use it for future re-uploads">Load</button>
+      <button class="proj-btn proj-del" data-id="${esc(p.id)}" title="Delete">&times;</button>
+    </div>
+  `).join('');
+  container.querySelectorAll('.proj-load').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const proj = loadProjects().find(p => p.id === btn.dataset.id);
+      if (!proj) return;
+      currentProjectId = proj.id;
+      mergeProjectStyling(proj);
+      syncGlobalControlsUI();
+      renderLayerCards();
+      render();
+      fitView();
+      renderProjectsList();
+    });
+  });
+  container.querySelectorAll('.proj-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Delete this saved project?')) return;
+      const next = loadProjects().filter(p => p.id !== btn.dataset.id);
+      persistProjects(next);
+      if (currentProjectId === btn.dataset.id) currentProjectId = null;
+      renderProjectsList();
+    });
+  });
+}
+
+document.getElementById('btn-save-project').addEventListener('click', () => {
+  const input = document.getElementById('projectNameInput');
+  const typed = input.value.trim();
+  const list = loadProjects();
+  const existingActive = currentProjectId ? list.find(p => p.id === currentProjectId) : null;
+  const name = typed || (existingActive ? existingActive.name : '');
+  if (!name) { alert('Enter a project name to save.'); input.focus(); return; }
+
+  const styling = captureCurrentStyling();
+  const matchIdx = list.findIndex(p => p.id === currentProjectId || p.name === name);
+  if (matchIdx >= 0) {
+    list[matchIdx] = { ...list[matchIdx], name, ...styling, savedAt: new Date().toISOString() };
+    currentProjectId = list[matchIdx].id;
+  } else {
+    const proj = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, ...styling, savedAt: new Date().toISOString() };
+    list.push(proj);
+    currentProjectId = proj.id;
+  }
+  persistProjects(list);
+  input.value = '';
+  renderProjectsList();
+});
+
+renderProjectsList();
+
+// ══════════════════════════════════════════════════════
 // EXPORT QUALITY
 // ══════════════════════════════════════════════════════
 document.querySelectorAll('.rb').forEach(b => b.addEventListener('click', () => {
@@ -1593,6 +1750,15 @@ document.getElementById('dxf-input').addEventListener('change', function() {
       layerOrder = result.layerOrder;
       layerStyles = result.layerStyles;
       expandedLayers = new Set();
+
+      // A revised drawing's layers keep their names even when the geometry
+      // changes, so re-uploading under an active saved project reapplies
+      // that project's colours/weights/opacity instead of resetting to
+      // fresh auto-picked defaults.
+      if (currentProjectId) {
+        const activeProject = loadProjects().find(p => p.id === currentProjectId);
+        if (activeProject) { mergeProjectStyling(activeProject); syncGlobalControlsUI(); }
+      }
 
       renderLayerCards();
       document.getElementById('htag-filename').textContent = file.name.replace(/\.dxf$/i,'');
