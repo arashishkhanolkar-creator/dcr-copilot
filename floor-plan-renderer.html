@@ -166,8 +166,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
 .proj-empty{font-size:11.5px;color:var(--tm);font-family:var(--fb);margin-top:10px}
 .proj-row{
   display:flex;align-items:center;gap:6px;margin-top:8px;padding:7px 9px;
-  border:1px solid var(--border);border-radius:7px;background:var(--s2);
+  border:1px solid var(--border);border-radius:7px;background:var(--s2);cursor:pointer;
 }
+.proj-row:hover{border-color:var(--bstrong)}
 .proj-row.active{border-color:var(--accent);background:var(--al)}
 .proj-name{flex:1;min-width:0;font-size:12px;font-weight:500;color:var(--text);font-family:var(--fb);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -251,6 +252,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
   border:1px solid transparent;border-radius:5px;padding:3px 4px;background:none;cursor:pointer;
 }
 .stat-select:hover{border-color:var(--border);background:var(--s2)}
+.custom-scale-wrap{display:inline-flex;align-items:center;gap:3px;font-family:var(--fb);font-size:11.5px;font-weight:500;color:var(--text)}
+.custom-scale-wrap input{
+  width:52px;font-family:var(--fb);font-size:11.5px;font-weight:500;color:var(--text);
+  border:1px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--surface);
+}
+.custom-scale-wrap input:focus{outline:none;border-color:var(--accent)}
 .stat-orient{
   width:22px;height:22px;border:1px solid transparent;border-radius:5px;background:none;color:var(--ts);
   cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;
@@ -381,7 +388,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;}
         <option value="100">1:100</option>
         <option value="150">1:150</option>
         <option value="200">1:200</option>
+        <option value="custom">Custom…</option>
       </select>
+      <span class="custom-scale-wrap" id="customScaleWrap" style="display:none;">
+        1:<input type="number" id="customScaleInput" min="1" max="100000" step="1" placeholder="x">
+      </span>
       <span class="status-sep">·</span>
       <select class="stat-select" id="paperSizeSelect">
         <option value="A4">A4</option>
@@ -1460,10 +1471,28 @@ document.getElementById('orientBtn').addEventListener('click', function() {
   this.style.transform = C.orientation === 'portrait' ? 'rotate(90deg)' : 'rotate(0deg)';
   render(); fitView();
 });
+const customScaleWrap = document.getElementById('customScaleWrap');
+const customScaleInput = document.getElementById('customScaleInput');
 document.getElementById('scaleSelect').addEventListener('change', function() {
-  if (this.value === 'fit') { C.scaleMode = 'fit'; }
-  else { C.scaleMode = 'fixed'; C.scaleN = parseInt(this.value); }
+  if (this.value === 'fit') {
+    C.scaleMode = 'fit';
+    customScaleWrap.style.display = 'none';
+  } else if (this.value === 'custom') {
+    customScaleWrap.style.display = 'inline-flex';
+    const v = parseInt(customScaleInput.value, 10);
+    C.scaleMode = 'fixed';
+    C.scaleN = v > 0 ? v : (C.scaleN || 100);
+    customScaleInput.value = C.scaleN;
+    customScaleInput.focus();
+  } else {
+    C.scaleMode = 'fixed'; C.scaleN = parseInt(this.value);
+    customScaleWrap.style.display = 'none';
+  }
   render(); fitView();
+});
+customScaleInput.addEventListener('input', function() {
+  const v = parseInt(this.value, 10);
+  if (v > 0) { C.scaleMode = 'fixed'; C.scaleN = v; render(); fitView(); }
 });
 document.getElementById('textScaleSlider').addEventListener('input', function() {
   C.textScale = parseInt(this.value) / 100;
@@ -1541,7 +1570,24 @@ function mergeProjectStyling(saved) {
 function syncGlobalControlsUI() {
   document.getElementById('paperSizeSelect').value = C.paperSize;
   document.getElementById('orientBtn').style.transform = C.orientation === 'portrait' ? 'rotate(90deg)' : 'rotate(0deg)';
-  document.getElementById('scaleSelect').value = C.scaleMode === 'fit' ? 'fit' : String(C.scaleN);
+
+  const scaleSelect = document.getElementById('scaleSelect');
+  if (C.scaleMode === 'fit') {
+    scaleSelect.value = 'fit';
+    customScaleWrap.style.display = 'none';
+  } else {
+    scaleSelect.value = String(C.scaleN);
+    // No matching preset option (e.g. a custom scale restored from a saved
+    // project) — fall back to the Custom… option with its value shown.
+    if (scaleSelect.value !== String(C.scaleN)) {
+      scaleSelect.value = 'custom';
+      customScaleInput.value = C.scaleN;
+      customScaleWrap.style.display = 'inline-flex';
+    } else {
+      customScaleWrap.style.display = 'none';
+    }
+  }
+
   const pct = Math.round(C.textScale * 100);
   document.getElementById('textScaleSlider').value = pct;
   document.getElementById('textScaleVal').textContent = pct + '%';
@@ -1555,15 +1601,14 @@ function renderProjectsList() {
     return;
   }
   container.innerHTML = list.slice().sort((a,b)=>savedAtMillis(b)-savedAtMillis(a)).map(p => `
-    <div class="proj-row${p.id === currentProjectId ? ' active' : ''}">
+    <div class="proj-row${p.id === currentProjectId ? ' active' : ''}" data-id="${esc(p.id)}" title="Open this project — applies its saved styling to the current drawing, and uses it for future re-uploads">
       <span class="proj-name" title="${esc(p.name)}">${esc(p.name)}</span>
-      <button class="proj-btn proj-load" data-id="${esc(p.id)}" title="Apply this project's saved styling to the current drawing, and use it for future re-uploads">Load</button>
       <button class="proj-btn proj-del" data-id="${esc(p.id)}" title="Delete">&times;</button>
     </div>
   `).join('');
-  container.querySelectorAll('.proj-load').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const proj = loadProjects().find(p => p.id === btn.dataset.id);
+  container.querySelectorAll('.proj-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const proj = loadProjects().find(p => p.id === row.dataset.id);
       if (!proj) return;
       currentProjectId = proj.id;
       mergeProjectStyling(proj);
@@ -1575,7 +1620,8 @@ function renderProjectsList() {
     });
   });
   container.querySelectorAll('.proj-del').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       if (!confirm('Delete this saved project?')) return;
       if (isCloudMode()) {
         try { await window.dcCloud.deleteDoc(window.dcCloud.doc('users', window.dcCloud.getUid(), 'floorPlanProjects', btn.dataset.id)); }
